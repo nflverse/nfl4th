@@ -12,14 +12,75 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(nfl4th)
 library(tidyverse)
+
+data <- nflfastR::load_pbp(2020)
 ```
 
+## Feeding in nflfastR data
+Here's how to calculate all probs from the 2020 season:
 ```{r ex1}
-nflfastR::load_pbp(2020) %>%
+tictoc::tic("All plays from one week")
+data %>%
+  filter(week == 1) %>%
   nfl4th:::add_4th_probs() %>%
   head(10) %>%
   select(
     posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
   ) %>%
   knitr::kable(digits = 2)
+tictoc::toc()
 ```
+
+But this kind of takes a long time since it's a whole season. If you want a sub-sample, filter **at the game level** before invoking the function because the win probability model needs all plays in a game in order to work (i.e., not just the 4th downs or one team's plays). This is because it has to figure out which team received the opening kickoff.
+
+```{r ex2}
+tictoc::tic("One game")
+data %>%
+  filter(week == 20, home_team == "GB") %>%
+  nfl4th:::add_4th_probs() %>%
+  select(
+    posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+  ) %>%
+  knitr::kable(digits = 2)
+tictoc::toc()
+```
+
+We see the infamous field goal at the bottom.
+
+Let's input the play ourselves to see if we can get the same thing. The below shows the bare minimum amount of information that has to be fed to `nfl4th` in order to compute 4th down decision recommendations.
+
+The reason teams from a specific game have to be used is that the model depends on factors such as point spread, team totals, and indoor/outdoor and the program automatically looks these up so that users don't have to provide them.
+
+## Calculations from user input
+```{r ex3}
+test <- tibble::tibble(
+  
+  # things to help find the right game (use "reg" or "post")
+  home_team = "GB",
+  away_team = "TB",
+  posteam = "GB",
+  type = "post",
+  season = 2020,
+  
+  # information about the situation
+  qtr = 4,
+  quarter_seconds_remaining = 129,
+  ydstogo = 8,
+  yardline_100 = 8,
+  score_differential = -8,
+
+  home_opening_kickoff = 0,
+  posteam_timeouts_remaining = 3,
+  defteam_timeouts_remaining = 3
+)
+
+test %>%
+  nfl4th:::add_4th_probs() %>%
+  select(
+    posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+  ) %>%
+  knitr::kable(digits = 2)
+
+```
+
+

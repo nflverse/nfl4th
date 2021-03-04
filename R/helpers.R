@@ -58,7 +58,7 @@ prepare_df <- function(df) {
   df %>%
     # if an nflfastR df is passed, need to drop all this so we don't get redundant cols
     dplyr::select(-tidyselect::any_of(drop.cols)) %>%
-    left_join(games, by = c("home_team", "away_team", "type", "season")) %>%
+    left_join(.games_nfl4th, by = c("home_team", "away_team", "type", "season")) %>%
     mutate(
       receive_2h_ko = case_when(
         # 1st half, home team opened game with kickoff, away team has ball
@@ -216,7 +216,7 @@ rds_from_url <- function(.url){
   dat
 }
 
-games <- get_games_file()
+.games_nfl4th <- get_games_file()
 
 load_fd_model <- function() {
   fd_model <- NULL
