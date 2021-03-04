@@ -28,8 +28,3 @@ first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_w
 Get various probabilities associated with each option on 4th downs (go
 for it, kick field goal, punt).
 }
-\details{
-To load valid game_ids please use the package function
-\code{\link{fast_scraper_schedules}} (the function can directly handle the
-output of that function)
-}

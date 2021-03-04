@@ -10,9 +10,6 @@
 #' for it, kick field goal, punt).
 #'
 #' @param df A data frame of decisions to be computed for.
-#' @details To load valid game_ids please use the package function
-#' \code{\link{fast_scraper_schedules}} (the function can directly handle the
-#' output of that function)
 #' @return Original data frame Data frame plus the following columns added:
 #' \describe{
 #'  first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
@@ -35,7 +32,8 @@ add_4th_probs <- function(df) {
   if (!"home_opening_kickoff" %in% names(df)) {
     message("home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .")
     modified_df <- original_df %>%
-      prepare_nflfastr_data()
+      prepare_nflfastr_data() %>%
+      filter(down == 4)
   }
 
   message("Performing final preparation . . .")
@@ -50,6 +48,59 @@ add_4th_probs <- function(df) {
       first_down_prob, wp_fail, wp_succeed, go_wp,
       fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp,
       punt_wp
+    )
+
+  original_df %>%
+    left_join(df, by = c("index")) %>%
+    select(-index) %>%
+    return()
+
+}
+
+#' Get 2pt decision probs
+#'
+#' @description Get various probabilities associated with each option on PATs (go
+#' for it, kick PAT).
+#'
+#' @param df A data frame of decisions to be computed for.
+#' @return Original data frame Data frame plus the following columns added:
+#' \describe{
+#'  first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+#' \item{wp_0}{Win probability when scoring 0 points on PAT.}
+#' \item{wp_1}{Win probability when scoring 1 point on PAT.}
+#' \item{wp_2}{Win probability when scoring 2 points on PAT.}
+#' \item{conv_1pt}{Probability of making PAT kick.}
+#' \item{conv_2pt}{Probability of converting 2-pt attempt.}
+#' \item{wp_go1}{Win probability associated with going for 1.}
+#' \item{wp_go2}{Win probability associated with going for 2.}
+#' }
+#' @export
+add_2pt_probs <- function(df) {
+
+  original_df <- df %>% mutate(index = 1 : n())
+  modified_df <- original_df
+
+  if (!"home_opening_kickoff" %in% names(df)) {
+    message("home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .")
+    modified_df <- original_df %>%
+      prepare_nflfastr_data() %>%
+      filter(
+        !is.na(two_point_conv_result) | !is.na(extra_point_result)
+      )
+  }
+
+  message("Performing final preparation . . .")
+  df <- modified_df %>%
+    prepare_df()
+
+  message(glue::glue("Computing probabilities for  {nrow(df)} plays. . ."))
+  df <- df %>%
+    get_2pt_wp() %>%
+    select(
+      index,
+      wp_0, wp_1, wp_2,
+      conv_1pt, conv_2pt,
+      wp_go1, wp_go2
     )
 
   original_df %>%
