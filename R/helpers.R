@@ -186,12 +186,6 @@ prepare_nflfastr_data <- function(pbp) {
     ungroup() %>%
     filter(game_seconds_remaining > 10,
            !is.na(half_seconds_remaining), !is.na(qtr), !is.na(posteam)) %>%
-    mutate(
-      go = rush + pass,
-      go = if_else(play_type_nfl %in% c("PUNT", "FIELD_GOAL"), 0, go)
-    ) %>%
-    group_by(posteam, game_id, series) %>%
-    mutate(series_go = max(go)) %>%
     ungroup()
 
   return(data)

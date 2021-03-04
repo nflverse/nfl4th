@@ -27,7 +27,7 @@ data %>%
   filter(down == 4) %>%
   head(10) %>%
   select(
-    posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
   ) %>%
   knitr::kable(digits = 2)
 tictoc::toc()
@@ -42,7 +42,7 @@ data %>%
   nfl4th:::add_4th_probs() %>%
   filter(down == 4) %>%
   select(
-    posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
   ) %>%
   knitr::kable(digits = 2)
 tictoc::toc()
@@ -80,10 +80,9 @@ one_play <- tibble::tibble(
 one_play %>%
   nfl4th::add_4th_probs() %>%
   select(
-    posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
   ) %>%
   knitr::kable(digits = 2)
-
 ```
 
 ## Make a summary table
@@ -128,3 +127,73 @@ another %>%
 ```
 
 Note that the go for 2 probability here is identical to the win probability associated with a successful 4th down conversion above because the 4th down model assumes that the Packers would go for 2 if they scored.
+
+## Check coaches' alignment with the model
+
+```{r coaches}
+library(gt)
+
+calculated <- data %>%
+  nfl4th:::add_4th_probs() %>%
+  filter(down == 4, !is.na(go_boost)) 
+```
+
+```{r big-table, echo = FALSE}
+calculated %>%
+  mutate(go = ifelse((rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"), 100, 0)) %>%
+  group_by(posteam, game_id, series) %>%
+  dplyr::slice(1) %>%
+  ungroup() %>%
+  mutate(type = case_when(
+    go_boost >= 4 ~ "Definitely go for it",
+    go_boost > 1 & go_boost < 4 ~ "Probably go for it",
+    go_boost >= -1 & go_boost <= 1 ~ "Toss-up",
+    go_boost < -1 & go_boost > -4 ~ "Probably kick",
+    go_boost <= -4 ~ "Definitely kick"
+  )) %>%
+  group_by(type) %>%
+  summarize(go = mean(go), n = n()) %>%
+  ungroup() %>%
+  arrange(-go) %>%
+  gt::gt() %>%
+  cols_label(
+    type = "Recommendation",
+    go = "Went for it %",
+    n = "Plays"
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold"),
+    locations = list(
+      cells_row_groups(),
+      cells_column_labels(everything())
+    )
+  ) %>% 
+  tab_options(
+    row_group.border.top.width = px(3),
+    row_group.border.top.color = "black",
+    row_group.border.bottom.color = "black",
+    table_body.hlines.color = "white",
+    table.border.top.color = "black",
+    table.border.top.width = px(1),
+    table.border.bottom.color = "white",
+    table.border.bottom.width = px(1),
+    column_labels.border.bottom.color = "black",
+    column_labels.border.bottom.width = px(2),
+    data_row.padding = px(2),
+    table.font.size = px(16L)
+  ) %>%
+  fmt_number(
+    columns = vars(go), decimals = 0
+  ) %>%
+  cols_align(
+    columns = 2:3,
+    align = "center"
+  ) %>% 
+  tab_header(
+    title = md(glue::glue("NFL team decision-making by go recommendation, 2020"))
+  ) %>%
+  tab_source_note(md('**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points'))
+
+```
+
+Thus, we can see that the model is strongly aligned to what coaches do.

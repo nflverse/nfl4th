@@ -12,7 +12,7 @@ add_4th_probs(df)
 \value{
 Original data frame Data frame plus the following columns added:
 \describe{
-first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+\item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
 \item{first_down_prob}{Probability of earning a first down if going for it on 4th down.}
 \item{wp_fail}{Win probability in the event of a failed 4th down attempt.}
 \item{wp_succeed}{Win probability in the event of a successful 4th down attempt.}
