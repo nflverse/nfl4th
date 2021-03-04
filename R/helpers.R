@@ -211,3 +211,9 @@ add_probs <- function(df) {
     return()
 
 }
+
+rds_from_url <- function(.url){
+  con <- url(.url)
+  dat <- readRDS(con)
+  close(con)
+  dat
