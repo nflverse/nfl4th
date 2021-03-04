@@ -27,7 +27,7 @@ drop.cols <- c(
 # loading and cleaning games file
 get_games_file <- function() {
 
-  readRDS(url("https://github.com/leesharpe/nfldata/blob/master/data/games.rds?raw=true")) %>%
+  rds_from_url("https://github.com/leesharpe/nfldata/blob/master/data/games.rds?raw=true") %>%
     filter(season > 2013) %>%
     mutate(
       type = if_else(game_type == "REG", "reg", "post"),
@@ -217,3 +217,4 @@ rds_from_url <- function(.url){
   dat <- readRDS(con)
   close(con)
   dat
+}
