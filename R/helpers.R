@@ -52,8 +52,6 @@ get_games_file <- function() {
     return()
 }
 
-
-
 # data prep function
 prepare_df <- function(df) {
 
@@ -217,3 +215,5 @@ rds_from_url <- function(.url){
   close(con)
   dat
 }
+
+games <- get_games_file()
