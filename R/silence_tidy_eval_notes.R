@@ -14,6 +14,7 @@ away_team <-
   fd_pct <-
   fg_index <-
   fg_make_prob <-
+  fg_wp <-
   first_down_prob <-
   gain <-
   game_id <-
@@ -21,10 +22,12 @@ away_team <-
   game_type <-
   go <-
   go_index <-
+  go_wp <-
   half_seconds_remaining <-
   home_team <-
   home_timeouts_remaining <-
   home_total <-
+  index <-
   index_2pt <-
   make_fg_wp <-
   miss_fg_wp <-
@@ -46,6 +49,7 @@ away_team <-
   prob_1pt <-
   pts <-
   punt_index <-
+  punt_wp <-
   qtr <-
   quarter_seconds_remaining <-
   receive_2h_ko <-

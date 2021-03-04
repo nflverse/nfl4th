@@ -6,8 +6,8 @@
 
 #' Get 4th down decision probs
 #'
-#' @description Get various probabilities associated with each option on 4th downs (
-#' go for it, kick field goal, punt).
+#' @description Get various probabilities associated with each option on 4th downs (go
+#' for it, kick field goal, punt).
 #'
 #' @param df A data frame of decisions to be computed for.
 #' @details To load valid game_ids please use the package function
