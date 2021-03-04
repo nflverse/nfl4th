@@ -15,8 +15,6 @@ library(tidyverse)
 ```
 
 ```{r ex1}
-# load games file for getting game total, point spread, and roof
-games <- nfl4th:::get_games_file()
 nflfastR::load_pbp(2020) %>%
   nfl4th:::add_4th_probs() %>%
   head(10) %>%
