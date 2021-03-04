@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+First load the packages and some data.
+```{r setup, message = FALSE}
 library(nfl4th)
 library(tidyverse)
 
@@ -17,12 +18,13 @@ data <- nflfastR::load_pbp(2020)
 ```
 
 ## Feeding in nflfastR data
-Here's how to calculate all probs from the 2020 season:
+Here's how to calculate all probs from one week in the 2020 season:
 ```{r ex1}
 tictoc::tic("All plays from one week")
 data %>%
   filter(week == 1) %>%
   nfl4th:::add_4th_probs() %>%
+  filter(down == 4) %>%
   head(10) %>%
   select(
     posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
@@ -38,6 +40,7 @@ tictoc::tic("One game")
 data %>%
   filter(week == 20, home_team == "GB") %>%
   nfl4th:::add_4th_probs() %>%
+  filter(down == 4) %>%
   select(
     posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
   ) %>%
@@ -75,7 +78,7 @@ test <- tibble::tibble(
 )
 
 test %>%
-  nfl4th:::add_4th_probs() %>%
+  nfl4th::add_4th_probs() %>%
   select(
     posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
   ) %>%
