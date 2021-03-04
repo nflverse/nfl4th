@@ -1,1 +1,15 @@
 url: https://guga31bb.github.io/nfl4th
+
+template:
+  params:
+    bootswatch: sandstone
+  # opengraph:
+  #   image:
+  #     src: https://raw.githubusercontent.com/leesharpe/nflseedR/master/man/figures/gh_preview.png
+
+toc:
+  depth: 3
+
+authors:
+  Ben Baldwin:
+    href: https://twitter.com/benbbaldwin
