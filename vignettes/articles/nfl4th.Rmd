@@ -56,7 +56,7 @@ The reason teams from a specific game have to be used is that the model depends 
 
 ## Calculations from user input
 ```{r ex3}
-test <- tibble::tibble(
+one_play <- tibble::tibble(
   
   # things to help find the right game (use "reg" or "post")
   home_team = "GB",
@@ -77,7 +77,7 @@ test <- tibble::tibble(
   defteam_timeouts_remaining = 3
 )
 
-test %>%
+one_play %>%
   nfl4th::add_4th_probs() %>%
   select(
     posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
@@ -86,4 +86,47 @@ test %>%
 
 ```
 
+## Make a summary table
 
+Put the play above into a table.
+
+```{r table1}
+one_play %>%
+  nfl4th::add_4th_probs() %>%
+  nfl4th:::make_table_data() %>%
+  knitr::kable(digits = 1)
+```
+
+## Make a summary for a 2-point decision
+
+Let's put in the situation that would have happened if the Packers had scored a touchdown on the 4th & 8. We don't need a calculator to know that they should have gone for two, but what does the model say?
+
+```{r table2}
+another <- tibble::tibble(
+  
+  # things to help find the right game (use "reg" or "post")
+  home_team = "GB",
+  away_team = "TB",
+  posteam = "GB",
+  type = "post",
+  season = 2020,
+  
+  # information about the situation
+  qtr = 4,
+  quarter_seconds_remaining = 123,
+  ydstogo = 8,
+  yardline_100 = 8,
+  score_differential = -2,
+
+  home_opening_kickoff = 0,
+  posteam_timeouts_remaining = 3,
+  defteam_timeouts_remaining = 3
+)
+
+another %>%
+  nfl4th::add_2pt_probs() %>%
+  nfl4th:::make_2pt_table_data() %>%
+  knitr::kable(digits = 1)
+```
+
+Hi

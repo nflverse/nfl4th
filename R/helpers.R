@@ -184,7 +184,7 @@ prepare_nflfastr_data <- function(pbp) {
       runoff = 0
     ) %>%
     ungroup() %>%
-    filter(down == 4, game_seconds_remaining > 10,
+    filter(game_seconds_remaining > 10,
            !is.na(half_seconds_remaining), !is.na(qtr), !is.na(posteam)) %>%
     mutate(
       go = rush + pass,
