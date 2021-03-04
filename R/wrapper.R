@@ -12,7 +12,7 @@
 #' @param df A data frame of decisions to be computed for.
 #' @return Original data frame Data frame plus the following columns added:
 #' \describe{
-#'  first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+#' \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
 #' \item{first_down_prob}{Probability of earning a first down if going for it on 4th down.}
 #' \item{wp_fail}{Win probability in the event of a failed 4th down attempt.}
 #' \item{wp_succeed}{Win probability in the event of a successful 4th down attempt.}
@@ -40,11 +40,23 @@ add_4th_probs <- function(df) {
   df <- modified_df %>%
     prepare_df()
 
+  if (!"runoff" %in% names(df)) {
+    df$runoff <- 0L
+  }
+
   message(glue::glue("Computing probabilities for  {nrow(df)} plays. . ."))
   df <- df %>%
     add_probs() %>%
+    mutate(play_no = 1 : n()) %>%
+    group_by(play_no) %>%
+    mutate(
+      punt_prob = if_else(is.na(punt_wp), 0, punt_wp),
+      max_non_go = max(fg_wp, punt_prob, na.rm = T),
+      go_boost = 100 * (go_wp - max_non_go)
+    ) %>%
+    ungroup() %>%
     select(
-      index,
+      index, go_boost,
       first_down_prob, wp_fail, wp_succeed, go_wp,
       fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp,
       punt_wp
