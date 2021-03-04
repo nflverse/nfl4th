@@ -88,16 +88,16 @@ one_play %>%
 
 ## Make a summary table
 
-Put the play above into a table.
+Put the play above into a table. This function only works with one play at a time since it makes a table using the results from the play.
 
 ```{r table1}
 one_play %>%
   nfl4th::add_4th_probs() %>%
-  nfl4th:::make_table_data() %>%
+  nfl4th::make_table_data() %>%
   knitr::kable(digits = 1)
 ```
 
-## Make a summary for a 2-point decision
+## Make a summary table for a 2-point decision
 
 Let's put in the situation that would have happened if the Packers had scored a touchdown on the 4th & 8. We don't need a calculator to know that they should have gone for two, but what does the model say?
 
@@ -114,8 +114,6 @@ another <- tibble::tibble(
   # information about the situation
   qtr = 4,
   quarter_seconds_remaining = 123,
-  ydstogo = 8,
-  yardline_100 = 8,
   score_differential = -2,
 
   home_opening_kickoff = 0,
@@ -125,8 +123,8 @@ another <- tibble::tibble(
 
 another %>%
   nfl4th::add_2pt_probs() %>%
-  nfl4th:::make_2pt_table_data() %>%
+  nfl4th::make_2pt_table_data() %>%
   knitr::kable(digits = 1)
 ```
 
-Hi
+Note that the go for 2 probability here is identical to the win probability associated with a successful 4th down conversion above because the 4th down model assumes that the Packers would go for 2 if they scored.

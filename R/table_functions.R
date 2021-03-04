@@ -1,4 +1,10 @@
-# get the data from a situation into a table
+#' Get 4th down decision probs
+#'
+#' @description Get a table with the probabilities on 4th down.
+#'
+#' @param probs A data frame that has had `add_4th_probs()` already run on it.
+#' @return A table showing the probabilities associated with each decision.
+#' @export
 make_table_data <- function(probs) {
 
   go <- tibble::tibble(
@@ -42,8 +48,13 @@ make_table_data <- function(probs) {
 }
 
 
-# get the numbers that go into the table
-# this is a separate function in case one wants the actual numbers
+#' Get 2pt decision probs
+#'
+#' @description Get a table with the probabilities associated with a 2-pt decision.
+#'
+#' @param probs A data frame that has had `add_2pt_probs()` already run on it.
+#' @return A table showing the probabilities associated with each decision.
+#' @export
 make_2pt_table_data <- function(probs) {
 
   go <- tibble::tibble(
