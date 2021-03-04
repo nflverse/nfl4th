@@ -12,13 +12,18 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(nfl4th)
 library(tidyverse)
-# load games file for getting game total, point spread, and roof
-games <- get_games_file()
+
+
 
 ```
 
 ```{r ex1}
-nflfastR::load_pbp(2020)
-
-
+# load games file for getting game total, point spread, and roof
+games <- nfl4th:::get_games_file()
+nflfastR::load_pbp(2020) %>%
+  nfl4th:::add_4th_probs() %>%
+  select(
+    posteam, ydstogo, yardline_100, posteam, first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
+  ) %>%
+  knitr::kable(digits = 2)
 ```

@@ -194,7 +194,6 @@ prepare_nflfastr_data <- function(pbp) {
     ) %>%
     group_by(posteam, game_id, series) %>%
     mutate(series_go = max(go)) %>%
-    # dplyr::slice(1) %>%
     ungroup()
 
   return(data)
