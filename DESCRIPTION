@@ -13,6 +13,9 @@ Authors@R:
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 URL: https://guga31bb.github.io/nfl4th
+Imports: 
+    dplyr,
+    magrittr
 Suggests: 
     rmarkdown
 Encoding: UTF-8
