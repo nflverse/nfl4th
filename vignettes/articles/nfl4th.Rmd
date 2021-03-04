@@ -11,4 +11,14 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(nfl4th)
+library(tidyverse)
+# load games file for getting game total, point spread, and roof
+games <- get_games_file()
+
+```
+
+```{r ex1}
+nflfastR::load_pbp(2020)
+
+
 ```
