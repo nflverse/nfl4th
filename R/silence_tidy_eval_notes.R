@@ -1,0 +1,13 @@
+away_team <- away_timeouts_remaining <- away_total <- conv_1pt <- conv_2pt
+defteam_timeouts_remaining <- dome <- down <- end_of_half <- era <- era2 <- era3 <- era4
+fd_pct <- fg_index <- fg_make_prob <- first_down_prob <- gain <- game_id
+game_seconds_remaining <- game_type <- go <- go_index <- half_seconds_remaining
+home_team <- home_timeouts_remaining <- home_total <- index_2pt <- make_fg_wp
+miss_fg_wp <- model_roof <- muff <- new_prob <- original_posteam <- outdoors <- pass
+pct <- pct_0 <- play_type_nfl <- posteam <- posteam_spread
+posteam_timeouts_remaining <- posteam_total <- prior_posteam <- prob <- prob_1pt
+pts <- punt_index <- qtr <- quarter_seconds_remaining <- receive_2h_ko
+retractable <- roof <- runoff <- rush <- score_differential <- season <- series
+spread_line <- total_line <- turnover <- type <- value <- vegas_wp <- week <- wp_0 <- wp_1
+wp_2 <- wp_fail <- wp_go1 <- wp_go2 <- wp_succeed <- wp_td <- wt_wp <- yardline_100
+yardline_after <- ydstogo <- NULL
