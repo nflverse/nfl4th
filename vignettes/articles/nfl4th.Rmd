@@ -1,0 +1,14 @@
+---
+title: "nfl4th"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(nfl4th)
+```

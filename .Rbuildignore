@@ -1,0 +1,11 @@
+^nfl4th\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^README\.Rmd$
+^cran-comments\.md$
+^\.github$
+^vignettes/articles$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^data-raw$
