@@ -217,3 +217,13 @@ rds_from_url <- function(.url){
 }
 
 games <- get_games_file()
+
+load_fd_model <- function() {
+  fd_model <- NULL
+  con <- url("https://github.com/guga31bb/fourth_calculator/blob/main/data/fd_model.Rdata?raw=true")
+  try(load(con), silent = TRUE)
+  close(con)
+  fd_model
+}
+
+fd_model <- load_fd_model()
