@@ -1,20 +1,17 @@
 library(splines)
 
-# predicted go for it model
-load('data/observed_go_model.Rdata', .GlobalEnv)
-
 
 add_pred_go <- function(data) {
-  
+
   data$pred_go <- predict(fit_fourth, data %>% prepare_glm(), type="response")
-  
+
   return(data)
-  
+
 }
 
 # for cleaning after getting the probs
 clean_data <- function(fourth_downs) {
-  
+
   fourth_downs %>%
     mutate(play_no = 1 : n()) %>%
     group_by(play_no) %>%
@@ -40,7 +37,7 @@ clean_data <- function(fourth_downs) {
 # wrapper function to get 4th down numbers for a season
 # works for 2014-present
 load_season <- function(s, rebuild = FALSE) {
-  
+
   # read previously-saved plays if they exist and user doesn't want to start over ("rebuild")
   if (file.exists(glue::glue("data/decisions_{s}.rds")) & rebuild == FALSE) {
     message(glue::glue("Loading existing plays for {s}"))
@@ -51,21 +48,21 @@ load_season <- function(s, rebuild = FALSE) {
     existing_plays <- nflfastR::load_pbp(s) %>%
       prepare_nflfastr_data() %>%
       prepare_df() %>%
-      add_probs() %>% 
+      add_probs() %>%
       add_pred_go() %>%
       clean_data()
-    
+
     saveRDS(existing_plays, glue::glue("data/decisions_{s}.rds"))
   }
-  
+
   return(existing_plays)
-  
+
 }
 
 
 # wrapper function to update 4th down numbers for an ongoing season
 update_season <- function(s) {
-  
+
   # read previously-saved plays if they exist
   if (file.exists(glue::glue("data/decisions_{s}.rds"))) {
     message(glue::glue("Loading existing plays for {s}"))
@@ -77,7 +74,7 @@ update_season <- function(s) {
       "play_id" = 0
     )
   }
-  
+
   # get new plays that haven't been saved
   plays <- nflfastR::load_pbp(s) %>%
     prepare_nflfastr_data() %>%
@@ -85,15 +82,15 @@ update_season <- function(s) {
       existing_plays %>% select(game_id, play_id) %>% mutate(already_scraped = 1), by = c("game_id", "play_id")
     ) %>%
     filter(is.na(already_scraped))
-  
+
   # if there are new plays, calculate decisions for them
   if (nrow(plays) > 0) {
-    
+
     message(glue::glue("Calculating probabilities for {nrow(plays)} plays"))
-    
+
     new_plays <- plays %>%
       prepare_df() %>%
-      add_probs() %>% 
+      add_probs() %>%
       add_pred_go() %>%
       clean_data()
 
@@ -104,19 +101,19 @@ update_season <- function(s) {
     ) %>%
       # this is to drop the dummy row created if file is missing above
       filter(!is.na(posteam))
-    
+
     saveRDS(cleaned, glue::glue("data/decisions_{s}.rds"))
-    
+
   } else {
     message("No new plays found.")
   }
-  
+
 }
 
 
 # get data ready for predicted 4th down model
 prepare_glm <- function(df) {
-  
+
   df %>%
     mutate(
       # this is all completely arbitrary
@@ -148,5 +145,5 @@ prepare_glm <- function(df) {
       bin_scorediff = as_factor(bin_scorediff),
       week = if_else(week > 17, 18, as.double(week))
     )
-  
+
 }

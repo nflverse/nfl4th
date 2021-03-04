@@ -29,7 +29,7 @@ points <- pbp %>%
   mutate(
     # give return yards too
     yardline_after = yardline_100 - kick_distance + return_yards,
-    yardline_after = 
+    yardline_after =
       if_else(
         stringr::str_detect(desc, "end zone") & is.na(kick_distance), 20, yardline_after
       ),
@@ -138,11 +138,11 @@ df <- density_map_normal %>%
   ) %>%
   arrange(yardline_100, yardline_after) %>%
   select(yardline_100, yardline_after, pct, bin_muffed_pct) %>%
-  filter(yardline_100 > 30) 
+  filter(yardline_100 > 30)
 
 bind_rows(
   # get a df without the return and blocked probs
-  df %>% 
+  df %>%
     filter(yardline_after != 100 & yardline_100 != yardline_after),
   df
 ) %>%
@@ -162,7 +162,7 @@ bind_rows(
   select(
     yardline_100, yardline_after, pct, muff
   ) %>%
-  saveRDS('data/punt_data.rds')
+  saveRDS('data-raw/punt_data.rds')
 
 
 # **************************************************************************************
@@ -188,5 +188,5 @@ pbp <- purrr::map_df(seasons, function(x) {
 fg_model <- mgcv::bam(sp ~ s(yardline_100, by = interaction(model_roof)) + model_roof,
                       data = pbp, family = "binomial")
 
-save(fg_model, file = 'data/fg_model.Rdata')
+save(fg_model, file = 'data-raw/fg_model.Rdata')
 

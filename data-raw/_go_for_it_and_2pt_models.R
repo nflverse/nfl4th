@@ -14,30 +14,30 @@ pbp <- purrr::map_df(seasons, function(x) {
   )
 }) %>%
   filter(
-    down %in% c(3,4), 
+    down %in% c(3,4),
     qb_kneel == 0,
-    rush == 1 | pass == 1, 
+    rush == 1 | pass == 1,
     !is.na(posteam),
     !is.na(yardline_100),
     !is.na(score_differential),
     week <= 17
   ) %>%
-  make_model_mutations() 
+  make_model_mutations()
 
-model_vars <- pbp %>% 
-  mutate(yards_gained = 
-           
+model_vars <- pbp %>%
+  mutate(yards_gained =
+
            # we need a way to account for defensive penalties that give auto first downs
            # hacky "solution" is saying here that a penalty that gives a first down goes for the yards to go
            # unless the actual penalty yardage is higher
-           
+
            # the drawback is that a defensive holding on eg 4th and 8 is coded as an 8 yard gain
            # the alternative is to estimate a separate model for penalties or have their own category
            # but first down penalties on 4th and long are very rare:
            # https://twitter.com/benbbaldwin/status/1322530446371074050
            case_when(
-             first_down_penalty == 1 & penalty_yards < ydstogo ~ ydstogo, 
-             first_down_penalty == 1 & penalty_yards >= ydstogo ~ penalty_yards, 
+             first_down_penalty == 1 & penalty_yards < ydstogo ~ ydstogo,
+             first_down_penalty == 1 & penalty_yards >= ydstogo ~ penalty_yards,
              TRUE ~ yards_gained
            ),
          # truncate to make model training easier
@@ -92,10 +92,10 @@ grid <- grid %>%
 grid
 
 get_metrics <- function(df, row = 1) {
-  
+
   # testing only
   # df <- grid %>% dplyr::slice(1)
-  
+
   params <-
     list(
       booster = "gbtree",
@@ -109,19 +109,19 @@ get_metrics <- function(df, row = 1) {
       max_depth = df$tree_depth,
       min_child_weight = df$min_n
     )
-  
+
   # tuning with cv
   fd_model <- xgboost::xgb.cv(data = full_train, params = params, nrounds = nrounds,
                                  nfold = 5, metrics = list("mlogloss"),
                                  early_stopping_rounds = 10, print_every_n = 10)
-  
+
   output <- params
   output$iter = fd_model$best_iteration
   output$logloss = fd_model$evaluation_log[output$iter]$test_mlogloss_mean
   output$error = fd_model$evaluation_log[output$iter]$test_merror_mean
-  
+
   this_param <- bind_rows(output)
-  
+
   if (row == 1) {
     saveRDS(this_param, "data/modeling.rds")
   } else {
@@ -129,16 +129,16 @@ get_metrics <- function(df, row = 1) {
     for_save <- bind_rows(prev, this_param)
     saveRDS(for_save, "data/modeling.rds")
   }
-  
+
   return(this_param)
-  
+
 }
 
 results <- map_df(1 : nrow(grid), function(x) {
-  
+
   message(glue::glue("Row {x}"))
   get_metrics(grid %>% dplyr::slice(x), row = x)
-  
+
 })
 
 # plot
@@ -178,7 +178,7 @@ params <-
 full_train = xgboost::xgb.DMatrix(model.matrix(~.+0, data = model_vars %>% dplyr::select(-label)), label = as.integer(model_vars$label))
 fd_model <- xgboost::xgboost(params = params, data = full_train, nrounds = nrounds, verbose = 2)
 
-save(fd_model, file = 'data/fd_model.Rdata')
+save(fd_model, file = 'data-raw/fd_model.Rdata')
 
 importance <- xgboost::xgb.importance(feature_names = colnames(fd_model), model = fd_model)
 xgboost::xgb.ggplot.importance(importance_matrix = importance)
@@ -208,15 +208,15 @@ pbp <- purrr::map_df(seasons, function(x) {
 }) %>%
   filter(
     is.na(down), !is.na(two_point_conv_result), yardline_100 == 2,
-    rush == 1 | pass == 1, 
+    rush == 1 | pass == 1,
     !is.na(posteam),
     !is.na(yardline_100),
     !is.na(score_differential),
     week <= 17
   ) %>%
-  make_model_mutations() 
+  make_model_mutations()
 
-model_data <- pbp %>% 
+model_data <- pbp %>%
   mutate(
     label = if_else(two_point_conv_result == "success", 1, 0),
      home_total = (spread_line + total_line) / 2,
@@ -226,14 +226,14 @@ model_data <- pbp %>%
   ) %>%
   select(
     label,
-    era2, 
-    era3, 
+    era2,
+    era3,
     era4,
-    outdoors, 
-    retractable, 
+    outdoors,
+    retractable,
     dome,
-    posteam_spread, 
-    total_line, 
+    posteam_spread,
+    total_line,
     posteam_total
   )
 
@@ -262,10 +262,10 @@ grid %>%
   head(20)
 
 get_metrics <- function(df, row = 1) {
-  
+
   # testing only
   # df <- grid %>% dplyr::slice(1)
-  
+
   params <-
     list(
       booster = "gbtree",
@@ -277,11 +277,11 @@ get_metrics <- function(df, row = 1) {
       colsample_bytree= df$mtry,
       max_depth = 8,
       min_child_weight = 2,
-      monotone_constraints = 
+      monotone_constraints =
         "(0, 0, 0, 0, 0, 0, 1, 0, 1)",
       nthread = thread
     )
-  # 
+  #
   # era2, 0
   # era3, 0
   # era4,0
@@ -291,19 +291,19 @@ get_metrics <- function(df, row = 1) {
   # posteam_spread, 1
   # total_line, 0
   # posteam_total 1
-  
+
   #train
   wp_cv_model <- xgboost::xgb.cv(data = full_train, params = params, nrounds = nrounds,
                                  nfold = 5, metrics = list("logloss"),
                                  early_stopping_rounds = 20, print_every_n = 50)
-  
+
   output <- params
   output$iter = wp_cv_model$best_iteration
   output$logloss = wp_cv_model$evaluation_log[output$iter]$test_logloss_mean
   output$error = wp_cv_model$evaluation_log[output$iter]$test_error_mean
-  
+
   this_param <- bind_rows(output)
-  
+
   if (row == 1) {
     saveRDS(this_param, "data/modeling.rds")
   } else {
@@ -311,9 +311,9 @@ get_metrics <- function(df, row = 1) {
     for_save <- bind_rows(prev, this_param)
     saveRDS(for_save, "data/modeling.rds")
   }
-  
+
   return(this_param)
-  
+
 }
 
 # do this piece by piece so server doesn't die
@@ -323,11 +323,11 @@ get_metrics <- function(df, row = 1) {
 
 # get results
 results <- map_df(1 : nrow(grid), function(x) {
-  
+
   gc()
   message(glue::glue("Row {x}"))
   get_metrics(grid %>% dplyr::slice(x), row = x)
-  
+
 })
 
 
@@ -371,7 +371,7 @@ params <-
     colsample_bytree= 0.444,
     max_depth = 8,
     min_child_weight = 2,
-    monotone_constraints = 
+    monotone_constraints =
       "(0, 0, 0, 0, 0, 0, 1, 0, 1)",
     nthread = thread
   )
@@ -399,14 +399,14 @@ params <-
     colsample_bytree= 0.444,
     max_depth = 8,
     min_child_weight = 2,
-    monotone_constraints = 
+    monotone_constraints =
       "(0, 0, 0, 0, 0, 0, 1, 0, 1)",
     nthread = thread
   )
 
 two_pt_model <- xgboost::xgboost(params = params, data = full_train, nrounds = nrounds, verbose = 2)
 
-save(two_pt_model, file = 'data/two_pt_model.Rdata')
+save(two_pt_model, file = 'data-raw/two_pt_model.Rdata')
 
 importance <- xgboost::xgb.importance(feature_names = colnames(two_pt_model), model = two_pt_model)
 xgboost::xgb.ggplot.importance(importance_matrix = importance)
