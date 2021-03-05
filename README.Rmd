@@ -53,80 +53,16 @@ There are some edge cases that are not accounted for. These should only make a m
 * The **punt** model doesn’t account for the punter or returner, ignores penalties on returns and ignores the potential for blocked punts to be returned for touchdowns
 * The **field goal** model doesn’t account for who the kicker is, what the weather is (only relevant for outdoor games), or the possibility of a kick being blocked and returned for a touchdown
 
-## Example 1: from nflfastR
-
-Let's start by loading 2020 play-by-play data from `nflfastR`.
-```{r example, message = FALSE}
-library(nfl4th)
-library(tidyverse)
-
-data <- nflfastR::load_pbp(2020)
-```
-
-Here's how to calculate all probabilities from one game:
-
-```{r ex1}
-tictoc::tic("One game")
-data %>%
-  dplyr::filter(week == 20, home_team == "GB") %>%
-  nfl4th::add_4th_probs() %>%
-  dplyr::filter(down == 4) %>%
-  dplyr::select(
-    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
-    wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
-    fg_wp, punt_wp
-  ) %>%
-  knitr::kable(digits = 2)
-tictoc::toc()
-```
-
-We see the infamous field goal at the bottom.
-
-## Example 2: from user input
-
-Let's input the play ourselves to verify that we get the same thing. The below shows the bare minimum amount of information that has to be fed to `nfl4th` in order to compute 4th down decision recommendations.
-
-```{r ex2}
-one_play <- tibble::tibble(
-  
-  # things to help find the right game (use "reg" or "post")
-  home_team = "GB",
-  away_team = "TB",
-  posteam = "GB",
-  type = "post",
-  season = 2020,
-  
-  # information about the situation
-  qtr = 4,
-  quarter_seconds_remaining = 129,
-  ydstogo = 8,
-  yardline_100 = 8,
-  score_differential = -8,
-
-  home_opening_kickoff = 0,
-  posteam_timeouts_remaining = 3,
-  defteam_timeouts_remaining = 3
-)
-
-one_play %>%
-  nfl4th::add_4th_probs() %>%
-  dplyr::select(
-    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
-    wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
-    fg_wp, punt_wp
-  ) %>%
-  knitr::kable(digits = 2)
-```
-
-As expected, the output is the same.
-
 ## Check coaches' alignment with the model
 
 Here's how to create one of the tables shown in [the piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/):
 
 ```{r coaches}
 library(gt)
+library(nfl4th)
+library(tidyverse)
 
+data <- nflfastR::load_pbp(2020)
 calculated <- data %>%
   nfl4th:::add_4th_probs() %>%
   dplyr::filter(down == 4, !is.na(go_boost)) 
