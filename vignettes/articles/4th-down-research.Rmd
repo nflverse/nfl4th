@@ -22,6 +22,9 @@ library(ggtext)
 library(DescTools)
 library(ggthemes)
 library(gt)
+library(magick)
+library(cowplot)
+library(ggpmisc)
 ```
 
 ```{r load}
@@ -195,3 +198,193 @@ pbp_2020 %>%
   scale_x_continuous(breaks = scales::pretty_breaks(n = 20)) 
 ```
 
+## Decisions by team
+``` {r divs, echo = FALSE, message = FALSE}
+divs <- teamcolors::teamcolors %>%
+  filter(league == "nfl") %>%
+  select(name, division) %>%
+  mutate(name = case_when(
+    name == "Washington Redskins" ~ "Washington Football Team",
+    name == "Oakland Raiders" ~ "Las Vegas Raiders",
+    TRUE ~ name
+  ))
+
+nfl_logos_df <- nflfastR::teams_colors_logos %>%
+  filter(!(team_abbr %in% c("LAR", "SD", "OAK"))) %>%
+  left_join(divs, by = c("team_name" = "name"))
+
+follow_bot <- function(conf) {
+  
+  logos_conf <- image_read(nfl_logos_df %>% filter(substr(division, 1, 3) == conf) %>% pull(team_logo_espn))
+  my_title <- glue::glue("<span style='color:red'>{conf}</span>: when did teams follow the bot? 2020")
+  
+  pbp_2020 %>% 
+    left_join(nfl_logos_df, by = c("posteam" = "team_abbr")) %>%
+    filter(substr(division, 1, 3) == conf) %>%
+    filter(between(go_boost, -5, 15)) %>%
+    mutate(go = as_factor(go)) %>%
+    select(game_id, posteam, team_logo_espn, go, go_boost, yardline_100, score_differential, ydstogo, desc) %>%
+    ggplot(aes(x = posteam, y=go_boost, color=go)) +
+    geom_hline(yintercept = 0) +
+    geom_jitter(aes(y = go_boost, fill = go), 
+                size = 3, width = 0.2, show.legend=FALSE, alpha=.5) +
+    scale_y_continuous(name = "4th down bot gain in going for it", breaks = scales::pretty_breaks(n = 5), expand = c(0,.03)) +
+    theme_ben +
+    labs(title = my_title,
+         x = "Went for it",
+         subtitle = "<span style='color:#F8766D'>Kicked</span> versus <span style='color:#00BFC4'>went for it</span>",
+         caption = "Predicted go based on past league behavior given\nyardage, time, score, field position, week, and season"
+    ) +
+    theme(
+      panel.grid.major = element_blank(),
+      plot.subtitle = element_markdown(size = 16, hjust = 0.5),
+      axis.title.x=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    ) +
+    geom_hline(yintercept = -6, color = "gray", alpha = .1) +
+    # doing this in a smart way is annoying so just brute forcing it
+    draw_image(logos_conf[1],  x = .5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[2],  x = 1.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[3],  x = 2.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[4],  x = 3.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[5],  x = 4.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[6],  x = 5.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[7],  x = 6.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[8],  x = 7.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[9],  x = 8.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[10],  x = 9.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[11],  x = 10.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[12],  x = 11.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[13],  x = 12.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[14],  x = 13.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[15],  x = 14.5, y = -5.75, scale = 2) +
+    draw_image(logos_conf[16],  x = 15.5, y = -5.75, scale = 2)
+  
+}
+```
+
+```{r afc, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+follow_bot("AFC")
+```
+
+```{r nfc, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+follow_bot("NFC")
+```
+
+```{r, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+current <- pbp_2020 %>%
+  filter(go_boost > 1.5) %>%
+  filter(vegas_wp > .2) %>%
+  group_by(posteam) %>%
+  summarize(go = mean(go), n = n()) %>%
+  ungroup() %>%
+  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
+  arrange(-go) %>%
+  mutate(rank = 1:n()) %>%
+  arrange(posteam)
+
+ids <- nflfastR::teams_colors_logos %>%
+  filter(!team_abbr %in% c('LAR', 'OAK', 'SD', 'STL'))
+images <- magick::image_read(ids%>% pull(team_logo_espn)) 
+
+logos <- tibble(
+  x = current$rank + .25, 
+  y = current$go + .02,
+  width = .035,
+  grob = 
+    map(1:32, function(x) {
+      grid::rasterGrob(images[x])
+    })
+)
+
+my_title <- glue::glue("Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> {max(pbp_2020$season)}")
+ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
+  geom_col(data = current, aes(fill = ifelse(posteam=="SEA", team_color2, team_color)), 
+           width = 0.5, alpha = .6, show.legend = FALSE
+  ) +
+  geom_grob(data = logos, 
+            aes(x, y, label = grob, vp.width = width),
+            hjust = 0.7) +
+  scale_fill_identity(aesthetics = c("fill", "colour")) +
+  theme_ben +
+  theme(
+    panel.grid.major.x = element_blank(),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+    ) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+  labs(
+    x = "",
+    y = "Go rate",
+    title= my_title,
+    subtitle = "When @ben_bot_baldwin recommends going for it (gain in win prob. at least 1.5 percentage points)",
+    caption = glue::glue("Sample size in parentheses\nExcl. final 30 seconds of game. Win prob >20%")
+  ) +
+  geom_text(data = current, aes(x = rank, y = -.015, size=.03, label = glue::glue("({n})")), show.legend = FALSE, nudge_x = 0, color="black")
+```
+
+```{r, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+current <- pbp_2020 %>%
+  group_by(posteam) %>%
+  mutate(
+    games = n_distinct(game_id),
+  ) %>%
+  ungroup() %>%
+  filter(go_boost > 0, go == 0) %>%
+  group_by(posteam) %>%
+  summarize(
+    go = sum(go_boost), 
+    n = n(),
+    games = dplyr::first(games),
+    go = go/games
+    ) %>%
+  ungroup() %>%
+  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
+  arrange(-go) %>%
+  mutate(rank = 1:n()) %>%
+  arrange(posteam)
+
+ids <- nflfastR::teams_colors_logos %>%
+  filter(!team_abbr %in% c('LAR', 'OAK', 'SD', 'STL')) %>%
+  filter(team_abbr %in% current$posteam)
+images <- magick::image_read(ids%>% pull(team_logo_espn)) 
+
+logos <- tibble(
+  x = current$rank + .25, 
+  y = current$go + .02,
+  width = .035,
+  grob = 
+    map(1:length(images), function(x) {
+      grid::rasterGrob(images[x])
+    })
+)
+
+my_title <- glue::glue("WP per game <span style='color:red'>lost by kicking in go situations</span>, {max(pbp_2020$season)}")
+ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
+  geom_col(data = current, aes(fill = ifelse(posteam=="SEA", team_color2, team_color)), 
+           width = 0.5, alpha = .6, show.legend = FALSE
+  ) +
+  geom_grob(data = logos, 
+            aes(x, y, label = grob, vp.width = width),
+            hjust = 0.7) +
+  scale_fill_identity(aesthetics = c("fill", "colour")) +
+  theme_bw() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    plot.title = element_markdown(size=20,face = 2,hjust=.5),
+    plot.subtitle = element_text(size=8, hjust=.5),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  ) +
+  # scale_y_continuous(expand=c(0,0), limits=c(0, max(current$go + 5))) +
+  scale_y_continuous(n.breaks = 10) +
+  labs(
+    x = "",
+    y = "Win probability lost per game",
+    title= my_title,
+    caption = glue::glue("@benbbaldwin | Excl. final 30 seconds of game")
+  )
+```
