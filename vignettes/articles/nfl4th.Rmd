@@ -1,5 +1,6 @@
 ---
-title: "nfl4th"
+title: "Get Started with nfl4th"
+author: "Ben Baldwin"
 ---
 
 ```{r, include = FALSE}
@@ -7,6 +8,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+options(dplyr.summarise.inform = FALSE)
 ```
 
 First load the packages and some data.
@@ -172,37 +174,35 @@ calculated %>%
     n = "Plays"
   ) %>%
   gt::tab_style(
-    style = cell_text(color = "black", weight = "bold"),
+    style = gt::cell_text(color = "black", weight = "bold"),
     locations = list(
-      cells_row_groups(),
-      cells_column_labels(everything())
+      gt::cells_row_groups(),
+      gt::cells_column_labels(dplyr::everything())
     )
   ) %>% 
   gt::tab_options(
-    row_group.border.top.width = px(3),
+    row_group.border.top.width = gt::px(3),
     row_group.border.top.color = "black",
     row_group.border.bottom.color = "black",
     table_body.hlines.color = "white",
     table.border.top.color = "black",
-    table.border.top.width = px(1),
+    table.border.top.width = gt::px(1),
     table.border.bottom.color = "white",
-    table.border.bottom.width = px(1),
+    table.border.bottom.width = gt::px(1),
     column_labels.border.bottom.color = "black",
-    column_labels.border.bottom.width = px(2),
-    data_row.padding = px(2),
-    table.font.size = px(16L)
+    column_labels.border.bottom.width = gt::px(2),
+    data_row.padding = gt::px(2),
+    table.font.size = gt::px(16L)
   ) %>%
   gt::fmt_number(
-    columns = vars(go), decimals = 0
+    columns = dplyr::vars(go), decimals = 0
   ) %>%
   gt::cols_align(
     columns = 2:3,
     align = "center"
   ) %>% 
-  gt::tab_header(
-    title = md(glue::glue("NFL team decision-making by go recommendation, 2020"))
-  ) %>%
-  gt::tab_source_note(md('**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points'))
+  gt::tab_header(title = "NFL team decision-making by go recommendation, 2020") %>%
+  gt::tab_source_note(gt::md('**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points'))
 
 ```
 
