@@ -29,6 +29,7 @@ Imports:
 Suggests: 
     gt,
     rmarkdown,
+    tictoc,
     tidyverse
 Encoding: UTF-8
 LazyData: true
