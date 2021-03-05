@@ -2,8 +2,9 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
+  articles/4th-down-research: 4th-down-research.html
   articles/nfl4th: nfl4th.html
-last_built: 2021-03-05T19:42Z
+last_built: 2021-03-05T19:58Z
 urls:
   reference: https://guga31bb.github.io/nfl4th/reference
   article: https://guga31bb.github.io/nfl4th/articles
