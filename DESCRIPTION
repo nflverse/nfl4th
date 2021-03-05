@@ -27,7 +27,9 @@ Imports:
     tidyselect,
     xgboost
 Suggests: 
-    rmarkdown
+    gt,
+    rmarkdown,
+    tidyverse
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
