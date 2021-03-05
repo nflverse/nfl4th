@@ -1,5 +1,5 @@
 Package: nfl4th
-Title: Functions to Improve 4th Down Decisions in the NFL
+Title: Functions to Improve Fourth Down Decisions in the NFL
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Ben",
@@ -10,7 +10,7 @@ Authors@R:
              family = "Carl",
              role = "ctb",
              email = "mrcaseb@gmail.com"))
-Description: A set of functions to estimate outcomes of 4th down
+Description: A set of functions to estimate outcomes of fourth down
     plays in the National Football League.
 License: MIT + file LICENSE
 URL: https://guga31bb.github.io/nfl4th

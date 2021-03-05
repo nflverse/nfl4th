@@ -4,11 +4,11 @@
 \name{nfl4th-package}
 \alias{nfl4th}
 \alias{nfl4th-package}
-\title{nfl4th: Functions to Improve 4th Down Decisions in the NFL}
+\title{nfl4th: Functions to Improve Fourth Down Decisions in the NFL}
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-A set of functions to estimate outcomes of 4th down
+A set of functions to estimate outcomes of fourth down
     plays in the National Football League.
 }
 \seealso{
