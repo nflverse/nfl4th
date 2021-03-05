@@ -72,7 +72,14 @@
   <a href="../../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/guga31bb/nfl4th/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -89,7 +96,7 @@
                         <h4 class="author">Ben Baldwin</h4>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/guga31bb/nfl4th/blob/master/vignettes/articles/nfl4th.Rmd"><code>vignettes/articles/nfl4th.Rmd</code></a></small>
       <div class="hidden name"><code>nfl4th.Rmd</code></div>
 
     </div>
@@ -308,7 +315,7 @@
 </table>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; All plays from one week: 3.248 sec elapsed</span></code></pre></div>
+<span class="co">#&gt; All plays from one week: 3.275 sec elapsed</span></code></pre></div>
 <p>But this kind of takes a long time since it’s a whole season. If you want a sub-sample, filter <strong>at the game level</strong> before invoking the function because the win probability model needs all plays in a game in order to work (i.e., not just the 4th downs or one team’s plays). This is because it has to figure out which team received the opening kickoff.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">tic</a></span><span class="op">(</span><span class="st">"One game"</span><span class="op">)</span>
@@ -496,7 +503,7 @@
 </table>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; One game: 1.574 sec elapsed</span></code></pre></div>
+<span class="co">#&gt; One game: 1.591 sec elapsed</span></code></pre></div>
 <p>We see the infamous field goal at the bottom.</p>
 <p>Let’s input the play ourselves to see if we can get the same thing. The below shows the bare minimum amount of information that has to be fed to <code>nfl4th</code> in order to compute 4th down decision recommendations.</p>
 <p>The reason teams from a specific game have to be used is that the model depends on factors such as point spread, team totals, and indoor/outdoor and the program automatically looks these up so that users don’t have to provide them.</p>
@@ -703,7 +710,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ddkhzmeuyv .gt_table {
+#ybcypxwwon .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -728,7 +735,7 @@
   border-left-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_heading {
+#ybcypxwwon .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -740,7 +747,7 @@
   border-right-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_title {
+#ybcypxwwon .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -750,7 +757,7 @@
   border-bottom-width: 0;
 }
 
-#ddkhzmeuyv .gt_subtitle {
+#ybcypxwwon .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -760,13 +767,13 @@
   border-top-width: 0;
 }
 
-#ddkhzmeuyv .gt_bottom_border {
+#ybcypxwwon .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_col_headings {
+#ybcypxwwon .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -781,7 +788,7 @@
   border-right-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_col_heading {
+#ybcypxwwon .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -801,7 +808,7 @@
   overflow-x: hidden;
 }
 
-#ddkhzmeuyv .gt_column_spanner_outer {
+#ybcypxwwon .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -813,15 +820,15 @@
   padding-right: 4px;
 }
 
-#ddkhzmeuyv .gt_column_spanner_outer:first-child {
+#ybcypxwwon .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ddkhzmeuyv .gt_column_spanner_outer:last-child {
+#ybcypxwwon .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ddkhzmeuyv .gt_column_spanner {
+#ybcypxwwon .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -833,7 +840,7 @@
   width: 100%;
 }
 
-#ddkhzmeuyv .gt_group_heading {
+#ybcypxwwon .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -855,7 +862,7 @@
   vertical-align: middle;
 }
 
-#ddkhzmeuyv .gt_empty_group_heading {
+#ybcypxwwon .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -870,15 +877,15 @@
   vertical-align: middle;
 }
 
-#ddkhzmeuyv .gt_from_md > :first-child {
+#ybcypxwwon .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ddkhzmeuyv .gt_from_md > :last-child {
+#ybcypxwwon .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ddkhzmeuyv .gt_row {
+#ybcypxwwon .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -897,7 +904,7 @@
   overflow-x: hidden;
 }
 
-#ddkhzmeuyv .gt_stub {
+#ybcypxwwon .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -909,7 +916,7 @@
   padding-left: 12px;
 }
 
-#ddkhzmeuyv .gt_summary_row {
+#ybcypxwwon .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -919,7 +926,7 @@
   padding-right: 5px;
 }
 
-#ddkhzmeuyv .gt_first_summary_row {
+#ybcypxwwon .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -929,7 +936,7 @@
   border-top-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_grand_summary_row {
+#ybcypxwwon .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -939,7 +946,7 @@
   padding-right: 5px;
 }
 
-#ddkhzmeuyv .gt_first_grand_summary_row {
+#ybcypxwwon .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -949,11 +956,11 @@
   border-top-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_striped {
+#ybcypxwwon .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ddkhzmeuyv .gt_table_body {
+#ybcypxwwon .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -962,7 +969,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_footnotes {
+#ybcypxwwon .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -976,13 +983,13 @@
   border-right-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_footnote {
+#ybcypxwwon .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ddkhzmeuyv .gt_sourcenotes {
+#ybcypxwwon .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -996,46 +1003,46 @@
   border-right-color: #D3D3D3;
 }
 
-#ddkhzmeuyv .gt_sourcenote {
+#ybcypxwwon .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ddkhzmeuyv .gt_left {
+#ybcypxwwon .gt_left {
   text-align: left;
 }
 
-#ddkhzmeuyv .gt_center {
+#ybcypxwwon .gt_center {
   text-align: center;
 }
 
-#ddkhzmeuyv .gt_right {
+#ybcypxwwon .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ddkhzmeuyv .gt_font_normal {
+#ybcypxwwon .gt_font_normal {
   font-weight: normal;
 }
 
-#ddkhzmeuyv .gt_font_bold {
+#ybcypxwwon .gt_font_bold {
   font-weight: bold;
 }
 
-#ddkhzmeuyv .gt_font_italic {
+#ybcypxwwon .gt_font_italic {
   font-style: italic;
 }
 
-#ddkhzmeuyv .gt_super {
+#ybcypxwwon .gt_super {
   font-size: 65%;
 }
 
-#ddkhzmeuyv .gt_footnote_marks {
+#ybcypxwwon .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ddkhzmeuyv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="ybcypxwwon" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>NFL team decision-making by go recommendation, 2020</th>
