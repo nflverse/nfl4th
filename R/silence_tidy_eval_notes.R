@@ -78,4 +78,15 @@ away_team <-
   wt_wp <-
   yardline_100 <-
   yardline_after <-
-  ydstogo <- NULL
+  ydstogo <-
+  choice <-
+  choice_prob <-
+  extra_point_result <-
+  fail_wp <-
+  go_boost <-
+  max_non_go <-
+  play_no <-
+  punt_prob <-
+  success_prob <-
+  success_wp <-
+  two_point_conv_result <- NULL
