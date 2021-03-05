@@ -14,7 +14,7 @@ A set of functions to estimate outcomes of fourth down
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://guga31bb.github.io/nfl4th}
+  \item \url{https://guga31bb.github.io/nfl4th/}
 }
 
 }

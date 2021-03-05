@@ -13,7 +13,7 @@ Authors@R:
 Description: A set of functions to estimate outcomes of fourth down
     plays in the National Football League.
 License: MIT + file LICENSE
-URL: https://guga31bb.github.io/nfl4th
+URL: https://guga31bb.github.io/nfl4th/
 Depends: 
     R (>= 2.10)
 Imports: 
