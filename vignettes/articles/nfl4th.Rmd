@@ -139,3 +139,74 @@ another %>%
 ```
 
 Note that the go for 2 probability here is identical to the win probability associated with a successful 4th down conversion above because the 4th down model assumes that the Packers would go for 2 if they scored.
+
+
+## Check coaches' alignment with the model
+
+Here's how to create one of the tables shown in [the piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/):
+
+```{r coaches}
+library(gt)
+
+calculated <- data %>%
+  nfl4th:::add_4th_probs() %>%
+  dplyr::filter(down == 4, !is.na(go_boost)) 
+```
+
+```{r big-table, echo = FALSE}
+calculated %>%
+  dplyr::mutate(go = ifelse((rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"), 100, 0)) %>%
+  dplyr::group_by(posteam, game_id, series) %>%
+  dplyr::slice(1) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(type = dplyr::case_when(
+    go_boost >= 4 ~ "Definitely go for it",
+    go_boost > 1 & go_boost < 4 ~ "Probably go for it",
+    go_boost >= -1 & go_boost <= 1 ~ "Toss-up",
+    go_boost < -1 & go_boost > -4 ~ "Probably kick",
+    go_boost <= -4 ~ "Definitely kick"
+  )) %>%
+  dplyr::group_by(type) %>%
+  dplyr::summarize(go = mean(go), n = dplyr::n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(-go) %>%
+  gt::gt() %>%
+  gt::cols_label(
+    type = "Recommendation",
+    go = "Went for it %",
+    n = "Plays"
+  ) %>%
+  gt::tab_style(
+    style = gt::cell_text(color = "black", weight = "bold"),
+    locations = list(
+      gt::cells_row_groups(),
+      gt::cells_column_labels(dplyr::everything())
+    )
+  ) %>% 
+  gt::tab_options(
+    row_group.border.top.width = gt::px(3),
+    row_group.border.top.color = "black",
+    row_group.border.bottom.color = "black",
+    table_body.hlines.color = "white",
+    table.border.top.color = "black",
+    table.border.top.width = gt::px(1),
+    table.border.bottom.color = "white",
+    table.border.bottom.width = gt::px(1),
+    column_labels.border.bottom.color = "black",
+    column_labels.border.bottom.width = gt::px(2),
+    data_row.padding = gt::px(2),
+    table.font.size = gt::px(16L)
+  ) %>%
+  gt::fmt_number(
+    columns = dplyr::vars(go), decimals = 0
+  ) %>%
+  gt::cols_align(
+    columns = 2:3,
+    align = "center"
+  ) %>% 
+  gt::tab_header(title = "NFL team decision-making by go recommendation, 2020") %>%
+  gt::tab_source_note(gt::md('**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points'))
+
+```
+
+Thus, we can see that the model is strongly aligned to what coaches do.

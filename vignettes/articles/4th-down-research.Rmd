@@ -12,22 +12,34 @@ knitr::opts_chunk$set(
 
 This is an update of [the analysis that used to be stored here](https://github.com/guga31bb/fourth_calculator/blob/main/R/season_numbers.R). The idea is to show different ways of using the package to analyze 4th down decisions in hopes of inspiring others to try other things.
 
-```{r setup}
+The code isn't being displayed on this webpage since it is long but [can be accessed here](https://github.com/guga31bb/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd).
+
+```{r setup, echo = FALSE, message = FALSE}
 library(nfl4th)
 library(tidyverse)
+library(ggplot2)
+library(ggtext)
+library(DescTools)
+library(ggthemes)
+library(gt)
+```
 
+```{r load}
 load_season <- function(season) {
   nflfastR::load_pbp(season) %>%
   nfl4th::add_4th_probs() %>%
   dplyr::mutate(go = ifelse((rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"), 100, 0)) %>%
+  dplyr::filter(down == 4) %>%
   return()
 }
 
 pbp_2020 <- load_season(2020)
 ```
 
-```{r worst}
-library(gt)
+
+## Worst kick decisions of 2020
+
+```{r worst, echo = FALSE}
 pbp_2020 %>%
   filter(
     go == 0,
@@ -109,3 +121,77 @@ pbp_2020 %>%
     title = md(glue::glue("Worst kick decisions of 2020"))
   )
 ```
+
+## Leaguewide behavior by strength of recommendation
+```{r league, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+theme_ben <- theme_fivethirtyeight() +
+  theme(
+    legend.position = "none",
+    plot.title = element_markdown(size = 22, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 12, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold")
+  )
+
+plot <- pbp_2020 %>%
+  mutate(go_boost = RoundTo(go_boost, 0.5)) %>%
+  group_by(go_boost) %>%
+  summarize(go = mean(go)) %>%
+  ungroup() %>%
+  filter(between(go_boost, -10, 10)) %>%
+  mutate(
+    should_go = case_when(go_boost > .5 ~ 1,
+                          go_boost < -.5 ~ 0,
+                          TRUE ~ 2)
+  )
+
+plot %>%
+  ggplot(aes(go_boost, go, color = as.factor(should_go))) + 
+  geom_point(size = 5, color = "black", alpha = .5) +
+  geom_vline(xintercept = 0) +
+  geom_smooth(method = "lm", show.legend = F, se = F, size = 3)+
+  theme_ben +
+  labs(x = "Gain in win probability by going for it",
+       y = "Go-for-it percentage",
+       caption = paste0("Figure: @benbbaldwin"),
+       subtitle = "By strength of @ben_bot_baldwin recommendation, 2020",
+       title = glue::glue("NFL Go-for-it Rate on <span style='color:red'>4th down</span>")
+       ) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,2)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 20), limits = c(-10, 10), expand = c(0,0)) +
+  annotate("text",x=-4, y= 90, label = "Should\nkick", color="red", size = 5) +
+  annotate("text",x=3, y= 90, label = "Should\ngo for it", color="red", size = 5) +
+  annotate("label",x=-6, y= 15, label = "Teams almost always kick\nwhen they should...", size = 5) +
+  annotate("label",x=6, y= 25, label = "...but frequently\n kick when they\nshould go for it", size = 5)
+```
+
+## League behavior based on win probability
+
+```{r wp, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+
+min <- 2
+max <- 4
+
+my_title <- glue::glue("NFL Go-for-it Rate on <span style='color:red'>4th down</span>")
+
+pbp_2020 %>%
+  filter(go_boost > min & go_boost < max) %>%
+  mutate(vegas_wp = 100 * vegas_wp) %>%
+  ggplot(aes(vegas_wp, go)) + 
+  # geom_point(size = 5, color = "black", alpha = .5) +
+  geom_smooth(show.legend = F, se = F, size = 3, color = "black")+
+  theme_ben +
+  labs(x = "Win probability prior to play",
+       y = "Go-for-it percentage",
+       caption = paste0("Figure: @benbbaldwin | 2020 season"),
+       subtitle = glue::glue("@ben_bot_baldwin gain in win prob by going {min}-{max} percentage points"),
+       title = my_title) +
+  theme(
+    legend.position = "none",
+    plot.title = element_markdown(size = 22, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 12, hjust = 0.5)
+  ) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10), limits = c(0, 100)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 20)) 
+```
+
