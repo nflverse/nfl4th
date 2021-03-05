@@ -20,7 +20,9 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
 <!-- badges: end -->
 
-The goal of nfl4th is to ...
+This is the package that powers the [fourth down calculator](https://rbsdm.com/stats/fourth_calculator) introduced in [this piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
+
+The code that powers the Twitter fourth down bot [is in this folder here](https://github.com/guga31bb/fourth_calculator/tree/main/bot) and the [code that runs the Shiny app is here](https://github.com/guga31bb/fourth_calculator/blob/main/app.R).
 
 ## Installation
 
@@ -36,27 +38,154 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("guga31bb/nfl4th")
 ```
-## Example
 
-This is a basic example which shows you how to solve a common problem:
+## Features
 
-```{r example, eval=FALSE}
+* The **go for it** model gives probabilities for possibilities of yards gained and includes the possibility of earning a first down via defensive penalty
+* The **punt** model includes the possibility for getting blocked, returned for a touchdown, or fumbled on the return
+* The **field goal** model is a simple model of field goal % by distance and roof type
+
+## Current limitations
+
+There are some edge cases that are not accounted for. These should only make a marginal difference to the recommendations as they are largely edge cases (e.g. the possibility for a field goal to be blocked and returned).
+
+* The **go for it** model does not allow for the possibility of a turnover return. However, long returns are extremely rare: For example, in 2018 and 2019 there were only four defensive touchdowns on plays where teams went for fourth downs out of 1,236 plays, and all of these happened when the game was well in hand for the other team.
+* The **punt** model doesn’t account for the punter or returner, ignores penalties on returns and ignores the potential for blocked punts to be returned for touchdowns
+* The **field goal** model doesn’t account for who the kicker is, what the weather is (only relevant for outdoor games), or the possibility of a kick being blocked and returned for a touchdown
+
+## Example 1: from nflfastR
+
+Let's start by loading 2020 play-by-play data from `nflfastR`.
+```{r example, message = FALSE}
 library(nfl4th)
-## basic example code
+library(tidyverse)
+
+data <- nflfastR::load_pbp(2020)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Here's how to calculate all probabilities from one game:
 
-```{r cars}
-summary(cars)
+```{r ex1}
+tictoc::tic("One game")
+data %>%
+  dplyr::filter(week == 20, home_team == "GB") %>%
+  nfl4th::add_4th_probs() %>%
+  dplyr::filter(down == 4) %>%
+  dplyr::select(
+    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
+    wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
+    fg_wp, punt_wp
+  ) %>%
+  knitr::kable(digits = 2)
+tictoc::toc()
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
+We see the infamous field goal at the bottom.
 
-You can also embed plots, for example:
+## Example 2: from user input
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+Let's input the play ourselves to verify that we get the same thing. The below shows the bare minimum amount of information that has to be fed to `nfl4th` in order to compute 4th down decision recommendations.
+
+```{r ex2}
+one_play <- tibble::tibble(
+  
+  # things to help find the right game (use "reg" or "post")
+  home_team = "GB",
+  away_team = "TB",
+  posteam = "GB",
+  type = "post",
+  season = 2020,
+  
+  # information about the situation
+  qtr = 4,
+  quarter_seconds_remaining = 129,
+  ydstogo = 8,
+  yardline_100 = 8,
+  score_differential = -8,
+
+  home_opening_kickoff = 0,
+  posteam_timeouts_remaining = 3,
+  defteam_timeouts_remaining = 3
+)
+
+one_play %>%
+  nfl4th::add_4th_probs() %>%
+  dplyr::select(
+    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
+    wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
+    fg_wp, punt_wp
+  ) %>%
+  knitr::kable(digits = 2)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+As expected, the output is the same.
+
+## Check coaches' alignment with the model
+
+Here's how to create one of the tables shown in [the piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/):
+
+```{r coaches}
+library(gt)
+
+calculated <- data %>%
+  nfl4th:::add_4th_probs() %>%
+  dplyr::filter(down == 4, !is.na(go_boost)) 
+```
+
+```{r big-table, echo = FALSE}
+calculated %>%
+  dplyr::mutate(go = ifelse((rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"), 100, 0)) %>%
+  dplyr::group_by(posteam, game_id, series) %>%
+  dplyr::slice(1) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(type = dplyr::case_when(
+    go_boost >= 4 ~ "Definitely go for it",
+    go_boost > 1 & go_boost < 4 ~ "Probably go for it",
+    go_boost >= -1 & go_boost <= 1 ~ "Toss-up",
+    go_boost < -1 & go_boost > -4 ~ "Probably kick",
+    go_boost <= -4 ~ "Definitely kick"
+  )) %>%
+  dplyr::group_by(type) %>%
+  dplyr::summarize(go = mean(go), n = dplyr::n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(-go) %>%
+  gt::gt() %>%
+  gt::cols_label(
+    type = "Recommendation",
+    go = "Went for it %",
+    n = "Plays"
+  ) %>%
+  gt::tab_style(
+    style = gt::cell_text(color = "black", weight = "bold"),
+    locations = list(
+      gt::cells_row_groups(),
+      gt::cells_column_labels(dplyr::everything())
+    )
+  ) %>% 
+  gt::tab_options(
+    row_group.border.top.width = gt::px(3),
+    row_group.border.top.color = "black",
+    row_group.border.bottom.color = "black",
+    table_body.hlines.color = "white",
+    table.border.top.color = "black",
+    table.border.top.width = gt::px(1),
+    table.border.bottom.color = "white",
+    table.border.bottom.width = gt::px(1),
+    column_labels.border.bottom.color = "black",
+    column_labels.border.bottom.width = gt::px(2),
+    data_row.padding = gt::px(2),
+    table.font.size = gt::px(16L)
+  ) %>%
+  gt::fmt_number(
+    columns = dplyr::vars(go), decimals = 0
+  ) %>%
+  gt::cols_align(
+    columns = 2:3,
+    align = "center"
+  ) %>% 
+  gt::tab_header(title = "NFL team decision-making by go recommendation, 2020") %>%
+  gt::tab_source_note(gt::md('**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points'))
+
+```
+
+Thus, we can see that the model is strongly aligned to what coaches do.
