@@ -16,7 +16,9 @@ calculator](https://rbsdm.com/stats/fourth_calculator) introduced in
 Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
 
 The code that powers the Twitter fourth down bot [is in this folder
-here](https://github.com/guga31bb/fourth_calculator/tree/main/bot).
+here](https://github.com/guga31bb/fourth_calculator/tree/main/bot) and
+the [code that runs the Shiny app is
+here](https://github.com/guga31bb/fourth_calculator/blob/main/app.R).
 
 ## Installation
 
@@ -34,100 +36,35 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("guga31bb/nfl4th")
 ```
 
-## Example 1: from nflfastR
+## Features
 
-Let’s start by loading 2020 play-by-play data from `nflfastR`.
+  - The **go for it** model gives probabilities for possibilities of
+    yards gained and includes the possibility of earning a first down
+    via defensive penalty
+  - The **punt** model includes the possibility for getting blocked,
+    returned for a touchdown, or fumbled on the return
+  - The **field goal** model is a simple model of field goal % by
+    distance and roof type
 
-``` r
-library(nfl4th)
-library(tidyverse)
+## Current limitations
 
-data <- nflfastR::load_pbp(2020)
-```
+There are some edge cases that are not accounted for. These should only
+make a marginal difference to the recommendations as they are largely
+edge cases (e.g. the possibility for a field goal to be blocked and
+returned).
 
-Here’s how to calculate all probabilities from one game:
-
-``` r
-tictoc::tic("One game")
-data %>%
-  dplyr::filter(week == 20, home_team == "GB") %>%
-  nfl4th::add_4th_probs() %>%
-  dplyr::filter(down == 4) %>%
-  dplyr::select(
-    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
-    wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
-    fg_wp, punt_wp
-  ) %>%
-  knitr::kable(digits = 2)
-#> home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .
-#> Performing final preparation . . .
-#> Computing probabilities for  9 plays. . .
-```
-
-| posteam | ydstogo | yardline\_100 | go\_boost | first\_down\_prob | wp\_fail | wp\_succeed | go\_wp | fg\_make\_prob | miss\_fg\_wp | make\_fg\_wp | fg\_wp | punt\_wp |
-| :------ | ------: | ------------: | --------: | ----------------: | -------: | ----------: | -----: | -------------: | -----------: | -----------: | -----: | -------: |
-| GB      |      17 |            65 |    \-3.74 |              0.15 |     0.33 |        0.47 |   0.35 |           0.00 |         0.31 |         0.47 |   0.31 |     0.38 |
-| TB      |      15 |            56 |    \-2.96 |              0.17 |     0.53 |        0.71 |   0.56 |           0.00 |         0.52 |         0.66 |   0.52 |     0.59 |
-| GB      |       6 |             6 |    \-2.16 |              0.31 |     0.36 |        0.57 |   0.43 |           0.98 |         0.33 |         0.45 |   0.45 |       NA |
-| TB      |       9 |            47 |    \-2.73 |              0.33 |     0.55 |        0.67 |   0.59 |           0.00 |         0.52 |         0.68 |   0.52 |     0.62 |
-| TB      |       4 |            45 |    \-0.12 |              0.51 |     0.55 |        0.67 |   0.62 |           0.00 |         0.54 |         0.69 |   0.54 |     0.62 |
-| GB      |      15 |            86 |    \-2.52 |              0.19 |     0.16 |        0.38 |   0.20 |           0.00 |         0.14 |         0.34 |   0.14 |     0.22 |
-| GB      |      10 |            76 |    \-0.37 |              0.32 |     0.15 |        0.37 |   0.22 |           0.00 |         0.14 |         0.32 |   0.14 |     0.23 |
-| TB      |       8 |            28 |    \-3.45 |              0.37 |     0.72 |        0.92 |   0.80 |           0.75 |         0.69 |         0.88 |   0.83 |       NA |
-| GB      |       8 |             8 |      3.77 |              0.33 |     0.04 |        0.31 |   0.13 |           0.98 |         0.03 |         0.09 |   0.09 |       NA |
-
-``` r
-tictoc::toc()
-#> One game: 1.38 sec elapsed
-```
-
-We see the infamous field goal at the bottom.
-
-## Example 2: from user input
-
-Let’s input the play ourselves to verify that we get the same thing. The
-below shows the bare minimum amount of information that has to be fed to
-`nfl4th` in order to compute 4th down decision recommendations.
-
-``` r
-one_play <- tibble::tibble(
-  
-  # things to help find the right game (use "reg" or "post")
-  home_team = "GB",
-  away_team = "TB",
-  posteam = "GB",
-  type = "post",
-  season = 2020,
-  
-  # information about the situation
-  qtr = 4,
-  quarter_seconds_remaining = 129,
-  ydstogo = 8,
-  yardline_100 = 8,
-  score_differential = -8,
-
-  home_opening_kickoff = 0,
-  posteam_timeouts_remaining = 3,
-  defteam_timeouts_remaining = 3
-)
-
-one_play %>%
-  nfl4th::add_4th_probs() %>%
-  dplyr::select(
-    posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
-    wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
-    fg_wp, punt_wp
-  ) %>%
-  knitr::kable(digits = 2)
-#> Performing final preparation . . .
-#> Computing probabilities for  1 plays. . .
-```
-
-| posteam | ydstogo | yardline\_100 | go\_boost | first\_down\_prob | wp\_fail | wp\_succeed | go\_wp | fg\_make\_prob | miss\_fg\_wp | make\_fg\_wp | fg\_wp | punt\_wp |
-| :------ | ------: | ------------: | --------: | ----------------: | -------: | ----------: | -----: | -------------: | -----------: | -----------: | -----: | -------: |
-| GB      |       8 |             8 |      3.77 |              0.33 |     0.04 |        0.31 |   0.13 |           0.98 |         0.03 |         0.09 |   0.09 |       NA |
-
-As expected, the output is the same.
+  - The **go for it** model does not allow for the possibility of a
+    turnover return. However, long returns are extremely rare: For
+    example, in 2018 and 2019 there were only four defensive touchdowns
+    on plays where teams went for fourth downs out of 1,236 plays, and
+    all of these happened when the game was well in hand for the other
+    team.
+  - The **punt** model doesn’t account for the punter or returner,
+    ignores penalties on returns and ignores the potential for blocked
+    punts to be returned for touchdowns
+  - The **field goal** model doesn’t account for who the kicker is, what
+    the weather is (only relevant for outdoor games), or the possibility
+    of a kick being blocked and returned for a touchdown
 
 ## Check coaches’ alignment with the model
 
@@ -136,7 +73,18 @@ Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-t
 
 ``` r
 library(gt)
+library(nfl4th)
+library(tidyverse)
+#> -- Attaching packages ------------------------------------------------------------------------------------------ tidyverse 1.3.0 --
+#> v ggplot2 3.3.2     v purrr   0.3.4
+#> v tibble  3.0.0     v dplyr   0.8.5
+#> v tidyr   1.1.2     v stringr 1.4.0
+#> v readr   1.3.1     v forcats 0.5.0
+#> -- Conflicts --------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+#> x dplyr::filter() masks stats::filter()
+#> x dplyr::lag()    masks stats::lag()
 
+data <- nflfastR::load_pbp(2020)
 calculated <- data %>%
   nfl4th:::add_4th_probs() %>%
   dplyr::filter(down == 4, !is.na(go_boost)) 
@@ -151,7 +99,7 @@ calculated <- data %>%
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ncjrajxkar .gt_table {
+#cxjsrqnfld .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -174,7 +122,7 @@ calculated <- data %>%
   border-left-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_heading {
+#cxjsrqnfld .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -186,7 +134,7 @@ calculated <- data %>%
   border-right-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_title {
+#cxjsrqnfld .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -196,7 +144,7 @@ calculated <- data %>%
   border-bottom-width: 0;
 }
 
-#ncjrajxkar .gt_subtitle {
+#cxjsrqnfld .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -206,13 +154,13 @@ calculated <- data %>%
   border-top-width: 0;
 }
 
-#ncjrajxkar .gt_bottom_border {
+#cxjsrqnfld .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_col_headings {
+#cxjsrqnfld .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -227,7 +175,7 @@ calculated <- data %>%
   border-right-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_col_heading {
+#cxjsrqnfld .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -247,7 +195,7 @@ calculated <- data %>%
   overflow-x: hidden;
 }
 
-#ncjrajxkar .gt_column_spanner_outer {
+#cxjsrqnfld .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -259,15 +207,15 @@ calculated <- data %>%
   padding-right: 4px;
 }
 
-#ncjrajxkar .gt_column_spanner_outer:first-child {
+#cxjsrqnfld .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ncjrajxkar .gt_column_spanner_outer:last-child {
+#cxjsrqnfld .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ncjrajxkar .gt_column_spanner {
+#cxjsrqnfld .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -279,7 +227,7 @@ calculated <- data %>%
   width: 100%;
 }
 
-#ncjrajxkar .gt_group_heading {
+#cxjsrqnfld .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -301,7 +249,7 @@ calculated <- data %>%
   vertical-align: middle;
 }
 
-#ncjrajxkar .gt_empty_group_heading {
+#cxjsrqnfld .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -316,19 +264,19 @@ calculated <- data %>%
   vertical-align: middle;
 }
 
-#ncjrajxkar .gt_striped {
+#cxjsrqnfld .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ncjrajxkar .gt_from_md > :first-child {
+#cxjsrqnfld .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ncjrajxkar .gt_from_md > :last-child {
+#cxjsrqnfld .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ncjrajxkar .gt_row {
+#cxjsrqnfld .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -347,7 +295,7 @@ calculated <- data %>%
   overflow-x: hidden;
 }
 
-#ncjrajxkar .gt_stub {
+#cxjsrqnfld .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -359,7 +307,7 @@ calculated <- data %>%
   padding-left: 12px;
 }
 
-#ncjrajxkar .gt_summary_row {
+#cxjsrqnfld .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -369,7 +317,7 @@ calculated <- data %>%
   padding-right: 5px;
 }
 
-#ncjrajxkar .gt_first_summary_row {
+#cxjsrqnfld .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -379,7 +327,7 @@ calculated <- data %>%
   border-top-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_grand_summary_row {
+#cxjsrqnfld .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -389,7 +337,7 @@ calculated <- data %>%
   padding-right: 5px;
 }
 
-#ncjrajxkar .gt_first_grand_summary_row {
+#cxjsrqnfld .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -399,7 +347,7 @@ calculated <- data %>%
   border-top-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_table_body {
+#cxjsrqnfld .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -408,7 +356,7 @@ calculated <- data %>%
   border-bottom-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_footnotes {
+#cxjsrqnfld .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -422,13 +370,13 @@ calculated <- data %>%
   border-right-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_footnote {
+#cxjsrqnfld .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ncjrajxkar .gt_sourcenotes {
+#cxjsrqnfld .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -442,47 +390,47 @@ calculated <- data %>%
   border-right-color: #D3D3D3;
 }
 
-#ncjrajxkar .gt_sourcenote {
+#cxjsrqnfld .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ncjrajxkar .gt_left {
+#cxjsrqnfld .gt_left {
   text-align: left;
 }
 
-#ncjrajxkar .gt_center {
+#cxjsrqnfld .gt_center {
   text-align: center;
 }
 
-#ncjrajxkar .gt_right {
+#cxjsrqnfld .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ncjrajxkar .gt_font_normal {
+#cxjsrqnfld .gt_font_normal {
   font-weight: normal;
 }
 
-#ncjrajxkar .gt_font_bold {
+#cxjsrqnfld .gt_font_bold {
   font-weight: bold;
 }
 
-#ncjrajxkar .gt_font_italic {
+#cxjsrqnfld .gt_font_italic {
   font-style: italic;
 }
 
-#ncjrajxkar .gt_super {
+#cxjsrqnfld .gt_super {
   font-size: 65%;
 }
 
-#ncjrajxkar .gt_footnote_marks {
+#cxjsrqnfld .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
 
-<div id="ncjrajxkar" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="cxjsrqnfld" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 
 <table class="gt_table">
 
