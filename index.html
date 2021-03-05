@@ -79,7 +79,8 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of nfl4th is to …</p>
+<p>This is the package that powers the <a href="https://rbsdm.com/stats/fourth_calculator">fourth down calculator</a> introduced in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/">this piece on The Athletic</a>.</p>
+<p>The code that powers the Twitter fourth down bot <a href="https://github.com/guga31bb/fourth_calculator/tree/main/bot">is in this folder here</a>.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -91,27 +92,728 @@
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"guga31bb/nfl4th"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="example" class="section level2">
+<div id="example-1-from-nflfastr" class="section level2">
 <h2 class="hasAnchor">
-<a href="#example" class="anchor"></a>Example</h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
+<a href="#example-1-from-nflfastr" class="anchor"></a>Example 1: from nflfastR</h2>
+<p>Let’s start by loading 2020 play-by-play data from <code>nflfastR</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://guga31bb.github.io/nfl4th/">nfl4th</a></span><span class="op">)</span>
-<span class="co">## basic example code</span></code></pre></div>
-<p>What is special about using <code>README.Rmd</code> instead of just <code>README.md</code>? You can include R chunks like so:</p>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">nflfastR</span><span class="fu">::</span><span class="fu"><a href="https://www.nflfastr.com//reference/load_pbp.html">load_pbp</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span></code></pre></div>
+<p>Here’s how to calculate all probabilities from one game:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">cars</span><span class="op">)</span>
-<span class="co">#&gt;      speed           dist       </span>
-<span class="co">#&gt;  Min.   : 4.0   Min.   :  2.00  </span>
-<span class="co">#&gt;  1st Qu.:12.0   1st Qu.: 26.00  </span>
-<span class="co">#&gt;  Median :15.0   Median : 36.00  </span>
-<span class="co">#&gt;  Mean   :15.4   Mean   : 42.98  </span>
-<span class="co">#&gt;  3rd Qu.:19.0   3rd Qu.: 56.00  </span>
-<span class="co">#&gt;  Max.   :25.0   Max.   :120.00</span></code></pre></div>
-<p>You’ll still need to render <code>README.Rmd</code> regularly, to keep <code>README.md</code> up-to-date. <code>devtools::build_readme()</code> is handy for this. You could also use GitHub Actions to re-render <code>README.Rmd</code> every time you push. An example workflow can be found here: <a href="https://github.com/r-lib/actions/tree/master/examples" class="uri">https://github.com/r-lib/actions/tree/master/examples</a>.</p>
-<p>You can also embed plots, for example:</p>
-<p><img src="reference/figures/README-pressure-1.png" width="100%"></p>
-<p>In that case, don’t forget to commit and push the resulting figure files, so they display on GitHub and CRAN.</p>
+<code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">tic</a></span><span class="op">(</span><span class="st">"One game"</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">week</span> <span class="op">==</span> <span class="fl">20</span>, <span class="va">home_team</span> <span class="op">==</span> <span class="st">"GB"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">down</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
+    <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
+    <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
+    <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="co">#&gt; home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
+<span class="co">#&gt; Performing final preparation . . .</span>
+<span class="co">#&gt; Computing probabilities for  9 plays. . .</span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="5%">
+<col width="5%">
+<col width="9%">
+<col width="6%">
+<col width="13%">
+<col width="6%">
+<col width="8%">
+<col width="4%">
+<col width="10%">
+<col width="9%">
+<col width="9%">
+<col width="4%">
+<col width="6%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">posteam</th>
+<th align="right">ydstogo</th>
+<th align="right">yardline_100</th>
+<th align="right">go_boost</th>
+<th align="right">first_down_prob</th>
+<th align="right">wp_fail</th>
+<th align="right">wp_succeed</th>
+<th align="right">go_wp</th>
+<th align="right">fg_make_prob</th>
+<th align="right">miss_fg_wp</th>
+<th align="right">make_fg_wp</th>
+<th align="right">fg_wp</th>
+<th align="right">punt_wp</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">17</td>
+<td align="right">65</td>
+<td align="right">-3.74</td>
+<td align="right">0.15</td>
+<td align="right">0.33</td>
+<td align="right">0.47</td>
+<td align="right">0.35</td>
+<td align="right">0.00</td>
+<td align="right">0.31</td>
+<td align="right">0.47</td>
+<td align="right">0.31</td>
+<td align="right">0.38</td>
+</tr>
+<tr class="even">
+<td align="left">TB</td>
+<td align="right">15</td>
+<td align="right">56</td>
+<td align="right">-2.96</td>
+<td align="right">0.17</td>
+<td align="right">0.53</td>
+<td align="right">0.71</td>
+<td align="right">0.56</td>
+<td align="right">0.00</td>
+<td align="right">0.52</td>
+<td align="right">0.66</td>
+<td align="right">0.52</td>
+<td align="right">0.59</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">-2.16</td>
+<td align="right">0.31</td>
+<td align="right">0.36</td>
+<td align="right">0.57</td>
+<td align="right">0.43</td>
+<td align="right">0.98</td>
+<td align="right">0.33</td>
+<td align="right">0.45</td>
+<td align="right">0.45</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">TB</td>
+<td align="right">9</td>
+<td align="right">47</td>
+<td align="right">-2.73</td>
+<td align="right">0.33</td>
+<td align="right">0.55</td>
+<td align="right">0.67</td>
+<td align="right">0.59</td>
+<td align="right">0.00</td>
+<td align="right">0.52</td>
+<td align="right">0.68</td>
+<td align="right">0.52</td>
+<td align="right">0.62</td>
+</tr>
+<tr class="odd">
+<td align="left">TB</td>
+<td align="right">4</td>
+<td align="right">45</td>
+<td align="right">-0.12</td>
+<td align="right">0.51</td>
+<td align="right">0.55</td>
+<td align="right">0.67</td>
+<td align="right">0.62</td>
+<td align="right">0.00</td>
+<td align="right">0.54</td>
+<td align="right">0.69</td>
+<td align="right">0.54</td>
+<td align="right">0.62</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">15</td>
+<td align="right">86</td>
+<td align="right">-2.52</td>
+<td align="right">0.19</td>
+<td align="right">0.16</td>
+<td align="right">0.38</td>
+<td align="right">0.20</td>
+<td align="right">0.00</td>
+<td align="right">0.14</td>
+<td align="right">0.34</td>
+<td align="right">0.14</td>
+<td align="right">0.22</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">76</td>
+<td align="right">-0.37</td>
+<td align="right">0.32</td>
+<td align="right">0.15</td>
+<td align="right">0.37</td>
+<td align="right">0.22</td>
+<td align="right">0.00</td>
+<td align="right">0.14</td>
+<td align="right">0.32</td>
+<td align="right">0.14</td>
+<td align="right">0.23</td>
+</tr>
+<tr class="even">
+<td align="left">TB</td>
+<td align="right">8</td>
+<td align="right">28</td>
+<td align="right">-3.45</td>
+<td align="right">0.37</td>
+<td align="right">0.72</td>
+<td align="right">0.92</td>
+<td align="right">0.80</td>
+<td align="right">0.75</td>
+<td align="right">0.69</td>
+<td align="right">0.88</td>
+<td align="right">0.83</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">3.77</td>
+<td align="right">0.33</td>
+<td align="right">0.04</td>
+<td align="right">0.31</td>
+<td align="right">0.13</td>
+<td align="right">0.98</td>
+<td align="right">0.03</td>
+<td align="right">0.09</td>
+<td align="right">0.09</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; One game: 1.38 sec elapsed</span></code></pre></div>
+<p>We see the infamous field goal at the bottom.</p>
+</div>
+<div id="example-2-from-user-input" class="section level2">
+<h2 class="hasAnchor">
+<a href="#example-2-from-user-input" class="anchor"></a>Example 2: from user input</h2>
+<p>Let’s input the play ourselves to verify that we get the same thing. The below shows the bare minimum amount of information that has to be fed to <code>nfl4th</code> in order to compute 4th down decision recommendations.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">one_play</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
+  
+  <span class="co"># things to help find the right game (use "reg" or "post")</span>
+  home_team <span class="op">=</span> <span class="st">"GB"</span>,
+  away_team <span class="op">=</span> <span class="st">"TB"</span>,
+  posteam <span class="op">=</span> <span class="st">"GB"</span>,
+  type <span class="op">=</span> <span class="st">"post"</span>,
+  season <span class="op">=</span> <span class="fl">2020</span>,
+  
+  <span class="co"># information about the situation</span>
+  qtr <span class="op">=</span> <span class="fl">4</span>,
+  quarter_seconds_remaining <span class="op">=</span> <span class="fl">129</span>,
+  ydstogo <span class="op">=</span> <span class="fl">8</span>,
+  yardline_100 <span class="op">=</span> <span class="fl">8</span>,
+  score_differential <span class="op">=</span> <span class="op">-</span><span class="fl">8</span>,
+
+  home_opening_kickoff <span class="op">=</span> <span class="fl">0</span>,
+  posteam_timeouts_remaining <span class="op">=</span> <span class="fl">3</span>,
+  defteam_timeouts_remaining <span class="op">=</span> <span class="fl">3</span>
+<span class="op">)</span>
+
+<span class="va">one_play</span> <span class="op">%&gt;%</span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
+    <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
+    <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
+    <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="co">#&gt; Performing final preparation . . .</span>
+<span class="co">#&gt; Computing probabilities for  1 plays. . .</span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="5%">
+<col width="5%">
+<col width="9%">
+<col width="6%">
+<col width="13%">
+<col width="6%">
+<col width="8%">
+<col width="4%">
+<col width="10%">
+<col width="9%">
+<col width="9%">
+<col width="4%">
+<col width="6%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">posteam</th>
+<th align="right">ydstogo</th>
+<th align="right">yardline_100</th>
+<th align="right">go_boost</th>
+<th align="right">first_down_prob</th>
+<th align="right">wp_fail</th>
+<th align="right">wp_succeed</th>
+<th align="right">go_wp</th>
+<th align="right">fg_make_prob</th>
+<th align="right">miss_fg_wp</th>
+<th align="right">make_fg_wp</th>
+<th align="right">fg_wp</th>
+<th align="right">punt_wp</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">3.77</td>
+<td align="right">0.33</td>
+<td align="right">0.04</td>
+<td align="right">0.31</td>
+<td align="right">0.13</td>
+<td align="right">0.98</td>
+<td align="right">0.03</td>
+<td align="right">0.09</td>
+<td align="right">0.09</td>
+<td align="right">NA</td>
+</tr></tbody>
+</table>
+<p>As expected, the output is the same.</p>
+</div>
+<div id="check-coaches-alignment-with-the-model" class="section level2">
+<h2 class="hasAnchor">
+<a href="#check-coaches-alignment-with-the-model" class="anchor"></a>Check coaches’ alignment with the model</h2>
+<p>Here’s how to create one of the tables shown in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/">the piece on The Athletic</a>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
+
+<span class="va">calculated</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span>
+  <span class="fu">nfl4th</span><span class="fu">:::</span><span class="fu"><a href="reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">down</span> <span class="op">==</span> <span class="fl">4</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span><span class="op">)</span> 
+<span class="co">#&gt; home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
+<span class="co">#&gt; Performing final preparation . . .</span>
+<span class="co">#&gt; Computing probabilities for  3811 plays. . .</span></code></pre></div>
+<!--html_preserve-->
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ncjrajxkar .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: black;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: white;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ncjrajxkar .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ncjrajxkar .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ncjrajxkar .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ncjrajxkar .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ncjrajxkar .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ncjrajxkar .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ncjrajxkar .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: black;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ncjrajxkar .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: black;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  vertical-align: middle;
+}
+
+#ncjrajxkar .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ncjrajxkar .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ncjrajxkar .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ncjrajxkar .gt_row {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: white;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ncjrajxkar .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#ncjrajxkar .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ncjrajxkar .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ncjrajxkar .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ncjrajxkar .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ncjrajxkar .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ncjrajxkar .gt_left {
+  text-align: left;
+}
+
+#ncjrajxkar .gt_center {
+  text-align: center;
+}
+
+#ncjrajxkar .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ncjrajxkar .gt_font_normal {
+  font-weight: normal;
+}
+
+#ncjrajxkar .gt_font_bold {
+  font-weight: bold;
+}
+
+#ncjrajxkar .gt_font_italic {
+  font-style: italic;
+}
+
+#ncjrajxkar .gt_super {
+  font-size: 65%;
+}
+
+#ncjrajxkar .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="ncjrajxkar" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<table class="table gt_table">
+<thead class="gt_header">
+<tr>
+<th colspan="3" class="gt_heading gt_title gt_font_normal" style>
+<p>NFL team decision-making by go recommendation, 2020</p>
+</th>
+</tr>
+<tr>
+<th colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>
+</th>
+</tr>
+</thead>
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: black; font-weight: bold;">
+<p>Recommendation</p>
+</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">
+<p>Went for it %</p>
+</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">
+<p>Plays</p>
+</th>
+</tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left">
+<p>Definitely go for it</p>
+</td>
+<td class="gt_row gt_center">
+<p>72</p>
+</td>
+<td class="gt_row gt_center">
+<p>232</p>
+</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">
+<p>Probably go for it</p>
+</td>
+<td class="gt_row gt_center">
+<p>35</p>
+</td>
+<td class="gt_row gt_center">
+<p>659</p>
+</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">
+<p>Toss-up</p>
+</td>
+<td class="gt_row gt_center">
+<p>18</p>
+</td>
+<td class="gt_row gt_center">
+<p>1557</p>
+</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">
+<p>Probably kick</p>
+</td>
+<td class="gt_row gt_center">
+<p>2</p>
+</td>
+<td class="gt_row gt_center">
+<p>882</p>
+</td>
+</tr>
+<tr>
+<td class="gt_row gt_left">
+<p>Definitely kick</p>
+</td>
+<td class="gt_row gt_center">
+<p>0</p>
+</td>
+<td class="gt_row gt_center">
+<p>306</p>
+</td>
+</tr>
+</tbody>
+<tfoot class="gt_sourcenotes"><tr>
+<td class="gt_sourcenote" colspan="3">
+<p><strong>Notes</strong>: “Definitely” recommendations are greater than 4 percentage point advantage,<br> “probably” 1-4 percentage points</p>
+</td>
+</tr></tfoot>
+</table>
+</div>
+<!--/html_preserve-->
+<p>Thus, we can see that the model is strongly aligned to what coaches do.</p>
 </div>
 </div>
   </div>

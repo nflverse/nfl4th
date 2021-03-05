@@ -296,7 +296,7 @@
 </table>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; All plays from one week: 3.979 sec elapsed</span></code></pre></div>
+<span class="co">#&gt; All plays from one week: 3.369 sec elapsed</span></code></pre></div>
 <p>But this kind of takes a long time since it’s a whole season. If you want a sub-sample, filter <strong>at the game level</strong> before invoking the function because the win probability model needs all plays in a game in order to work (i.e., not just the 4th downs or one team’s plays). This is because it has to figure out which team received the opening kickoff.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">tic</a></span><span class="op">(</span><span class="st">"One game"</span><span class="op">)</span>
@@ -484,7 +484,7 @@
 </table>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; One game: 1.901 sec elapsed</span></code></pre></div>
+<span class="co">#&gt; One game: 1.506 sec elapsed</span></code></pre></div>
 <p>We see the infamous field goal at the bottom.</p>
 <p>Let’s input the play ourselves to see if we can get the same thing. The below shows the bare minimum amount of information that has to be fed to <code>nfl4th</code> in order to compute 4th down decision recommendations.</p>
 <p>The reason teams from a specific game have to be used is that the model depends on factors such as point spread, team totals, and indoor/outdoor and the program automatically looks these up so that users don’t have to provide them.</p>
