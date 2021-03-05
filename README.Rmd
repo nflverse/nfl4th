@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# nfl4th
+# **nfl4th** <img src="man/figures/logo.png" align="right" width="25%" min-width="120px"/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/guga31bb/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/guga31bb/nfl4th/actions)
