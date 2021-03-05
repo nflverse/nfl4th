@@ -97,22 +97,13 @@
     
     
 <p>This is an update of <a href="https://github.com/guga31bb/fourth_calculator/blob/main/R/season_numbers.R">the analysis that used to be stored here</a>. The idea is to show different ways of using the package to analyze 4th down decisions in hopes of inspiring others to try other things.</p>
+<p>The code isn’t being displayed on this webpage since it is long but <a href="https://github.com/guga31bb/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd">can be accessed here</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://guga31bb.github.io/nfl4th/">nfl4th</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
-<span class="co">#&gt; ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</span>
-<span class="co">#&gt; ✔ ggplot2 3.3.3     ✔ purrr   0.3.4</span>
-<span class="co">#&gt; ✔ tibble  3.1.0     ✔ dplyr   1.0.4</span>
-<span class="co">#&gt; ✔ tidyr   1.1.3     ✔ stringr 1.4.0</span>
-<span class="co">#&gt; ✔ readr   1.4.0     ✔ forcats 0.5.1</span>
-<span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span>
-<span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span>
-<span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span>
-
-<span class="va">load_season</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">season</span><span class="op">)</span> <span class="op">{</span>
+<code class="sourceCode R"><span class="va">load_season</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">season</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu">nflfastR</span><span class="fu">::</span><span class="fu"><a href="https://www.nflfastr.com//reference/load_pbp.html">load_pbp</a></span><span class="op">(</span><span class="va">season</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>go <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="op">(</span><span class="va">rush</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">|</span> <span class="va">pass</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">play_type_nfl</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"PUNT"</span>, <span class="st">"FIELD_GOAL"</span><span class="op">)</span>, <span class="fl">100</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">down</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="op">)</span>
 <span class="op">}</span>
 
@@ -120,94 +111,15 @@
 <span class="co">#&gt; home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
 <span class="co">#&gt; Performing final preparation . . .</span>
 <span class="co">#&gt; Computing probabilities for  3811 plays. . .</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
-<span class="va">pbp_2020</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span>
-    <span class="va">go</span> <span class="op">==</span> <span class="fl">0</span>,
-    <span class="co"># they tried to go for it</span>
-    <span class="op">!</span><span class="op">(</span><span class="va">posteam</span> <span class="op">==</span> <span class="st">"ARI"</span> <span class="op">&amp;</span> <span class="va">week</span> <span class="op">==</span> <span class="fl">3</span> <span class="op">&amp;</span> <span class="va">play_id</span> <span class="op">==</span> <span class="fl">2364</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>
-    defteam <span class="op">=</span> <span class="fu">if_else</span><span class="op">(</span><span class="va">posteam</span> <span class="op">==</span> <span class="va">home_team</span>, <span class="va">away_team</span>, <span class="va">home_team</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">arrange</span><span class="op">(</span><span class="op">-</span><span class="va">go_boost</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">mutate</span><span class="op">(</span>rank <span class="op">=</span> <span class="fl">1</span> <span class="op">:</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">select</span><span class="op">(</span><span class="va">rank</span>, <span class="va">posteam</span>, <span class="va">defteam</span>, <span class="va">week</span>, <span class="va">qtr</span>, <span class="va">ydstogo</span>, diff <span class="op">=</span> <span class="va">score_differential</span>, <span class="va">go_boost</span>, <span class="va">desc</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>
-    rank <span class="op">=</span> <span class="st">""</span>,
-    posteam <span class="op">=</span> <span class="st">"Team"</span>,
-    defteam <span class="op">=</span> <span class="st">"Opp"</span>,
-    week <span class="op">=</span> <span class="st">"Week"</span>,
-    qtr <span class="op">=</span> <span class="st">"Qtr"</span>,
-    ydstogo <span class="op">=</span> <span class="st">"YTG"</span>,
-    diff <span class="op">=</span> <span class="st">"Diff"</span>,
-    desc <span class="op">=</span> <span class="st">"Play"</span>,
-    go_boost <span class="op">=</span> <span class="st">"WP loss"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_style.html">tab_style</a></span><span class="op">(</span>
-    style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cell_text.html">cell_text</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, weight <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,
-    locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-      <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cells_row_groups.html">cells_row_groups</a></span><span class="op">(</span><span class="op">)</span>,
-      <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cells_column_labels.html">cells_column_labels</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/text_transform.html">text_transform</a></span><span class="op">(</span>
-    locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cells_body.html">cells_body</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">posteam</span><span class="op">)</span><span class="op">)</span>,
-    fn <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/web_image.html">web_image</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">'https://a.espncdn.com/i/teamlogos/nfl/500/'</span>,<span class="va">x</span>,<span class="st">'.png'</span><span class="op">)</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/text_transform.html">text_transform</a></span><span class="op">(</span>
-    locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cells_body.html">cells_body</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">defteam</span><span class="op">)</span><span class="op">)</span>,
-    fn <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/web_image.html">web_image</a></span><span class="op">(</span>url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">'https://a.espncdn.com/i/teamlogos/nfl/500/'</span>,<span class="va">x</span>,<span class="st">'.png'</span><span class="op">)</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_width.html">cols_width</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">400</span><span class="op">)</span>,
-    <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_width.html">cols_width</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">rank</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">30</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">posteam</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">defteam</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">week</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">diff</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">qtr</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">ydstogo</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">70</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_options.html">tab_options</a></span><span class="op">(</span>
-    row_group.border.top.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,
-    row_group.border.top.color <span class="op">=</span> <span class="st">"black"</span>,
-    row_group.border.bottom.color <span class="op">=</span> <span class="st">"black"</span>,
-    table_body.hlines.color <span class="op">=</span> <span class="st">"white"</span>,
-    table.border.top.color <span class="op">=</span> <span class="st">"black"</span>,
-    table.border.top.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
-    table.border.bottom.color <span class="op">=</span> <span class="st">"white"</span>,
-    table.border.bottom.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
-    column_labels.border.bottom.color <span class="op">=</span> <span class="st">"black"</span>,
-    column_labels.border.bottom.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>,
-    row.striping.background_color <span class="op">=</span> <span class="st">'#FFFFFF'</span>,
-    row.striping.include_table_body <span class="op">=</span> <span class="cn">TRUE</span>,
-    table.background.color <span class="op">=</span> <span class="st">'#F2F2F2'</span>,
-    data_row.padding <span class="op">=</span> <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>,
-    table.font.size <span class="op">=</span> <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/px.html">px</a></span><span class="op">(</span><span class="fl">16L</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/fmt_number.html">fmt_number</a></span><span class="op">(</span>
-    columns <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">1</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_align.html">cols_align</a></span><span class="op">(</span>
-    columns <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,
-    align <span class="op">=</span> <span class="st">"center"</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>
-    title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Worst kick decisions of 2020"</span><span class="op">)</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="co">#&gt; Warning: The `.dots` argument of `group_by()` is deprecated as of dplyr 1.0.0.</span></code></pre></div>
+<div id="worst-kick-decisions-of-2020" class="section level2">
+<h2 class="hasAnchor">
+<a href="#worst-kick-decisions-of-2020" class="anchor"></a>Worst kick decisions of 2020</h2>
+<pre><code>#&gt; Warning: The `.dots` argument of `group_by()` is deprecated as of dplyr 1.0.0.</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#sfstvnhqxt .gt_table {
+#kydycsteql .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -232,7 +144,7 @@
   border-left-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_heading {
+#kydycsteql .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -244,7 +156,7 @@
   border-right-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_title {
+#kydycsteql .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -254,7 +166,7 @@
   border-bottom-width: 0;
 }
 
-#sfstvnhqxt .gt_subtitle {
+#kydycsteql .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -264,13 +176,13 @@
   border-top-width: 0;
 }
 
-#sfstvnhqxt .gt_bottom_border {
+#kydycsteql .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_col_headings {
+#kydycsteql .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -285,7 +197,7 @@
   border-right-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_col_heading {
+#kydycsteql .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -305,7 +217,7 @@
   overflow-x: hidden;
 }
 
-#sfstvnhqxt .gt_column_spanner_outer {
+#kydycsteql .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -317,15 +229,15 @@
   padding-right: 4px;
 }
 
-#sfstvnhqxt .gt_column_spanner_outer:first-child {
+#kydycsteql .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#sfstvnhqxt .gt_column_spanner_outer:last-child {
+#kydycsteql .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#sfstvnhqxt .gt_column_spanner {
+#kydycsteql .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -337,7 +249,7 @@
   width: 100%;
 }
 
-#sfstvnhqxt .gt_group_heading {
+#kydycsteql .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #F2F2F2;
@@ -359,7 +271,7 @@
   vertical-align: middle;
 }
 
-#sfstvnhqxt .gt_empty_group_heading {
+#kydycsteql .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -374,15 +286,15 @@
   vertical-align: middle;
 }
 
-#sfstvnhqxt .gt_from_md > :first-child {
+#kydycsteql .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#sfstvnhqxt .gt_from_md > :last-child {
+#kydycsteql .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#sfstvnhqxt .gt_row {
+#kydycsteql .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -401,7 +313,7 @@
   overflow-x: hidden;
 }
 
-#sfstvnhqxt .gt_stub {
+#kydycsteql .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -413,7 +325,7 @@
   padding-left: 12px;
 }
 
-#sfstvnhqxt .gt_summary_row {
+#kydycsteql .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -423,7 +335,7 @@
   padding-right: 5px;
 }
 
-#sfstvnhqxt .gt_first_summary_row {
+#kydycsteql .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -433,7 +345,7 @@
   border-top-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_grand_summary_row {
+#kydycsteql .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -443,7 +355,7 @@
   padding-right: 5px;
 }
 
-#sfstvnhqxt .gt_first_grand_summary_row {
+#kydycsteql .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -453,11 +365,11 @@
   border-top-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_striped {
+#kydycsteql .gt_striped {
   background-color: #FFFFFF;
 }
 
-#sfstvnhqxt .gt_table_body {
+#kydycsteql .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -466,7 +378,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_footnotes {
+#kydycsteql .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -480,13 +392,13 @@
   border-right-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_footnote {
+#kydycsteql .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#sfstvnhqxt .gt_sourcenotes {
+#kydycsteql .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -500,46 +412,46 @@
   border-right-color: #D3D3D3;
 }
 
-#sfstvnhqxt .gt_sourcenote {
+#kydycsteql .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#sfstvnhqxt .gt_left {
+#kydycsteql .gt_left {
   text-align: left;
 }
 
-#sfstvnhqxt .gt_center {
+#kydycsteql .gt_center {
   text-align: center;
 }
 
-#sfstvnhqxt .gt_right {
+#kydycsteql .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#sfstvnhqxt .gt_font_normal {
+#kydycsteql .gt_font_normal {
   font-weight: normal;
 }
 
-#sfstvnhqxt .gt_font_bold {
+#kydycsteql .gt_font_bold {
   font-weight: bold;
 }
 
-#sfstvnhqxt .gt_font_italic {
+#kydycsteql .gt_font_italic {
   font-style: italic;
 }
 
-#sfstvnhqxt .gt_super {
+#kydycsteql .gt_super {
   font-size: 65%;
 }
 
-#sfstvnhqxt .gt_footnote_marks {
+#kydycsteql .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="sfstvnhqxt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="kydycsteql" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <colgroup>
 <col style="width:30px;">
 <col style="width:50px;">
@@ -683,11 +595,32 @@
     </tr>
 </tbody>
 </table></div>
+</div>
+<div id="leaguewide-behavior-by-strength-of-recommendation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#leaguewide-behavior-by-strength-of-recommendation" class="anchor"></a>Leaguewide behavior by strength of recommendation</h2>
+<p><img src="4th-down-research_files/figure-html/league-1.png" width="5833.33333333333"></p>
+</div>
+<div id="league-behavior-based-on-win-probability" class="section level2">
+<h2 class="hasAnchor">
+<a href="#league-behavior-based-on-win-probability" class="anchor"></a>League behavior based on win probability</h2>
+<p><img src="4th-down-research_files/figure-html/wp-1.png" width="5833.33333333333"></p>
+</div>
+<div id="decisions-by-team" class="section level2">
+<h2 class="hasAnchor">
+<a href="#decisions-by-team" class="anchor"></a>Decisions by team</h2>
+<p><img src="4th-down-research_files/figure-html/afc-1.png" width="5833.33333333333"></p>
+<p><img src="4th-down-research_files/figure-html/nfc-1.png" width="5833.33333333333"></p>
+<p><img src="4th-down-research_files/figure-html/unnamed-chunk-2-1.png" width="5833.33333333333"></p>
+<p><img src="4th-down-research_files/figure-html/unnamed-chunk-3-1.png" width="5833.33333333333"></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
