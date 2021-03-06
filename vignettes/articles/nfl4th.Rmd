@@ -114,7 +114,7 @@ one_play %>%
 Let's put in the situation that would have happened if the Packers had scored a touchdown on the 4th & 8. We don't need a calculator to know that they should have gone for two, but what does the model say?
 
 ```{r table2}
-another <- tibble::tibble(
+another_play <- tibble::tibble(
   
   # things to help find the right game (use "reg" or "post")
   home_team = "GB",
@@ -133,7 +133,7 @@ another <- tibble::tibble(
   defteam_timeouts_remaining = 3
 )
 
-another %>%
+another_play %>%
   nfl4th::add_2pt_probs() %>%
   nfl4th::make_2pt_table_data() %>%
   knitr::kable(digits = 1)
@@ -141,6 +141,24 @@ another %>%
 
 Note that the go for 2 probability here is identical to the win probability associated with a successful 4th down conversion above because the 4th down model assumes that the Packers would go for 2 if they scored.
 
+## Getting 4th down plays from a live game
+
+`nflfastR` doesn't give data for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With the ESPN API.
+
+```{r espn}
+plays <- get_4th_plays("2020_20_TB_GB") %>%
+  tail(1)
+
+plays %>% 
+  select(desc, quarter_seconds_remaining)
+
+plays %>% 
+  nfl4th::add_4th_probs() %>%
+  nfl4th::make_table_data() %>%
+  knitr::kable(digits = 1)
+```
+
+Note that the probabilities are slightly different here because ESPN has the wrong value for time remaining (125 seconds instead of 129). This doesn't affect a lot of plays but is something to be aware of.
 
 ## Check coaches' alignment with the model
 
