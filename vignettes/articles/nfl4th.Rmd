@@ -9,6 +9,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 options(dplyr.summarise.inform = FALSE)
+options(warn = -1) # silences a warning caused by a dplyr bug in the gt package
 ```
 
 First load the packages and some data.
