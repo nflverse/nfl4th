@@ -142,16 +142,10 @@ Note that the go for 2 probability here is identical to the win probability asso
 
 ## Getting 4th down plays from a live game
 
-`nflfastR` doesn't give data for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With the ESPN API. To get the ESPN game ID, go to the [game page](https://www.espn.com/nfl/game?gameId=401220402) and look for the numbers at the end of the url. That's the game ID.
+`nflfastR` doesn't give data for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With the ESPN API.
 
 ```{r espn}
-game <- tibble::tibble(     
-  espn = "401220402",
-  type = "post",
-  season = 2020
-  )
-
-plays <- get_4th_plays(game) %>%
+plays <- get_4th_plays("2020_20_TB_GB") %>%
   tail(1)
 
 plays %>% 
@@ -163,7 +157,7 @@ plays %>%
   knitr::kable(digits = 1)
 ```
 
-Note that the probabilities are slightly different here because ESPN has the wrong value for time remaining. This doesn't affect a lot of plays but is something to be aware of.
+Note that the probabilities are slightly different here because ESPN has the wrong value for time remaining (125 seconds instead of 129). This doesn't affect a lot of plays but is something to be aware of.
 
 ## Check coaches' alignment with the model
 
