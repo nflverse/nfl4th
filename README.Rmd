@@ -26,17 +26,17 @@ The code that powers the Twitter fourth down bot [is in this folder here](https:
 
 ## Installation
 
-You can install the released version of nfl4th from [CRAN](https://CRAN.R-project.org) with:
+<!-- You can install the released version of nfl4th from [CRAN](https://CRAN.R-project.org) with: -->
+
+<!-- ``` r -->
+<!-- install.packages("nfl4th") -->
+<!-- ``` -->
+
+You can install nfl4th from [GitHub](https://github.com/) with:
 
 ``` r
-install.packages("nfl4th")
-```
-
-And the development version from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("guga31bb/nfl4th")
+if (!require("remotes")) install.packages("remotes")
+remotes::install_github("guga31bb/nfl4th")
 ```
 
 ## Features
@@ -53,3 +53,6 @@ There are some edge cases that are not accounted for. These should only make a m
 * The **punt** model doesn’t account for the punter or returner, ignores penalties on returns and ignores the potential for blocked punts to be returned for touchdowns
 * The **field goal** model doesn’t account for who the kicker is, what the weather is (only relevant for outdoor games), or the possibility of a kick being blocked and returned for a touchdown
 
+## Get Started
+
+To get started with nfl4th please see [this article](https://guga31bb.github.io/nfl4th/articles/articles/nfl4th.html). Some 4th down research by Ben Baldwin [can be found here](https://guga31bb.github.io/nfl4th/articles/articles/4th-down-research.html).
