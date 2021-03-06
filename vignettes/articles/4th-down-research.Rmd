@@ -25,6 +25,16 @@ library(gt)
 library(magick)
 library(cowplot)
 library(ggpmisc)
+
+theme_ben <- theme_fivethirtyeight() +
+  theme(
+    legend.position = "none",
+    plot.title = element_markdown(size = 18, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 10, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold")
+  )
+
 ```
 
 ```{r load}
@@ -39,8 +49,13 @@ load_season <- function(season) {
 pbp_2020 <- load_season(2020)
 ```
 
+# Numbers from 2020
 
 ## Worst kick decisions of 2020
+
+Here are the worst choices of not going for it (and instead punting or kicking a field goal) in terms of total expected win probability lost.
+
+2020's champion is Kliff Kingsbury.
 
 ```{r worst, echo = FALSE}
 pbp_2020 %>%
@@ -126,15 +141,9 @@ pbp_2020 %>%
 ```
 
 ## Leaguewide behavior by strength of recommendation
+
+Here's a plot that shows that teams' likelihood of going for it is determined in part by how obvious of a decision it is.
 ```{r league, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
-theme_ben <- theme_fivethirtyeight() +
-  theme(
-    legend.position = "none",
-    plot.title = element_markdown(size = 22, hjust = 0.5),
-    plot.subtitle = element_markdown(size = 12, hjust = 0.5),
-    axis.title.x = element_text(size=12, face="bold"),
-    axis.title.y = element_text(size=12, face="bold")
-  )
 
 plot <- pbp_2020 %>%
   mutate(go_boost = RoundTo(go_boost, 0.5)) %>%
@@ -169,6 +178,8 @@ plot %>%
 ```
 
 ## League behavior based on win probability
+
+Holding the expected "go" gain constant, coaches are more likely to go for it when ahead by a lot or trailing by a lot. This makes sense as their decision is less likely to make the difference between a win and a loss (and thus open the coach up to being blamed for a loss).
 
 ```{r wp, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
 
@@ -228,7 +239,7 @@ follow_bot <- function(conf) {
     geom_hline(yintercept = 0) +
     geom_jitter(aes(y = go_boost, fill = go), 
                 size = 3, width = 0.2, show.legend=FALSE, alpha=.5) +
-    scale_y_continuous(name = "4th down bot gain in going for it", breaks = scales::pretty_breaks(n = 5), expand = c(0,.03)) +
+    scale_y_continuous(name = "4th down bot gain in going for it", breaks = scales::pretty_breaks(n = 5), expand = c(0,1)) +
     theme_ben +
     labs(title = my_title,
          x = "Went for it",
@@ -264,15 +275,18 @@ follow_bot <- function(conf) {
 }
 ```
 
-```{r afc, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+Here is each decision made by every team in 2020.
+```{r afc, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 follow_bot("AFC")
 ```
 
-```{r nfc, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+```{r nfc, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 follow_bot("NFC")
 ```
 
-```{r, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+
+## Which teams were most closely aligned with the bot in 2020
+```{r goshould, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 current <- pbp_2020 %>%
   filter(go_boost > 1.5) %>%
   filter(vegas_wp > .2) %>%
@@ -322,10 +336,11 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
     subtitle = "When @ben_bot_baldwin recommends going for it (gain in win prob. at least 1.5 percentage points)",
     caption = glue::glue("Sample size in parentheses\nExcl. final 30 seconds of game. Win prob >20%")
   ) +
-  geom_text(data = current, aes(x = rank, y = -.015, size=.03, label = glue::glue("({n})")), show.legend = FALSE, nudge_x = 0, color="black")
+  geom_text(data = current, aes(x = rank, y = -.015, label = glue::glue("({n})")), size = 3, show.legend = FALSE, nudge_x = 0, color="black")
 ```
 
-```{r, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+The teams that lost the most win probability in 2020 by conservative decision-making.
+```{r golost, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 current <- pbp_2020 %>%
   group_by(posteam) %>%
   mutate(
@@ -370,11 +385,9 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
             aes(x, y, label = grob, vp.width = width),
             hjust = 0.7) +
   scale_fill_identity(aesthetics = c("fill", "colour")) +
-  theme_bw() +
+  theme_ben +
   theme(
     panel.grid.major.x = element_blank(),
-    plot.title = element_markdown(size=20,face = 2,hjust=.5),
-    plot.subtitle = element_text(size=8, hjust=.5),
     axis.title.x=element_blank(),
     axis.text.x=element_blank(),
     axis.ticks.x=element_blank()
@@ -387,4 +400,262 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
     title= my_title,
     caption = glue::glue("@benbbaldwin | Excl. final 30 seconds of game")
   )
+```
+
+# Numbers from 2014 - 2020
+
+## Making timelines of teams over time
+```{r alldata, echo = FALSE, message = FALSE}
+pbp_all <- map_df(2014:2020, ~{load_season(.x)})
+```
+
+```{r tlfunction, echo = FALSE}
+# function to make team timeline
+make_timeline <- function(team) {
+  
+  current <- pbp_all %>%
+    filter(go_boost > 1.5) %>%
+    filter(vegas_wp > .2) %>%
+    group_by(posteam, season) %>%
+    summarize(go = mean(go), n = n()) %>%
+    ungroup() %>%
+    left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
+    arrange(-go) %>%
+    mutate(rank = 1:n()) %>%
+    arrange(posteam, season)
+
+  means <- current %>%
+    group_by(season) %>%
+    summarize(league_go = mean(go)) %>%
+    ungroup()
+  
+  prim <- nflfastR::teams_colors_logos %>% filter(team_abbr == team) %>% pull(team_color)
+  sec <- nflfastR::teams_colors_logos %>% filter(team_abbr == team) %>% pull(team_color2)
+  name <- nflfastR::teams_colors_logos %>% filter(team_abbr == team) %>% pull(team_nick)
+  
+  chart <- current %>%
+    filter(posteam==team)
+  teams <- current %>%
+    filter(posteam != team)
+  
+  ### pass downs over time
+  my_title <- glue::glue("How often do the <span style='color:red'>{name}</span> go for it when they <span style='color:red'>should?</span>")
+  fig <- ggplot(data=chart, aes(x=season,y=go)) +
+    geom_line(data=chart,
+              aes(x=season,y=go),color=prim,size=3) +
+    geom_point(data=chart,
+               aes(x=season,y=go),color=sec,size=8) +
+    geom_line(data=means,
+              aes(x=season,y=league_go),color="black",size=1, linetype="dashed", alpha=.6) +
+    geom_jitter(data=teams,
+                aes(x=season,y=go), color=teams$team_color, size=4, alpha=.6, width = .045) +
+    labs(
+      x = "",
+      y = "Go rate",
+      title= my_title,
+      subtitle = "When @ben_bot_baldwin recommends going for it (gain in win prob. at least 1.5 percentage points)",
+      caption = glue::glue("Excl. final 30 seconds of game. Win prob >20%")
+    ) +
+    scale_x_continuous(breaks=c(min(chart$season):max(chart$season))) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    theme_ben+
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 18),
+          panel.grid.minor.x = element_blank(),
+          axis.text.x = element_text(size=16),
+          axis.text.y = element_text(size=16)
+          )
+  
+  return(fig)
+  
+}
+```
+
+Our Ravens: very good at this.
+```{r tlbal, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
+make_timeline("BAL")
+```
+
+The Seahawks: less so!
+
+```{r tlsea, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
+make_timeline("SEA")
+```
+
+## Worst playoff games in terms of total WP loss
+```{r wp_playoff, echo = FALSE}
+current <- pbp_all %>%
+  filter(go_boost > 0, go == 0, season_type != "REG") %>%
+  group_by(game_id, posteam, defteam) %>%
+  summarize(
+    go = sum(go_boost), 
+    n = n(),
+    season = dplyr::first(season),
+    week = dplyr::first(week)
+    ) %>%
+  ungroup() %>%
+  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
+  arrange(-go) %>%
+  mutate(rank = 1:n()) %>%
+  arrange(rank) %>%
+  head(20) %>%
+  select(rank, posteam, defteam, season, week, go) %>%
+  mutate(week = case_when(
+    week == 18 ~ "WC",
+    week == 19 ~ "DIV",
+    week == 20 ~ "CONF",
+    week == 21 ~ "SB"
+  ))
+
+# to split decisions up into two columns so the figure isn't so long
+d <- bind_cols(
+  current %>% dplyr::slice(1:10),
+  current %>% dplyr::slice(11:20)
+)
+
+t <- d %>%
+  gt() %>%
+    cols_label(
+      rank = " ",
+      posteam = "Team",
+      defteam = "Opp",
+      week = "Week",
+      season = "Season",
+      go = "WP Lost", 
+      rank1 = " ",
+      posteam1 = "Team",
+      defteam1= "Opp",
+      week1 = "Week",
+      season1 = "Season",
+      go1 = "WP Lost"
+    ) %>%
+    tab_style(
+      style = cell_text(color = "black", weight = "bold"),
+      locations = list(
+        cells_row_groups(),
+        cells_column_labels(everything())
+      )
+    ) %>% 
+    text_transform(
+      locations = cells_body(vars(posteam, posteam1, defteam, defteam1)),
+      fn = function(x) web_image(url = paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
+    ) %>% 
+    cols_width(
+      everything() ~ px(400),
+    ) %>% 
+    cols_width(
+      vars(posteam, posteam1) ~ px(50),
+      vars(defteam, defteam1) ~ px(50),
+      vars(week, week1) ~ px(50),
+      vars(rank, rank1) ~ px(50),
+      vars(season, season1) ~ px(70),
+      vars(go, go1) ~ px(80)
+    ) %>% 
+    tab_options(
+      row_group.border.top.width = px(3),
+      row_group.border.top.color = "black",
+      row_group.border.bottom.color = "black",
+      table_body.hlines.color = "white",
+      table.border.top.color = "black",
+      table.border.top.width = px(1),
+      table.border.bottom.color = "white",
+      table.border.bottom.width = px(1),
+      column_labels.border.bottom.color = "black",
+      column_labels.border.bottom.width = px(2),
+      row.striping.background_color = '#FFFFFF',
+      row.striping.include_table_body = TRUE,
+      table.background.color = '#F2F2F2',
+      data_row.padding = gt::px(2),
+      table.font.size = gt::px(16L)
+    ) %>%
+    fmt_number(
+      columns = vars(go, go1), decimals = 1
+    ) %>%
+    cols_align(
+      columns = 1:12,
+      align = "center"
+    ) %>% 
+    tab_header(
+      title = md(glue::glue("Win probability lost by kicking in playoff games, 2014-2020"))
+    ) %>%
+    tab_style(
+      style = cell_borders(
+        sides = c("left"),
+        color = "#BBBBBB",
+        weight = px(1.5),
+        style = "solid"
+      ),
+      locations = cells_body(
+        columns = vars(rank1),
+        rows = everything()
+      )
+    )
+
+t
+```
+
+## The league is becoming better at 4th downs over time
+```{r time, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
+# labels on the plot
+text_df <- tibble(
+  label = c(
+    "NFL coaches<br>in <span style='color:#00BFC4'>**2020**</span>",
+    "NFL coaches<br>in <span style='color:#F8766D'>**2014**</span>"
+  ),
+  x = c(6, 8.2),
+  y = c(80, 37),
+  angle = c(10, 10),
+  color = c("black", "black")
+)
+
+my_title <- glue::glue("How <span style='color:red'>math</span> is changing football")
+pbp_all %>%
+  filter(vegas_wp > .2) %>%
+  filter(between(go_boost, -10, 10)) %>%
+  filter(season %in% c(2014, 2020)) %>%
+  ggplot(aes(go_boost, go, color = as.factor(season))) + 
+  geom_richtext(data = text_df,   
+                aes(
+                  x, y, label = label, angle = angle
+                ), color = "black", fill = NA, label.color = NA, size = 5
+  ) + 
+  
+  geom_vline(xintercept = 0)+
+  stat_smooth(method = "gam", method.args = list(gamma = 1), formula = y ~ s(x, bs = "cs", k = 10), show.legend = F, se = F, size = 4) +
+  # this is just to get the plot to draw the full 0 to 100 range
+  geom_hline(yintercept = 100, alpha = 0) +
+  geom_hline(yintercept = 0, alpha = 0) +
+  theme_fivethirtyeight()+
+  labs(x = "Gain in win probability by going for it",
+       y = "Go-for-it percentage",
+       subtitle = "4th down decisions in 2020 versus 2014",
+       caption = paste0("Figure: @benbbaldwin | WP gain from @ben_bot_baldwin\nWin prob. > 20%"),
+       title = my_title) +
+  theme(
+    legend.position = "none",
+    plot.title = element_markdown(size = 22, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 12, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold")
+  ) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 4), expand = c(0,0)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10), limits = c(-10, 10), expand = c(0,0)) +
+  
+
+  annotate("text",x=-1.2, y= 70, label = "Should\nkick", color="black", size = 5) +
+  annotate("text",x=1.2, y= 70, label = "Should\ngo for it", color="black", size = 5) +
+
+  geom_segment(
+    aes(x = -.1, y = 80, xend = -2, yend = 80),
+    arrow = arrow(length = unit(0.05, "npc")),
+    color = "black",
+    size = 2
+    ) +
+  geom_segment(
+    aes(x = .1, y = 80, xend = 2, yend = 80),
+    arrow = arrow(length = unit(0.05, "npc")),
+    color = "black",
+    size = 2
+  )
+
 ```
