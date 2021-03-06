@@ -45,7 +45,7 @@ get_games_file <- function() {
     ) %>%
     dplyr::mutate_at(dplyr::vars("home_team", "away_team"), team_name_fn) %>%
     dplyr::select(
-      game_id, season, type, week, away_team, home_team,
+      game_id, season, type, week, away_team, home_team, espn,
       model_roof, era3, era4, era, home_total, away_total, total_line, spread_line,
       retractable, dome, outdoors
     ) %>%
