@@ -21,9 +21,13 @@ Depends:
 Imports: 
     dplyr,
     glue,
+    httr,
+    janitor,
+    jsonlite,
     magrittr,
     mgcv,
     nflfastR,
+    purrr,
     stringr,
     tibble,
     tidyr,
