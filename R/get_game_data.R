@@ -8,7 +8,7 @@
 #'
 #' @description Get 4th down plays from a game.
 #'
-#' @param df A data frame of decisions to be computed for.
+#' @param gid A game to get 4th down decisions of.
 #' @details Obtains a data frame that can be used with `add_4th_probs()`. The following columns
 #' must be present:
 #' \itemize{
