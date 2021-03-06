@@ -89,4 +89,37 @@ away_team <-
   punt_prob <-
   success_prob <-
   success_wp <-
-  two_point_conv_result <- NULL
+  two_point_conv_result <-
+  away_score <-
+  away_timeout_used <-
+  challenge_team <-
+  clock_display_value <-
+  defteam <-
+  espn <-
+  espn_id <-
+  half <-
+  home_opening_kickoff <-
+  home_score <-
+  home_timeout_used <-
+  mins <-
+  period_number <-
+  play_min <-
+  play_sec <-
+  play_time <-
+  secs <-
+  start_distance <-
+  start_down <-
+  start_possession_text <-
+  start_yards_to_endzone <-
+  team.abbreviation <-
+  team_abbreviation <-
+  temp_yardline <-
+  text <-
+  time <-
+  timeout_team <-
+  total_away_timeouts_used <-
+  total_home_timeouts_used <-
+  type_text <-
+  yardline <-
+  yardline_number <-
+  yardline_side <- NULL
