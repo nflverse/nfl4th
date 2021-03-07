@@ -315,7 +315,7 @@
 </table>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; All plays from one week: 3.275 sec elapsed</span></code></pre></div>
+<span class="co">#&gt; All plays from one week: 3.123 sec elapsed</span></code></pre></div>
 <p>But this kind of takes a long time since it’s a whole season. If you want a sub-sample, filter <strong>at the game level</strong> before invoking the function because the win probability model needs all plays in a game in order to work (i.e., not just the 4th downs or one team’s plays). This is because it has to figure out which team received the opening kickoff.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">tic</a></span><span class="op">(</span><span class="st">"One game"</span><span class="op">)</span>
@@ -503,7 +503,7 @@
 </table>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; One game: 1.591 sec elapsed</span></code></pre></div>
+<span class="co">#&gt; One game: 1.491 sec elapsed</span></code></pre></div>
 <p>We see the infamous field goal at the bottom.</p>
 <p>Let’s input the play ourselves to see if we can get the same thing. The below shows the bare minimum amount of information that has to be fed to <code>nfl4th</code> in order to compute 4th down decision recommendations.</p>
 <p>The reason teams from a specific game have to be used is that the model depends on factors such as point spread, team totals, and indoor/outdoor and the program automatically looks these up so that users don’t have to provide them.</p>
@@ -640,7 +640,7 @@
 <a href="#make-a-summary-table-for-a-2-point-decision" class="anchor"></a>Make a summary table for a 2-point decision</h2>
 <p>Let’s put in the situation that would have happened if the Packers had scored a touchdown on the 4th &amp; 8. We don’t need a calculator to know that they should have gone for two, but what does the model say?</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">another</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">another_play</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
   
   <span class="co"># things to help find the right game (use "reg" or "post")</span>
   home_team <span class="op">=</span> <span class="st">"GB"</span>,
@@ -659,7 +659,7 @@
   defteam_timeouts_remaining <span class="op">=</span> <span class="fl">3</span>
 <span class="op">)</span>
 
-<span class="va">another</span> <span class="op">%&gt;%</span>
+<span class="va">another_play</span> <span class="op">%&gt;%</span>
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_2pt_probs.html">add_2pt_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_2pt_table_data.html">make_2pt_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
@@ -692,11 +692,66 @@
 </table>
 <p>Note that the go for 2 probability here is identical to the win probability associated with a successful 4th down conversion above because the 4th down model assumes that the Packers would go for 2 if they scored.</p>
 </div>
+<div id="getting-4th-down-plays-from-a-live-game" class="section level2">
+<h2 class="hasAnchor">
+<a href="#getting-4th-down-plays-from-a-live-game" class="anchor"></a>Getting 4th down plays from a live game</h2>
+<p><code>nflfastR</code> doesn’t give data for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With the ESPN API.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">plays</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/get_4th_plays.html">get_4th_plays</a></span><span class="op">(</span><span class="st">"2020_20_TB_GB"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+
+<span class="va">plays</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="va">desc</span>, <span class="va">quarter_seconds_remaining</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   desc                             quarter_seconds_remaining</span>
+<span class="co">#&gt;   &lt;chr&gt;                                                &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 "Mason Crosby 26 Yd Field Goal "                       125</span>
+
+<span class="va">plays</span> <span class="op">%&gt;%</span> 
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
+<span class="co">#&gt; Performing final preparation . . .</span>
+<span class="co">#&gt; Computing probabilities for  1 plays. . .</span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">choice</th>
+<th align="right">choice_prob</th>
+<th align="right">success_prob</th>
+<th align="right">fail_wp</th>
+<th align="right">success_wp</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Go for it</td>
+<td align="right">12.0</td>
+<td align="right">32.7</td>
+<td align="right">3.2</td>
+<td align="right">30.3</td>
+</tr>
+<tr class="even">
+<td align="left">Field goal attempt</td>
+<td align="right">7.8</td>
+<td align="right">97.5</td>
+<td align="right">2.7</td>
+<td align="right">7.9</td>
+</tr>
+<tr class="odd">
+<td align="left">Punt</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the probabilities are slightly different here because ESPN has the wrong value for time remaining (125 seconds instead of 129). This doesn’t affect a lot of plays but is something to be aware of.</p>
+</div>
 <div id="check-coaches-alignment-with-the-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#check-coaches-alignment-with-the-model" class="anchor"></a>Check coaches’ alignment with the model</h2>
 <p>Here’s how to create one of the tables shown in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/">the piece on The Athletic</a>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
 
 <span class="va">calculated</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span>
@@ -705,12 +760,11 @@
 <span class="co">#&gt; home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
 <span class="co">#&gt; Performing final preparation . . .</span>
 <span class="co">#&gt; Computing probabilities for  3811 plays. . .</span></code></pre></div>
-<pre><code>#&gt; Warning: The `.dots` argument of `group_by()` is deprecated as of dplyr 1.0.0.</code></pre>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ybcypxwwon .gt_table {
+#wmcmbzselm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -735,7 +789,7 @@
   border-left-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_heading {
+#wmcmbzselm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -747,7 +801,7 @@
   border-right-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_title {
+#wmcmbzselm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -757,7 +811,7 @@
   border-bottom-width: 0;
 }
 
-#ybcypxwwon .gt_subtitle {
+#wmcmbzselm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -767,13 +821,13 @@
   border-top-width: 0;
 }
 
-#ybcypxwwon .gt_bottom_border {
+#wmcmbzselm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_col_headings {
+#wmcmbzselm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -788,7 +842,7 @@
   border-right-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_col_heading {
+#wmcmbzselm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -808,7 +862,7 @@
   overflow-x: hidden;
 }
 
-#ybcypxwwon .gt_column_spanner_outer {
+#wmcmbzselm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -820,15 +874,15 @@
   padding-right: 4px;
 }
 
-#ybcypxwwon .gt_column_spanner_outer:first-child {
+#wmcmbzselm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ybcypxwwon .gt_column_spanner_outer:last-child {
+#wmcmbzselm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ybcypxwwon .gt_column_spanner {
+#wmcmbzselm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -840,7 +894,7 @@
   width: 100%;
 }
 
-#ybcypxwwon .gt_group_heading {
+#wmcmbzselm .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -862,7 +916,7 @@
   vertical-align: middle;
 }
 
-#ybcypxwwon .gt_empty_group_heading {
+#wmcmbzselm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -877,15 +931,15 @@
   vertical-align: middle;
 }
 
-#ybcypxwwon .gt_from_md > :first-child {
+#wmcmbzselm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ybcypxwwon .gt_from_md > :last-child {
+#wmcmbzselm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ybcypxwwon .gt_row {
+#wmcmbzselm .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -904,7 +958,7 @@
   overflow-x: hidden;
 }
 
-#ybcypxwwon .gt_stub {
+#wmcmbzselm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -916,7 +970,7 @@
   padding-left: 12px;
 }
 
-#ybcypxwwon .gt_summary_row {
+#wmcmbzselm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -926,7 +980,7 @@
   padding-right: 5px;
 }
 
-#ybcypxwwon .gt_first_summary_row {
+#wmcmbzselm .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -936,7 +990,7 @@
   border-top-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_grand_summary_row {
+#wmcmbzselm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -946,7 +1000,7 @@
   padding-right: 5px;
 }
 
-#ybcypxwwon .gt_first_grand_summary_row {
+#wmcmbzselm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -956,11 +1010,11 @@
   border-top-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_striped {
+#wmcmbzselm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ybcypxwwon .gt_table_body {
+#wmcmbzselm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -969,7 +1023,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_footnotes {
+#wmcmbzselm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -983,13 +1037,13 @@
   border-right-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_footnote {
+#wmcmbzselm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ybcypxwwon .gt_sourcenotes {
+#wmcmbzselm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1003,46 +1057,46 @@
   border-right-color: #D3D3D3;
 }
 
-#ybcypxwwon .gt_sourcenote {
+#wmcmbzselm .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ybcypxwwon .gt_left {
+#wmcmbzselm .gt_left {
   text-align: left;
 }
 
-#ybcypxwwon .gt_center {
+#wmcmbzselm .gt_center {
   text-align: center;
 }
 
-#ybcypxwwon .gt_right {
+#wmcmbzselm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ybcypxwwon .gt_font_normal {
+#wmcmbzselm .gt_font_normal {
   font-weight: normal;
 }
 
-#ybcypxwwon .gt_font_bold {
+#wmcmbzselm .gt_font_bold {
   font-weight: bold;
 }
 
-#ybcypxwwon .gt_font_italic {
+#wmcmbzselm .gt_font_italic {
   font-style: italic;
 }
 
-#ybcypxwwon .gt_super {
+#wmcmbzselm .gt_super {
   font-size: 65%;
 }
 
-#ybcypxwwon .gt_footnote_marks {
+#wmcmbzselm .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="ybcypxwwon" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="wmcmbzselm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>NFL team decision-making by go recommendation, 2020</th>
