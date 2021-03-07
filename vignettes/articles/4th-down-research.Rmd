@@ -57,7 +57,7 @@ Here are the worst choices of not going for it (and instead punting or kicking a
 
 2020's champion is Kliff Kingsbury.
 
-```{r worst, echo = FALSE}
+```{r worst, echo = FALSE, warning = FALSE}
 pbp_2020 %>%
   filter(
     go == 0,
