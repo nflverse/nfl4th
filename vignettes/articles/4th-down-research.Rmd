@@ -35,9 +35,6 @@ theme_ben <- theme_fivethirtyeight() +
     axis.title.y = element_text(size=12, face="bold")
   )
 
-```
-
-```{r load}
 load_season <- function(season) {
   nflfastR::load_pbp(season) %>%
   nfl4th::add_4th_probs() %>%
@@ -46,6 +43,9 @@ load_season <- function(season) {
   return()
 }
 
+```
+
+```{r data2020}
 pbp_2020 <- load_season(2020)
 ```
 
@@ -512,8 +512,9 @@ d <- bind_cols(
   current %>% dplyr::slice(1:10),
   current %>% dplyr::slice(11:20)
 )
+names(d) <- c("rank", "posteam", "defteam", "season", "week", "go", "rank1", "posteam1", "defteam1", "season1", "week1", "go1")
 
-t <- d %>%
+d %>%
   gt() %>%
     cols_label(
       rank = " ",
@@ -590,8 +591,6 @@ t <- d %>%
         rows = everything()
       )
     )
-
-t
 ```
 
 ## The league is becoming better at 4th downs over time
