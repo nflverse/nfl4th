@@ -483,7 +483,7 @@ make_timeline("SEA")
 ```
 
 ## Worst playoff games in terms of total WP loss
-```{r wp_playoff, echo = FALSE}
+```{r wp_playoff, echo = FALSE, message = FALSE}
 current <- pbp_all %>%
   filter(go_boost > 0, go == 0, season_type != "REG") %>%
   group_by(game_id, posteam, defteam) %>%
