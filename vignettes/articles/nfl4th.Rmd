@@ -23,7 +23,7 @@ data <- nflfastR::load_pbp(2020)
 
 ## Feeding in nflfastR data
 
-Here's how to calculate all probs from one week in the 2020 season:
+Here's how to calculate all probs from one week in the 2020 season with `nflfastR` data. The main function is `add_4th_probs()`:
 
 ```{r ex1}
 tictoc::tic("All plays from one week")
@@ -41,12 +41,12 @@ data %>%
 tictoc::toc()
 ```
 
-But this kind of takes a long time since it's a whole season. If you want a sub-sample, filter **at the game level** before invoking the function because the win probability model needs all plays in a game in order to work (i.e., not just the 4th downs or one team's plays). This is because it has to figure out which team received the opening kickoff.
+Or we can add some filters beforehand:
 
 ```{r ex2}
 tictoc::tic("One game")
 data %>%
-  dplyr::filter(week == 20, home_team == "GB") %>%
+  dplyr::filter(week == 20, posteam == "GB") %>%
   nfl4th::add_4th_probs() %>%
   dplyr::filter(down == 4) %>%
   dplyr::select(
@@ -69,7 +69,7 @@ The reason teams from a specific game have to be used is that the model depends 
 ```{r ex3}
 one_play <- tibble::tibble(
   
-  # things to help find the right game (use "reg" or "post")
+  # things to help find the right game (use "reg" or "post" for type)
   home_team = "GB",
   away_team = "TB",
   posteam = "GB",

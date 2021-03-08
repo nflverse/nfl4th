@@ -176,17 +176,17 @@ prepare_nflfastr_data <- function(pbp) {
 
   # some prep
   data <- pbp %>%
-    dplyr::group_by(game_id) %>%
     dplyr::mutate(
-      # needed for WP model
-      home_opening_kickoff = dplyr::if_else(home_team == dplyr::first(stats::na.omit(posteam)), 1, 0),
-      type = if_else(week <= 17, "reg", "post"),
-      runoff = 0
+      type = ifelse(tolower(season_type) == "reg", "reg", "post")
     ) %>%
-    ungroup() %>%
-    filter(game_seconds_remaining > 10,
-           !is.na(half_seconds_remaining), !is.na(qtr), !is.na(posteam)) %>%
-    ungroup()
+    filter(
+      game_seconds_remaining > 30,
+      !is.na(half_seconds_remaining),
+      !is.na(qtr),
+      !is.na(posteam),
+      qtr <= 4,
+      down == 4
+      )
 
   return(data)
 

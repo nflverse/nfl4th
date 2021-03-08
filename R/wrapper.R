@@ -56,11 +56,10 @@ add_4th_probs <- function(df) {
   original_df <- df %>% mutate(index = 1 : n())
   modified_df <- original_df
 
-  if (!"home_opening_kickoff" %in% names(df)) {
-    message("home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .")
+  if (!"type" %in% names(df)) {
+    message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
     modified_df <- original_df %>%
-      prepare_nflfastr_data() %>%
-      filter(down == 4)
+      prepare_nflfastr_data()
   }
 
   message("Performing final preparation . . .")
@@ -144,8 +143,8 @@ add_2pt_probs <- function(df) {
   original_df <- df %>% mutate(index = 1 : n())
   modified_df <- original_df
 
-  if (!"home_opening_kickoff" %in% names(df)) {
-    message("home_opening_kickoff not found. Assuming an nflfastR df and doing necessary cleaning . . .")
+  if (!"type" %in% names(df)) {
+    message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
     modified_df <- original_df %>%
       prepare_nflfastr_data() %>%
       filter(
