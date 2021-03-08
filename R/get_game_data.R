@@ -252,6 +252,8 @@ get_4th_plays <- function(gid) {
             posteam,
             away_team,
             home_team,
+            # needed for bot text
+            yardline,
             yardline_100,
             ydstogo,
             posteam_timeouts_remaining,
