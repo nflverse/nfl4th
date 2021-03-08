@@ -244,6 +244,7 @@ get_4th_plays <- function(gid) {
           select(
             game_id,
             espn_id,
+            play_id = id,
             desc,
             type,
             qtr,
