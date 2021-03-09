@@ -106,6 +106,7 @@ away_team <-
   play_min <-
   play_sec <-
   play_time <-
+  season_type <-
   secs <-
   start_distance <-
   start_down <-
