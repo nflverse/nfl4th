@@ -6,7 +6,8 @@ author: "Ben Baldwin"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width=12, fig.height=6
 )
 ```
 
@@ -25,6 +26,7 @@ library(gt)
 library(magick)
 library(cowplot)
 library(ggpmisc)
+library(patchwork)
 
 theme_ben <- theme_fivethirtyeight() +
   theme(
@@ -34,19 +36,259 @@ theme_ben <- theme_fivethirtyeight() +
     axis.title.x = element_text(size=12, face="bold"),
     axis.title.y = element_text(size=12, face="bold")
   )
-
-load_season <- function(season) {
-  nflfastR::load_pbp(season) %>%
-  nfl4th::add_4th_probs() %>%
-  dplyr::mutate(go = ifelse((rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"), 100, 0)) %>%
-  dplyr::filter(down == 4) %>%
-  return()
-}
-
 ```
 
-```{r data2020}
-pbp_2020 <- load_season(2020)
+```{r data2020, message = FALSE}
+pbp <- nfl4th::load_4th_pbp(2014:2020)
+```
+# General `nfl4th` recommendations
+
+Let's start by seeing what the model tends to recommend on 4th downs.
+
+## Comparison of `nfl4th` and New York Times model recommendations
+
+The recommendations from `nfl4th` are somewhat more aggressive on than New York Times. I think this is mostly because NYT assumed that a successful 4th down conversion would gain exactly the necessary yards to go and nothing more, resulting in an under-estimate of the benefit of going for 4th down. Let's compare the recommendations using the numbers in [this NYT article](https://www.nytimes.com/2014/09/05/upshot/4th-down-when-to-go-for-it-and-why.html).
+
+```{r plot_data, echo = FALSE, message = FALSE}
+plot <- pbp %>%
+  filter(!is.na(go_wp)) %>%
+  mutate(
+    punt_prob = if_else(is.na(punt_wp), 0, punt_wp),
+    ydstogo = ifelse(ydstogo > 10, 10, ydstogo),
+    decision = case_when(
+      punt_prob > fg_wp & punt_prob > go_wp ~ "Punt",
+      fg_wp > punt_prob & fg_wp > go_wp ~ "Field goal",
+      go_wp > punt_prob & go_wp > fg_wp ~ "Go for it",
+      TRUE ~ NA_character_
+    ),
+    # round to nearest 5
+    binned_yardline = 5 * round(yardline_100 / 5)
+    ) %>%
+  select(binned_yardline, yardline_100, ydstogo, go_boost, decision, vegas_wp, score_differential, qtr)
+```
+
+```{r nfl4th, echo = FALSE, message = FALSE}
+fig1 <- plot %>%
+  group_by(binned_yardline, ydstogo) %>%
+  mutate(tot_n = n()) %>%
+  ungroup() %>%
+  group_by(binned_yardline, ydstogo, decision) %>%
+  summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
+  group_by(binned_yardline, ydstogo) %>%
+  arrange(binned_yardline, ydstogo, -n) %>%
+  dplyr::slice(1) %>%
+  ungroup() %>%
+  ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
+  geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95), alpha = 0.75) +
+  scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  theme_fivethirtyeight() +
+  theme(
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    legend.position = "none",
+    plot.title = element_markdown(size = 12, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 10, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold"),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "Distance to opponent end zone",
+     y = "Yards to go",
+     title = "@ben_bot_baldwin") +
+  scale_fill_brewer(palette="Dark2") +
+  annotate("text",x=50, y= 2, label = "Go for it", size = 6) +
+  annotate("text",x=80, y= 7, label = "Punt", size = 6) +
+  annotate("text",x=20, y= 7, label = "Field goal", size = 6)
+```
+
+```{r nyt, echo = FALSE, message = FALSE}
+fig2 <- plot %>%
+  mutate(
+    nyt_go = if_else(
+      ydstogo==1 |
+        (ydstogo==2 & yardline_100<=72) |
+        (ydstogo==3 & yardline_100<=60 & yardline_100 >= 20) |
+        (ydstogo==3 & yardline_100<=4) |
+        (ydstogo==4 & yardline_100<=55 & yardline_100>=29) |
+        (ydstogo==5 & yardline_100<=50 & yardline_100>=33) |
+        (ydstogo==6 & yardline_100<=47 & yardline_100>=35) |
+        (ydstogo==7 & yardline_100<=44 & yardline_100>=36) |
+        (ydstogo==8 & yardline_100<=41 & yardline_100>=37) |
+        (ydstogo==9 & yardline_100<=38 & yardline_100>=38), 1, 0
+    ),
+    decision = case_when(
+      nyt_go == 1 ~ "Go for it",
+      ydstogo == 2 & nyt_go == 0 ~ "Punt",
+      ydstogo == 3 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 4 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 5 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 6 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 7 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 8 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 9 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      ydstogo == 10 & nyt_go == 0 & yardline_100 > 62 ~ "Punt",
+      nyt_go == 0 & yardline_100 > 38 ~ "Punt",
+      TRUE ~ "Field goal"
+    ),
+      binned_yardline = 5 * round(yardline_100 / 5)
+  ) %>%
+  select(binned_yardline, ydstogo, decision) %>%
+  group_by(binned_yardline, ydstogo, decision) %>%
+  summarize(n = n()) %>%
+  group_by(binned_yardline, ydstogo) %>%
+  arrange(binned_yardline, ydstogo, -n) %>%
+  dplyr::slice(1) %>%
+  ungroup() %>%
+  ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
+  geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95), alpha = .75) +
+  scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  theme_fivethirtyeight() +
+  theme(
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    legend.position = "none",
+    plot.title = element_markdown(size = 12, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 10, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold"),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "Distance to opponent end zone",
+     y = "Yards to go",
+     title = "NYT 4th down bot") +
+  scale_fill_brewer(palette="Dark2") +
+  annotate("text",x=50, y= 2, label = "Go for it", size = 6) +
+  annotate("text",x=80, y= 7, label = "Punt", size = 6) +
+  annotate("text",x=20, y= 7, label = "Field goal", size = 6)
+```
+
+```{r combined, echo = FALSE, warning = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
+p <- fig1 + fig2 +
+  plot_annotation(title = '4th down model comparison',
+                      theme = theme(plot.title = element_text(size = 16, hjust = 0.5, face="bold"))
+                  ) &
+  theme_fivethirtyeight() & 
+    theme(
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    legend.position = "none",
+    plot.title = element_markdown(size = 16, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold"),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank()
+  )
+
+p
+
+# for getting a nice figure
+# ggsave("tmp.png", height = 5, width = 10)
+```
+
+While `nfl4th` and NYT agree that teams should always go for 4th & 1, `nfl4th` also thinks this is the case for 4th-and-2 and even most 4th-and-3s. However, note that this is an oversimplification: the `nfl4th` plot on the left shows the most frequent recommendation at a given location, but the recommendations can change given game stat (for example, it will recommend that trailing teams play more aggressively).
+
+## `nfl4th` recommendations by situation
+
+The model makes very different recommendations based on game situations. Teams that are underdogs or are trailing are told to act more aggressively to get back in the game:
+
+```{r nfl4th-trailing, echo = FALSE, message = FALSE}
+fig1 <- plot %>%
+  filter(
+    score_differential < -7
+    ) %>%
+  group_by(binned_yardline, ydstogo) %>%
+  mutate(tot_n = n()) %>%
+  ungroup() %>%
+  group_by(binned_yardline, ydstogo, decision) %>%
+  summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
+  group_by(binned_yardline, ydstogo) %>%
+  arrange(binned_yardline, ydstogo, -n) %>%
+  dplyr::slice(1) %>%
+  ungroup() %>%
+  ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
+  geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95, alpha = pct)) +
+  scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  theme_fivethirtyeight() +
+  theme(
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    legend.position = "none",
+    plot.title = element_markdown(size = 12, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 10, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold"),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "Distance to opponent end zone",
+     y = "Yards to go",
+     title = "Trailing by 8+") +
+  scale_fill_brewer(palette="Dark2") +
+  annotate("text",x=50, y= 2, label = "Go for it", size = 6) +
+  annotate("text",x=80, y= 7, label = "Punt", size = 6) +
+  annotate("text",x=20, y= 7, label = "Field goal", size = 6)
+```
+
+```{r nfl4th-leading, echo = FALSE, message = FALSE}
+fig2 <- plot %>%
+  filter(
+    score_differential > 7
+    ) %>%
+  group_by(binned_yardline, ydstogo) %>%
+  mutate(tot_n = n()) %>%
+  ungroup() %>%
+  group_by(binned_yardline, ydstogo, decision) %>%
+  summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
+  group_by(binned_yardline, ydstogo) %>%
+  arrange(binned_yardline, ydstogo, -n) %>%
+  dplyr::slice(1) %>%
+  ungroup() %>%
+  ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
+  geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95, alpha = pct)) +
+  scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  theme_fivethirtyeight() +
+  theme(
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    legend.position = "none",
+    plot.title = element_markdown(size = 12, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 10, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold"),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "Distance to opponent end zone",
+     y = "Yards to go",
+     title = "Leading by 8+") +
+  scale_fill_brewer(palette="Dark2") +
+  annotate("text",x=50, y= 2, label = "Go for it", size = 6) +
+  annotate("text",x=80, y= 7, label = "Punt", size = 6) +
+  annotate("text",x=20, y= 7, label = "Field goal", size = 6)
+```
+
+```{r combined2, echo = FALSE, warning = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
+p <- fig1 + fig2 +
+  plot_annotation(title = '4th down recommendations by situation', caption = "Darker = more frequent recommendation",
+                      theme = theme(plot.title = element_text(size = 16, hjust = 0.5, face="bold"))
+                  ) &
+  theme_fivethirtyeight() & 
+    theme(
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    legend.position = "none",
+    plot.title = element_markdown(size = 16, hjust = 0.5),
+    axis.title.x = element_text(size=12, face="bold"),
+    axis.title.y = element_text(size=12, face="bold"),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank()
+  )
+
+p
+
+# for getting a nice figure
+# ggsave("tmp.png", height = 5, width = 10)
+
 ```
 
 # Numbers from 2020
@@ -58,8 +300,9 @@ Here are the worst choices of not going for it (and instead punting or kicking a
 2020's champion is Kliff Kingsbury.
 
 ```{r worst, echo = FALSE, warning = FALSE}
-pbp_2020 %>%
+pbp %>%
   filter(
+    season == 2020,
     go == 0,
     # they tried to go for it
     !(posteam == "ARI" & week == 3 & play_id == 2364)
@@ -143,9 +386,10 @@ pbp_2020 %>%
 ## Leaguewide behavior by strength of recommendation
 
 Here's a plot that shows that teams' likelihood of going for it is determined in part by how obvious of a decision it is.
-```{r league, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+```{r league, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 
-plot <- pbp_2020 %>%
+plot <- pbp %>%
+  filter(season == 2020) %>%
   mutate(go_boost = RoundTo(go_boost, 0.5)) %>%
   group_by(go_boost) %>%
   summarize(go = mean(go)) %>%
@@ -181,15 +425,15 @@ plot %>%
 
 Holding the expected "go" gain constant, coaches are more likely to go for it when ahead by a lot or trailing by a lot. This makes sense as their decision is less likely to make the difference between a win and a loss (and thus open the coach up to being blamed for a loss).
 
-```{r wp, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 800}
+```{r wp, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 
 min <- 2
 max <- 4
 
 my_title <- glue::glue("NFL Go-for-it Rate on <span style='color:red'>4th down</span>")
 
-pbp_2020 %>%
-  filter(go_boost > min & go_boost < max) %>%
+pbp %>%
+  filter(go_boost > min & go_boost < max, season == 2020) %>%
   mutate(vegas_wp = 100 * vegas_wp) %>%
   ggplot(aes(vegas_wp, go)) + 
   # geom_point(size = 5, color = "black", alpha = .5) +
@@ -229,7 +473,8 @@ follow_bot <- function(conf) {
   logos_conf <- image_read(nfl_logos_df %>% filter(substr(division, 1, 3) == conf) %>% pull(team_logo_espn))
   my_title <- glue::glue("<span style='color:red'>{conf}</span>: when did teams follow the bot? 2020")
   
-  pbp_2020 %>% 
+  pbp %>% 
+    filter(season == 2020) %>%
     left_join(nfl_logos_df, by = c("posteam" = "team_abbr")) %>%
     filter(substr(division, 1, 3) == conf) %>%
     filter(between(go_boost, -5, 15)) %>%
@@ -287,7 +532,8 @@ follow_bot("NFC")
 
 ## Which teams were most closely aligned with the bot in 2020
 ```{r goshould, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
-current <- pbp_2020 %>%
+current <- pbp %>%
+  filter(season == 2020) %>%
   filter(go_boost > 1.5) %>%
   filter(vegas_wp > .2) %>%
   group_by(posteam) %>%
@@ -312,7 +558,7 @@ logos <- tibble(
     })
 )
 
-my_title <- glue::glue("Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> {max(pbp_2020$season)}")
+my_title <- glue::glue("Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> 2020")
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(data = current, aes(fill = ifelse(posteam=="SEA", team_color2, team_color)), 
            width = 0.5, alpha = .6, show.legend = FALSE
@@ -341,7 +587,8 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
 
 The teams that lost the most win probability in 2020 by conservative decision-making.
 ```{r golost, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
-current <- pbp_2020 %>%
+current <- pbp %>%
+  filter(season == 2020) %>%
   group_by(posteam) %>%
   mutate(
     games = n_distinct(game_id),
@@ -376,7 +623,7 @@ logos <- tibble(
     })
 )
 
-my_title <- glue::glue("WP per game <span style='color:red'>lost by kicking in go situations</span>, {max(pbp_2020$season)}")
+my_title <- glue::glue("WP per game <span style='color:red'>lost by kicking in go situations</span>, 2020")
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(data = current, aes(fill = ifelse(posteam=="SEA", team_color2, team_color)), 
            width = 0.5, alpha = .6, show.legend = FALSE
@@ -405,15 +652,12 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
 # Numbers from 2014 - 2020
 
 ## Making timelines of teams over time
-```{r alldata, echo = FALSE, message = FALSE}
-pbp_all <- map_df(2014:2020, ~{load_season(.x)})
-```
 
 ```{r tlfunction, echo = FALSE}
 # function to make team timeline
 make_timeline <- function(team) {
   
-  current <- pbp_all %>%
+  current <- pbp %>%
     filter(go_boost > 1.5) %>%
     filter(vegas_wp > .2) %>%
     group_by(posteam, season) %>%
@@ -484,7 +728,7 @@ make_timeline("SEA")
 
 ## Worst playoff games in terms of total WP loss
 ```{r wp_playoff, echo = FALSE, message = FALSE}
-current <- pbp_all %>%
+current <- pbp %>%
   filter(go_boost > 0, go == 0, season_type != "REG") %>%
   group_by(game_id, posteam, defteam) %>%
   summarize(
@@ -608,7 +852,7 @@ text_df <- tibble(
 )
 
 my_title <- glue::glue("How <span style='color:red'>math</span> is changing football")
-pbp_all %>%
+pbp %>%
   filter(vegas_wp > .2) %>%
   filter(between(go_boost, -10, 10)) %>%
   filter(season %in% c(2014, 2020)) %>%

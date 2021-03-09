@@ -57,12 +57,12 @@ add_4th_probs <- function(df) {
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
-    message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
+    # message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
     modified_df <- original_df %>%
       prepare_nflfastr_data()
   }
 
-  message("Performing final preparation . . .")
+  # message("Performing final preparation . . .")
   df <- modified_df %>%
     prepare_df()
 
@@ -70,7 +70,7 @@ add_4th_probs <- function(df) {
     df$runoff <- 0L
   }
 
-  message(glue::glue("Computing probabilities for  {nrow(df)} plays. . ."))
+  message(glue::glue("Computing probabilities for {nrow(df)} plays. . ."))
   df <- df %>%
     add_probs() %>%
     mutate(play_no = 1 : n()) %>%
@@ -91,6 +91,45 @@ add_4th_probs <- function(df) {
   original_df %>%
     left_join(df, by = c("index")) %>%
     select(-index) %>%
+    return()
+
+}
+
+#' Load calculated 4th down probs from `nflfastR` data
+#'
+#' @description Load calculated 4th down probs from `nflfastR` data.
+#'
+#' @param seasons Seasons to load. Must be 2014 and later.
+#' @return `nflfastR` data on 4th downs with the `add_4th_probs()` columns added and also the following:
+#' \describe{
+#' \item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times going for it.}
+#' }
+#' @export
+#' @examples
+#' \donttest{
+#' probs <- load_4th_pbp(2019:2020)
+#'
+#' dplyr::glimpse(probs)
+#' }
+load_4th_pbp <- function(seasons) {
+
+  if (min(seasons) < 2014) {
+    stop("Season before 2014 supplied. Please try again with nothing before 2014.")
+  }
+
+  # this is less likely to result in crashes due to memory
+  purrr::map_df(seasons, ~{
+    message(glue::glue("Loading season {.x}"))
+    nflfastR::load_pbp(.x) %>%
+      nfl4th::add_4th_probs() %>%
+      return()
+    }) %>%
+    dplyr::mutate(
+      go = ifelse(
+        (rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
+        100, 0
+      )
+    ) %>%
     return()
 
 }
