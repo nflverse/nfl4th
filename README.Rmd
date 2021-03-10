@@ -17,7 +17,8 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/guga31bb/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/guga31bb/nfl4th/actions)
-[![CRAN status](https://www.r-pkg.org/badges/version/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
+[![CRAN status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
+[![Twitter Follow](https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social)](https://twitter.com/ben_bot_baldwin)
 <!-- badges: end -->
 
 This is the package that powers the [fourth down calculator](https://rbsdm.com/stats/fourth_calculator) introduced in [this piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
