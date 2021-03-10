@@ -15,3 +15,18 @@ authors:
     href: https://twitter.com/benbbaldwin
   Sebastian Carl:
     href: https://twitter.com/mrcaseb
+
+navbar:
+  structure:
+    left:  [home, intro, reference, research, articles, news, tutorials]
+    right: [twitter, github]
+  components:
+    reference:
+      text: "Functions"
+      href: reference/index.html
+    research:
+      text: "4th Down Research"
+      href: articles/articles/4th-down-research.html
+    twitter:
+      icon: "fab fa-twitter fa-lg"
+      href: http://twitter.com/ben_bot_baldwin
