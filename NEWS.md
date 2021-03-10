@@ -1,3 +1,7 @@
+# nfl4th 1.0.0
+
+* Initial public release
+
 # nfl4th 0.0.0.9000
 
 * Release as package
