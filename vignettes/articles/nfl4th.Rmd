@@ -41,7 +41,7 @@ Or we can add some filters to look up a certain game:
 
 ```{r ex2}
 data %>%
-  dplyr::filter(week == 20, posteam == "GB") %>%
+  dplyr::filter(week == 20, posteam == "GB", down == 4) %>%
   dplyr::select(
     posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
     wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
