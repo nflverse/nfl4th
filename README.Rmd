@@ -27,11 +27,11 @@ The code that powers the Twitter fourth down bot [is in this folder here](https:
 
 ## Installation
 
-<!-- You can install the released version of nfl4th from [CRAN](https://CRAN.R-project.org) with: -->
+You can install the released version of nfl4th from [CRAN](https://CRAN.R-project.org) with:
 
-<!-- ``` r -->
-<!-- install.packages("nfl4th") -->
-<!-- ``` -->
+``` r
+install.packages("nfl4th")
+```
 
 You can install nfl4th from [GitHub](https://github.com/) with:
 
