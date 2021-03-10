@@ -38,8 +38,8 @@ play <-
     defteam_timeouts_remaining = 3
   )
 
-nfl4th::add_4th_probs(play) \%>\%
-nfl4th::make_table_data()
+probs <- nfl4th::add_4th_probs(play)
+nfl4th::make_table_data(probs)
 
 }
 }
