@@ -71,6 +71,6 @@ returned).
 ## Get Started
 
 To get started with nfl4th please see [this
-article](https://www.nfl4th.com/articles/articles/nfl4th.html). Some 4th
-down research by Ben Baldwin [can be found
+article](https://www.nfl4th.com/articles/articles/nfl4th.html). Some
+examples of 4th down research using the package [can be found
 here](https://www.nfl4th.com/articles/articles/4th-down-research.html).
