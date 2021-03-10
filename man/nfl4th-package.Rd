@@ -21,7 +21,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ben Baldwin \email{bbaldwin206@gmail.com}
+\strong{Maintainer}: Ben Baldwin \email{bbaldwin206@gmail.com} [copyright holder]
 
 Other contributors:
 \itemize{
