@@ -103,32 +103,26 @@
 
     
     
-<p>First load the packages and some data.</p>
+<p>First load the packages and some data. <code><a href="../../reference/load_4th_pbp.html">load_4th_pbp()</a></code> loads <code>nflfastR</code> data and computes 4th down probabilities (depending on your computer, this may take up to a minute or two per season).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://guga31bb.github.io/nfl4th/">nfl4th</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">nflfastR</span><span class="fu">::</span><span class="fu"><a href="https://www.nflfastr.com//reference/load_pbp.html">load_pbp</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span></code></pre></div>
-<div id="feeding-in-nflfastr-data" class="section level2">
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/load_4th_pbp.html">load_4th_pbp</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span></code></pre></div>
+<div id="easy-mode-using-nflfastr-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#feeding-in-nflfastr-data" class="anchor"></a>Feeding in nflfastR data</h2>
-<p>Here’s how to calculate all probs from one week in the 2020 season with <code>nflfastR</code> data. The main function is <code><a href="../../reference/add_4th_probs.html">add_4th_probs()</a></code>:</p>
+<a href="#easy-mode-using-nflfastr-data" class="anchor"></a>Easy mode: using nflfastR data</h2>
+<p>Here’s what the data obtained using <code><a href="../../reference/load_4th_pbp.html">load_4th_pbp()</a></code> looks like:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">tic</a></span><span class="op">(</span><span class="st">"All plays from one week"</span><span class="op">)</span>
-<span class="va">data</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">week</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">down</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">data</span> <span class="op">%&gt;%</span>
   <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
     <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
     <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; type not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
-<span class="co">#&gt; Performing final preparation . . .</span>
-<span class="co">#&gt; Computing probabilities for  230 plays. . .</span></code></pre></div>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="6%">
@@ -162,10 +156,115 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">SF</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">SF</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">SF</td>
+<td align="right">10</td>
+<td align="right">55</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">SF</td>
+<td align="right">10</td>
+<td align="right">41</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">SF</td>
+<td align="right">8</td>
+<td align="right">39</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">SF</td>
+<td align="right">14</td>
+<td align="right">45</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
 <td align="left">SF</td>
 <td align="right">3</td>
 <td align="right">34</td>
-<td align="right">1.40</td>
+<td align="right">1.4</td>
 <td align="right">0.55</td>
 <td align="right">0.69</td>
 <td align="right">0.78</td>
@@ -176,162 +275,48 @@
 <td align="right">0.73</td>
 <td align="right">0.72</td>
 </tr>
-<tr class="even">
-<td align="left">ARI</td>
-<td align="right">10</td>
-<td align="right">65</td>
-<td align="right">-2.49</td>
-<td align="right">0.27</td>
-<td align="right">0.18</td>
-<td align="right">0.28</td>
-<td align="right">0.21</td>
-<td align="right">0.00</td>
-<td align="right">0.18</td>
-<td align="right">0.29</td>
-<td align="right">0.18</td>
-<td align="right">0.24</td>
-</tr>
 <tr class="odd">
 <td align="left">ARI</td>
-<td align="right">7</td>
-<td align="right">72</td>
-<td align="right">-0.27</td>
-<td align="right">0.38</td>
-<td align="right">0.07</td>
-<td align="right">0.14</td>
-<td align="right">0.10</td>
-<td align="right">0.00</td>
-<td align="right">0.07</td>
-<td align="right">0.15</td>
-<td align="right">0.07</td>
-<td align="right">0.10</td>
-</tr>
-<tr class="even">
-<td align="left">SF</td>
-<td align="right">5</td>
-<td align="right">64</td>
-<td align="right">0.78</td>
-<td align="right">0.48</td>
-<td align="right">0.84</td>
-<td align="right">0.92</td>
-<td align="right">0.88</td>
-<td align="right">0.00</td>
-<td align="right">0.83</td>
-<td align="right">0.92</td>
-<td align="right">0.83</td>
-<td align="right">0.87</td>
-</tr>
-<tr class="odd">
-<td align="left">SF</td>
-<td align="right">3</td>
-<td align="right">68</td>
-<td align="right">1.71</td>
-<td align="right">0.55</td>
-<td align="right">0.65</td>
-<td align="right">0.81</td>
-<td align="right">0.74</td>
-<td align="right">0.00</td>
-<td align="right">0.62</td>
-<td align="right">0.80</td>
-<td align="right">0.62</td>
-<td align="right">0.72</td>
-</tr>
-<tr class="even">
-<td align="left">ARI</td>
-<td align="right">9</td>
-<td align="right">77</td>
-<td align="right">-1.06</td>
-<td align="right">0.30</td>
-<td align="right">0.16</td>
-<td align="right">0.28</td>
-<td align="right">0.19</td>
-<td align="right">0.00</td>
-<td align="right">0.15</td>
-<td align="right">0.28</td>
-<td align="right">0.15</td>
-<td align="right">0.20</td>
-</tr>
-<tr class="odd">
-<td align="left">SF</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">3.22</td>
-<td align="right">0.63</td>
-<td align="right">0.78</td>
-<td align="right">0.89</td>
-<td align="right">0.85</td>
-<td align="right">0.99</td>
-<td align="right">0.76</td>
-<td align="right">0.82</td>
-<td align="right">0.82</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
 <td align="left">ARI</td>
-<td align="right">5</td>
-<td align="right">34</td>
-<td align="right">0.54</td>
-<td align="right">0.45</td>
-<td align="right">0.19</td>
-<td align="right">0.37</td>
-<td align="right">0.27</td>
-<td align="right">0.62</td>
-<td align="right">0.19</td>
-<td align="right">0.31</td>
-<td align="right">0.27</td>
-<td align="right">0.23</td>
-</tr>
-<tr class="odd">
-<td align="left">SF</td>
-<td align="right">9</td>
-<td align="right">36</td>
-<td align="right">-0.12</td>
-<td align="right">0.32</td>
-<td align="right">0.72</td>
-<td align="right">0.84</td>
-<td align="right">0.76</td>
-<td align="right">0.57</td>
-<td align="right">0.71</td>
-<td align="right">0.80</td>
-<td align="right">0.76</td>
-<td align="right">0.76</td>
-</tr>
-<tr class="even">
-<td align="left">SF</td>
-<td align="right">2</td>
-<td align="right">6</td>
-<td align="right">1.88</td>
-<td align="right">0.54</td>
-<td align="right">0.77</td>
-<td align="right">0.89</td>
-<td align="right">0.83</td>
-<td align="right">0.98</td>
-<td align="right">0.75</td>
-<td align="right">0.81</td>
-<td align="right">0.81</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
 </tbody>
 </table>
+<p>Or we can add some filters to look up a certain game:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; All plays from one week: 3.396 sec elapsed</span></code></pre></div>
-<p>Or we can add some filters beforehand:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">tic</a></span><span class="op">(</span><span class="st">"One game"</span><span class="op">)</span>
-<span class="va">data</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">data</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">week</span> <span class="op">==</span> <span class="fl">20</span>, <span class="va">posteam</span> <span class="op">==</span> <span class="st">"GB"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">down</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
     <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
     <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; type not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
-<span class="co">#&gt; Performing final preparation . . .</span>
-<span class="co">#&gt; Computing probabilities for  5 plays. . .</span></code></pre></div>
+  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="6%">
@@ -364,6 +349,96 @@
 <th align="right">punt_wp</th>
 </tr></thead>
 <tbody>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">7</td>
+<td align="right">72</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">58</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">9</td>
+<td align="right">57</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">9</td>
+<td align="right">57</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
 <tr class="odd">
 <td align="left">GB</td>
 <td align="right">17</td>
@@ -381,6 +456,366 @@
 </tr>
 <tr class="even">
 <td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">90</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">88</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">15</td>
+<td align="right">95</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">72</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">57</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">52</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">3</td>
+<td align="right">50</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">15</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">63</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">6</td>
+<td align="right">59</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">47</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">42</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">30</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">18</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">9</td>
+<td align="right">17</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
 <td align="right">6</td>
 <td align="right">6</td>
 <td align="right">-2.16</td>
@@ -392,6 +827,576 @@
 <td align="right">0.33</td>
 <td align="right">0.45</td>
 <td align="right">0.45</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">87</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">87</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">6</td>
+<td align="right">83</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">60</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">17</td>
+<td align="right">67</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">70</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">70</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">75</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">4</td>
+<td align="right">69</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">3</td>
+<td align="right">68</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">58</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">34</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">24</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">24</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">15</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">68</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">63</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">3</td>
+<td align="right">61</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">57</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">44</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">39</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">32</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">27</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">2</td>
+<td align="right">24</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">13</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">9</td>
+<td align="right">12</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">81</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">81</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">5</td>
+<td align="right">76</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
 <tr class="odd">
@@ -413,6 +1418,51 @@
 <td align="left">GB</td>
 <td align="right">10</td>
 <td align="right">76</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">76</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">76</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">76</td>
 <td align="right">-0.37</td>
 <td align="right">0.32</td>
 <td align="right">0.15</td>
@@ -423,6 +1473,141 @@
 <td align="right">0.32</td>
 <td align="right">0.14</td>
 <td align="right">0.23</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">0</td>
+<td align="right">35</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">66</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">1</td>
+<td align="right">57</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">28</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">10</td>
+<td align="right">28</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">1</td>
+<td align="right">19</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">GB</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">GB</td>
@@ -441,17 +1626,14 @@
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">tictoc</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; One game: 1.513 sec elapsed</span></code></pre></div>
 <p>We see the infamous field goal at the bottom.</p>
-<p>Let’s input the play ourselves to see if we can get the same thing. The below shows the bare minimum amount of information that has to be fed to <code>nfl4th</code> in order to compute 4th down decision recommendations.</p>
-<p>The reason teams from a specific game have to be used is that the model depends on factors such as point spread, team totals, and indoor/outdoor and the program automatically looks these up so that users don’t have to provide them.</p>
 </div>
 <div id="calculations-from-user-input" class="section level2">
 <h2 class="hasAnchor">
 <a href="#calculations-from-user-input" class="anchor"></a>Calculations from user input</h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>The below shows the bare minimum amount of information that has to be fed to <code>nfl4th</code> in order to compute 4th down decision recommendations. The main function on user-input data is <code><a href="../../reference/add_4th_probs.html">add_4th_probs()</a></code>.</p>
+<p>The reason teams from a specific game have to be used is that the model depends on factors such as point spread, team totals, and indoor/outdoor and the program automatically looks these up so that users don’t have to provide them.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">one_play</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
   
   <span class="co"># things to help find the right game (use "reg" or "post" for type)</span>
@@ -481,8 +1663,7 @@
     <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; Performing final preparation . . .</span>
-<span class="co">#&gt; Computing probabilities for  1 plays. . .</span></code></pre></div>
+<span class="co">#&gt; Computing probabilities for 1 plays. . .</span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="6%">
@@ -530,18 +1711,18 @@
 <td align="right">NA</td>
 </tr></tbody>
 </table>
+<p>Comparing this and the table above, we see the exact same numbers as expected.</p>
 </div>
 <div id="make-a-summary-table" class="section level2">
 <h2 class="hasAnchor">
 <a href="#make-a-summary-table" class="anchor"></a>Make a summary table</h2>
-<p>Put the play above into a table. This function only works with one play at a time since it makes a table using the results from the play.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>Let’s put the play above into a table using the provided function <code><a href="../../reference/make_table_data.html">make_table_data()</a></code>, which makes it easier to interpret the recommendations for a play. This function only works with one play at a time since it makes a table using the results from the play.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">one_play</span> <span class="op">%&gt;%</span>
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="co">#&gt; Performing final preparation . . .</span>
-<span class="co">#&gt; Computing probabilities for  1 plays. . .</span></code></pre></div>
+<span class="co">#&gt; Computing probabilities for 1 plays. . .</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">choice</th>
@@ -574,12 +1755,13 @@
 </tr>
 </tbody>
 </table>
+<p>Looking at the table, the Packers would be expected to have 12.7% win probability if they had gone for it and 8.9% if they kicked a field goal. This difference of 3.8 percentage points is <a href="https://twitter.com/benbbaldwin/status/1354239287299088384">almost exactly the same as PFF’s 3.5 percentage points</a> for the decision.</p>
 </div>
 <div id="make-a-summary-table-for-a-2-point-decision" class="section level2">
 <h2 class="hasAnchor">
 <a href="#make-a-summary-table-for-a-2-point-decision" class="anchor"></a>Make a summary table for a 2-point decision</h2>
-<p>Let’s put in the situation that would have happened if the Packers had scored a touchdown on the 4th &amp; 8. We don’t need a calculator to know that they should have gone for two, but what does the model say?</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><code>nfl4th</code> also contains a function to calculate 2-point decisions. Let’s put in the situation that would have happened if the Packers had scored a touchdown on the 4th &amp; 8. We don’t need a calculator to know that they should have gone for two, but let’s practice by putting in the numbers, assuming that the 4th down play took 6 seconds while resulting in a touchdown.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">another_play</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
   
   <span class="co"># things to help find the right game (use "reg" or "post")</span>
@@ -635,8 +1817,8 @@
 <div id="getting-4th-down-plays-from-a-live-game" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-4th-down-plays-from-a-live-game" class="anchor"></a>Getting 4th down plays from a live game</h2>
-<p><code>nflfastR</code> doesn’t give data for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With the ESPN API.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p><code>nflfastR</code> isn’t available for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With thanks to the ESPN API, which can be accessed using <code><a href="../../reference/get_4th_plays.html">get_4th_plays()</a></code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plays</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/get_4th_plays.html">get_4th_plays</a></span><span class="op">(</span><span class="st">"2020_20_TB_GB"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 
@@ -651,8 +1833,7 @@
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="co">#&gt; Performing final preparation . . .</span>
-<span class="co">#&gt; Computing probabilities for  1 plays. . .</span></code></pre></div>
+<span class="co">#&gt; Computing probabilities for 1 plays. . .</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">choice</th>
@@ -691,20 +1872,11 @@
 <h2 class="hasAnchor">
 <a href="#check-coaches-alignment-with-the-model" class="anchor"></a>Check coaches’ alignment with the model</h2>
 <p>Here’s how to create one of the tables shown in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/">the piece on The Athletic</a>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/gt">gt</a></span><span class="op">)</span>
-
-<span class="va">calculated</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">:::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">down</span> <span class="op">==</span> <span class="fl">4</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span><span class="op">)</span> 
-<span class="co">#&gt; type not found. Assuming an nflfastR df and doing necessary cleaning . . .</span>
-<span class="co">#&gt; Performing final preparation . . .</span>
-<span class="co">#&gt; Computing probabilities for  3747 plays. . .</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#tjrdagjqal .gt_table {
+#yanmqdcatu .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -729,7 +1901,7 @@
   border-left-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_heading {
+#yanmqdcatu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -741,7 +1913,7 @@
   border-right-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_title {
+#yanmqdcatu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -751,7 +1923,7 @@
   border-bottom-width: 0;
 }
 
-#tjrdagjqal .gt_subtitle {
+#yanmqdcatu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -761,13 +1933,13 @@
   border-top-width: 0;
 }
 
-#tjrdagjqal .gt_bottom_border {
+#yanmqdcatu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_col_headings {
+#yanmqdcatu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -782,7 +1954,7 @@
   border-right-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_col_heading {
+#yanmqdcatu .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -802,7 +1974,7 @@
   overflow-x: hidden;
 }
 
-#tjrdagjqal .gt_column_spanner_outer {
+#yanmqdcatu .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -814,15 +1986,15 @@
   padding-right: 4px;
 }
 
-#tjrdagjqal .gt_column_spanner_outer:first-child {
+#yanmqdcatu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tjrdagjqal .gt_column_spanner_outer:last-child {
+#yanmqdcatu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tjrdagjqal .gt_column_spanner {
+#yanmqdcatu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -834,7 +2006,7 @@
   width: 100%;
 }
 
-#tjrdagjqal .gt_group_heading {
+#yanmqdcatu .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -856,7 +2028,7 @@
   vertical-align: middle;
 }
 
-#tjrdagjqal .gt_empty_group_heading {
+#yanmqdcatu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -871,15 +2043,15 @@
   vertical-align: middle;
 }
 
-#tjrdagjqal .gt_from_md > :first-child {
+#yanmqdcatu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tjrdagjqal .gt_from_md > :last-child {
+#yanmqdcatu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tjrdagjqal .gt_row {
+#yanmqdcatu .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -898,7 +2070,7 @@
   overflow-x: hidden;
 }
 
-#tjrdagjqal .gt_stub {
+#yanmqdcatu .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -910,7 +2082,7 @@
   padding-left: 12px;
 }
 
-#tjrdagjqal .gt_summary_row {
+#yanmqdcatu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -920,7 +2092,7 @@
   padding-right: 5px;
 }
 
-#tjrdagjqal .gt_first_summary_row {
+#yanmqdcatu .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -930,7 +2102,7 @@
   border-top-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_grand_summary_row {
+#yanmqdcatu .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -940,7 +2112,7 @@
   padding-right: 5px;
 }
 
-#tjrdagjqal .gt_first_grand_summary_row {
+#yanmqdcatu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -950,11 +2122,11 @@
   border-top-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_striped {
+#yanmqdcatu .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#tjrdagjqal .gt_table_body {
+#yanmqdcatu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -963,7 +2135,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_footnotes {
+#yanmqdcatu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -977,13 +2149,13 @@
   border-right-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_footnote {
+#yanmqdcatu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#tjrdagjqal .gt_sourcenotes {
+#yanmqdcatu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -997,46 +2169,46 @@
   border-right-color: #D3D3D3;
 }
 
-#tjrdagjqal .gt_sourcenote {
+#yanmqdcatu .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#tjrdagjqal .gt_left {
+#yanmqdcatu .gt_left {
   text-align: left;
 }
 
-#tjrdagjqal .gt_center {
+#yanmqdcatu .gt_center {
   text-align: center;
 }
 
-#tjrdagjqal .gt_right {
+#yanmqdcatu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tjrdagjqal .gt_font_normal {
+#yanmqdcatu .gt_font_normal {
   font-weight: normal;
 }
 
-#tjrdagjqal .gt_font_bold {
+#yanmqdcatu .gt_font_bold {
   font-weight: bold;
 }
 
-#tjrdagjqal .gt_font_italic {
+#yanmqdcatu .gt_font_italic {
   font-style: italic;
 }
 
-#tjrdagjqal .gt_super {
+#yanmqdcatu .gt_super {
   font-size: 65%;
 }
 
-#tjrdagjqal .gt_footnote_marks {
+#yanmqdcatu .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="tjrdagjqal" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="yanmqdcatu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>NFL team decision-making by go recommendation, 2020</th>
