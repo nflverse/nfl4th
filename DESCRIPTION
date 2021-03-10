@@ -33,6 +33,7 @@ Imports:
     tidyselect,
     xgboost
 Suggests: 
+    future,
     gt,
     rmarkdown,
     tictoc,

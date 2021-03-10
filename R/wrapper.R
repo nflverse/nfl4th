@@ -110,6 +110,10 @@ add_4th_probs <- function(df) {
 #' probs <- load_4th_pbp(2019:2020)
 #'
 #' dplyr::glimpse(probs)
+#' \dontshow{
+#' # Close open connections for R CMD Check
+#' future::plan("sequential")
+#' }
 #' }
 load_4th_pbp <- function(seasons) {
 
