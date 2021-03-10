@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get 4th down decision probs — make_table_data • nfl4th</title>
+<title>Get 4th down decision probabilities — make_table_data • nfl4th</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 
 
 
-<meta property="og:title" content="Get 4th down decision probs — make_table_data" />
+<meta property="og:title" content="Get 4th down decision probabilities — make_table_data" />
 <meta property="og:description" content="Get a table with the probabilities on 4th down." />
 <meta property="og:image" content="https://www.nfl4th.com/logo.png" />
 
@@ -143,7 +143,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get 4th down decision probs</h1>
+    <h1>Get 4th down decision probabilities</h1>
     <small class="dont-index">Source: <a href='https://github.com/guga31bb/nfl4th/blob/master/R/table_functions.R'><code>R/table_functions.R</code></a></small>
     <div class="hidden name"><code>make_table_data.Rd</code></div>
     </div>
@@ -159,14 +159,47 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>probs</th>
-      <td><p>A data frame that has had <code><a href='add_4th_probs.html'>add_4th_probs()</a></code> already run on it.</p></td>
+      <td><p>A data frame consisting of one play that has had <code><a href='add_4th_probs.html'>add_4th_probs()</a></code> already run on it.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A table showing the probabilities associated with each decision.</p>
+    <p>A table showing the probabilities associated with each possible choice.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='va'>play</span> <span class='op'>&lt;-</span>
+  <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span>
+    <span class='co'># things to help find the right game (use "reg" or "post")</span>
+    home_team <span class='op'>=</span> <span class='st'>"GB"</span>,
+    away_team <span class='op'>=</span> <span class='st'>"TB"</span>,
+    posteam <span class='op'>=</span> <span class='st'>"GB"</span>,
+    type <span class='op'>=</span> <span class='st'>"post"</span>,
+    season <span class='op'>=</span> <span class='fl'>2020</span>,
+
+    <span class='co'># information about the situation</span>
+    qtr <span class='op'>=</span> <span class='fl'>4</span>,
+    quarter_seconds_remaining <span class='op'>=</span> <span class='fl'>129</span>,
+    ydstogo <span class='op'>=</span> <span class='fl'>8</span>,
+    yardline_100 <span class='op'>=</span> <span class='fl'>8</span>,
+    score_differential <span class='op'>=</span> <span class='op'>-</span><span class='fl'>8</span>,
+
+    home_opening_kickoff <span class='op'>=</span> <span class='fl'>0</span>,
+    posteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span>,
+    defteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span>
+  <span class='op'>)</span>
+
+<span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'><a href='add_4th_probs.html'>add_4th_probs</a></span><span class='op'>(</span><span class='va'>play</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+<span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'>make_table_data</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Computing probabilities for 1 plays. . .</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 3 x 5</span><span>
+#&gt;   choice             choice_prob success_prob fail_wp success_wp
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>                    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> Go for it                12.7          32.7    3.53      31.5 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> Field goal attempt        8.90         97.5    2.99       9.05
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> Punt                     </span><span style='color: #BB0000;'>NA</span><span>            </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>         </span><span style='color: #BB0000;'>NA</span><span>   </div><div class='input'>
+<span class='co'># }</span>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
