@@ -18,7 +18,7 @@ authors:
 
 navbar:
   structure:
-    left:  [home, intro, reference, research, articles, news, tutorials]
+    left:  [home, intro, reference, research, news, tutorials]
     right: [twitter, github]
   components:
     reference:
