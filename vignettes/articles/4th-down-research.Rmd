@@ -64,7 +64,7 @@ plot <- pbp %>%
     # round to nearest 5
     binned_yardline = 5 * round(yardline_100 / 5)
     ) %>%
-  select(binned_yardline, yardline_100, ydstogo, go_boost, decision, vegas_wp, score_differential, qtr)
+  select(binned_yardline, yardline_100, ydstogo, go_boost, decision, vegas_wp, score_differential, qtr, posteam, home_team, spread_line)
 ```
 
 ```{r nfl4th, echo = FALSE, message = FALSE}
@@ -95,7 +95,7 @@ fig1 <- plot %>%
   ) +
   labs(x = "Distance to opponent end zone",
      y = "Yards to go",
-     title = "@ben_bot_baldwin") +
+     title = "nfl4th") +
   scale_fill_brewer(palette="Dark2") +
   annotate("text",x=50, y= 2, label = "Go for it", size = 6) +
   annotate("text",x=80, y= 7, label = "Punt", size = 6) +
@@ -188,7 +188,7 @@ p
 
 While `nfl4th` and NYT agree that teams should always go for 4th & 1, `nfl4th` also thinks this is the case for 4th-and-2 and even most 4th-and-3s. However, note that this is an oversimplification: the `nfl4th` plot on the left shows the most frequent recommendation at a given location, but the recommendations can change given game stat (for example, it will recommend that trailing teams play more aggressively).
 
-## `nfl4th` recommendations by situation
+## `nfl4th` recommendations while leading and trailing
 
 The model makes very different recommendations based on game situations. Teams that are underdogs or are trailing are told to act more aggressively to get back in the game:
 
@@ -289,6 +289,60 @@ p
 # for getting a nice figure
 # ggsave("tmp.png", height = 5, width = 10)
 
+```
+
+## `nfl4th` recommendations given Vegas line
+
+Here is the use of a function that takes in a point spread and generates a recommendation chart based on previous situations involving teams favored or not favored by a similar number of points. Here is what the recommendations look like for teams that are 4-10 point underdogs. As expected, these teams are encouraged to be more aggressive, although the difference isn't as large as I might have thought.
+
+```{r nfl4th-spread, echo = FALSE, message = FALSE}
+spread_plot <- function(spread, range = 2) {
+  
+  fig1 <- plot %>%
+    mutate(posteam_spread = ifelse(posteam == home_team, spread_line, -spread_line)) %>%
+    filter(
+      between(posteam_spread, spread - range, spread + range)
+    ) %>%
+    group_by(binned_yardline, ydstogo) %>%
+    mutate(tot_n = n()) %>%
+    ungroup() %>%
+    group_by(binned_yardline, ydstogo, decision) %>%
+    summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
+    group_by(binned_yardline, ydstogo) %>%
+    arrange(binned_yardline, ydstogo, -n) %>%
+    dplyr::slice(1) %>%
+    ungroup() %>%
+    ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
+    geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95, alpha = pct)) +
+    scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+    scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+    theme_fivethirtyeight() +
+    theme(
+      plot.margin = margin(0, 0, 0, 0, "cm"),
+      legend.position = "none",
+      plot.title = element_markdown(size = 12, hjust = 0.5),
+      plot.subtitle = element_markdown(size = 10, hjust = 0.5),
+      axis.title.x = element_text(size=12, face="bold"),
+      axis.title.y = element_text(size=12, face="bold"),
+      panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank()
+    ) +
+    labs(
+      x = "Distance to opponent end zone",
+       y = "Yards to go",
+       title = glue::glue("Team favored by {spread - range} to {spread + range} points")
+      ) +
+    scale_fill_brewer(palette="Dark2") +
+    annotate("text",x=50, y= 2, label = "Go for it", size = 6) +
+    annotate("text",x=80, y= 7, label = "Punt", size = 6) +
+    annotate("text",x=20, y= 7, label = "Field goal", size = 6)
+  
+  return(fig1)
+}
+```
+
+```{r make_spread_plot, echo = FALSE, warning = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
+spread_plot(-7, 3)
 ```
 
 # Numbers from 2020
