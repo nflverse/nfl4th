@@ -23,5 +23,9 @@ Load calculated 4th down probabilities from \code{nflfastR} data.
 probs <- load_4th_pbp(2019:2020)
 
 dplyr::glimpse(probs)
+\dontshow{
+# Close open connections for R CMD Check
+future::plan("sequential")
+}
 }
 }
