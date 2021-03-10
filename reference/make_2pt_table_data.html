@@ -188,9 +188,9 @@
     defteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span>
   <span class='op'>)</span>
 
-<span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'><a href='add_2pt_probs.html'>add_2pt_probs</a></span><span class='op'>(</span><span class='va'>play</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-<span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'>make_2pt_table_data</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Performing final preparation . . .</span></div><div class='output co'>#&gt; <span class='message'>Computing probabilities for  1 plays. . .</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 5</span><span>
+<span class='va'>probs</span> <span class='op'>&lt;-</span> <span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'><a href='add_2pt_probs.html'>add_2pt_probs</a></span><span class='op'>(</span><span class='va'>play</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Performing final preparation . . .</span></div><div class='output co'>#&gt; <span class='message'>Computing probabilities for  1 plays. . .</span></div><div class='input'><span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'>make_2pt_table_data</span><span class='op'>(</span><span class='va'>probs</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 5</span><span>
 #&gt;   choice   choice_prob success_prob fail_wp success_wp
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> Go for 2        31.5         58.9    18.4       40.6
