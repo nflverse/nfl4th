@@ -191,7 +191,7 @@ add_2pt_probs <- function(df) {
       )
   }
 
-  message("Performing final preparation . . .")
+  # message("Performing final preparation . . .")
   df <- modified_df %>%
     prepare_df()
 

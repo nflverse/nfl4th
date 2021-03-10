@@ -25,7 +25,7 @@ Get 4th down plays from a game.
 Obtains a data frame that can be used with \code{add_4th_probs()}. The following columns
 must be present:
 \itemize{
-\item{game_id}{game_id in nflfastR format (eg '2020_20_TB_GB'))}
+\item{game_id : game ID in nflfastR format (eg '2020_20_TB_GB')}
 }
 }
 \examples{
