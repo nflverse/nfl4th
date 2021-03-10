@@ -13,7 +13,7 @@ Follow](https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social)]
 <!-- badges: end -->
 
 This is the package that powers the [fourth down
-calculator](https://rbsdm.com/stats/fourth_calculator) introduced in
+calculator](https://rbsdm.com/stats/fourth_calculator/) introduced in
 [this piece on The
 Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
 
@@ -71,6 +71,6 @@ returned).
 ## Get Started
 
 To get started with nfl4th please see [this
-article](https://guga31bb.github.io/nfl4th/articles/articles/nfl4th.html).
-Some 4th down research by Ben Baldwin [can be found
-here](https://guga31bb.github.io/nfl4th/articles/articles/4th-down-research.html).
+article](https://www.nfl4th.com/articles/articles/nfl4th.html). Some 4th
+down research by Ben Baldwin [can be found
+here](https://www.nfl4th.com/articles/articles/4th-down-research.html).
