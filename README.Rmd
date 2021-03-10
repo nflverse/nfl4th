@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 [![Twitter Follow](https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social)](https://twitter.com/ben_bot_baldwin)
 <!-- badges: end -->
 
-This is the package that powers the [fourth down calculator](https://rbsdm.com/stats/fourth_calculator) introduced in [this piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
+This is the package that powers the [fourth down calculator](https://rbsdm.com/stats/fourth_calculator/) introduced in [this piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
 
 The code that powers the Twitter fourth down bot [is in this folder here](https://github.com/guga31bb/fourth_calculator/tree/main/bot) and the [code that runs the Shiny app is here](https://github.com/guga31bb/fourth_calculator/blob/main/app.R).
 
@@ -56,4 +56,4 @@ There are some edge cases that are not accounted for. These should only make a m
 
 ## Get Started
 
-To get started with nfl4th please see [this article](https://guga31bb.github.io/nfl4th/articles/articles/nfl4th.html). Some 4th down research by Ben Baldwin [can be found here](https://guga31bb.github.io/nfl4th/articles/articles/4th-down-research.html).
+To get started with nfl4th please see [this article](https://www.nfl4th.com/articles/articles/nfl4th.html). Some 4th down research by Ben Baldwin [can be found here](https://www.nfl4th.com/articles/articles/4th-down-research.html).
