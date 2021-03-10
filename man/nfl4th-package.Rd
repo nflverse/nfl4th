@@ -4,7 +4,7 @@
 \name{nfl4th-package}
 \alias{nfl4th}
 \alias{nfl4th-package}
-\title{nfl4th: Functions to Improve Fourth Down Decisions in the NFL}
+\title{nfl4th: Functions to Calculate Optimal Fourth Down Decisions in the National Football League}
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
@@ -14,8 +14,8 @@ A set of functions to estimate outcomes of fourth down
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://guga31bb.github.io/nfl4th/}
-  \item \url{https://github.com/guga31bb/nfl4th}
+  \item \url{https://www.nfl4th.com/}
+  \item \url{https://github.com/guga31bb/nfl4th/}
   \item Report bugs at \url{https://github.com/guga31bb/nfl4th/issues}
 }
 

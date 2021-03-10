@@ -488,8 +488,7 @@ follow_bot <- function(conf) {
     theme_ben +
     labs(title = my_title,
          x = "Went for it",
-         subtitle = "<span style='color:#F8766D'>Kicked</span> versus <span style='color:#00BFC4'>went for it</span>",
-         caption = "Predicted go based on past league behavior given\nyardage, time, score, field position, week, and season"
+         subtitle = "<span style='color:#F8766D'>Kicked</span> versus <span style='color:#00BFC4'>went for it</span>"
     ) +
     theme(
       panel.grid.major = element_blank(),
