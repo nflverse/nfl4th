@@ -2,16 +2,44 @@
 % Please edit documentation in R/table_functions.R
 \name{make_table_data}
 \alias{make_table_data}
-\title{Get 4th down decision probs}
+\title{Get 4th down decision probabilities}
 \usage{
 make_table_data(probs)
 }
 \arguments{
-\item{probs}{A data frame that has had \code{add_4th_probs()} already run on it.}
+\item{probs}{A data frame consisting of one play that has had \code{add_4th_probs()} already run on it.}
 }
 \value{
-A table showing the probabilities associated with each decision.
+A table showing the probabilities associated with each possible choice.
 }
 \description{
 Get a table with the probabilities on 4th down.
+}
+\examples{
+\donttest{
+play <-
+  tibble::tibble(
+    # things to help find the right game (use "reg" or "post")
+    home_team = "GB",
+    away_team = "TB",
+    posteam = "GB",
+    type = "post",
+    season = 2020,
+
+    # information about the situation
+    qtr = 4,
+    quarter_seconds_remaining = 129,
+    ydstogo = 8,
+    yardline_100 = 8,
+    score_differential = -8,
+
+    home_opening_kickoff = 0,
+    posteam_timeouts_remaining = 3,
+    defteam_timeouts_remaining = 3
+  )
+
+nfl4th::add_4th_probs(play) \%>\%
+nfl4th::make_table_data()
+
+}
 }

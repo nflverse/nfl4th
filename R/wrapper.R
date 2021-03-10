@@ -4,7 +4,7 @@
 # Code Style Guide: styler::tidyverse_style()
 ################################################################################
 
-#' Get 4th down decision probs
+#' Get 4th down decision probabilities
 #'
 #' @description Get various probabilities associated with each option on 4th downs (go
 #' for it, kick field goal, punt).
@@ -95,9 +95,9 @@ add_4th_probs <- function(df) {
 
 }
 
-#' Load calculated 4th down probs from `nflfastR` data
+#' Load calculated 4th down probabilities from `nflfastR` data
 #'
-#' @description Load calculated 4th down probs from `nflfastR` data.
+#' @description Load calculated 4th down probabilities from `nflfastR` data.
 #'
 #' @param seasons Seasons to load. Must be 2014 and later.
 #' @return `nflfastR` data on 4th downs with the `add_4th_probs()` columns added and also the following:
@@ -134,7 +134,7 @@ load_4th_pbp <- function(seasons) {
 
 }
 
-#' Get 2pt decision probs
+#' Get 2pt decision probabilities
 #'
 #' @description Get various probabilities associated with each option on PATs (go
 #' for it, kick PAT).

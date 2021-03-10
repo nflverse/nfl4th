@@ -2,21 +2,21 @@
 % Please edit documentation in R/wrapper.R
 \name{load_4th_pbp}
 \alias{load_4th_pbp}
-\title{Load calculated 4th down probs from \code{nflfastR} data}
+\title{Load calculated 4th down probabilities from \code{nflfastR} data}
 \usage{
 load_4th_pbp(seasons)
 }
 \arguments{
-\item{seasons}{Seasons to load.}
+\item{seasons}{Seasons to load. Must be 2014 and later.}
 }
 \value{
 \code{nflfastR} data on 4th downs with the \code{add_4th_probs()} columns added and also the following:
 \describe{
-\item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times gone for it.}
+\item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times going for it.}
 }
 }
 \description{
-Load calculated 4th down probs from \code{nflfastR} data.
+Load calculated 4th down probabilities from \code{nflfastR} data.
 }
 \examples{
 \donttest{

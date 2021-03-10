@@ -1,10 +1,37 @@
-#' Get 4th down decision probs
+#' Get 4th down decision probabilities
 #'
 #' @description Get a table with the probabilities on 4th down.
 #'
-#' @param probs A data frame that has had `add_4th_probs()` already run on it.
-#' @return A table showing the probabilities associated with each decision.
+#' @param probs A data frame consisting of one play that has had `add_4th_probs()` already run on it.
+#' @return A table showing the probabilities associated with each possible choice.
 #' @export
+#' @examples
+#' \donttest{
+#' play <-
+#'   tibble::tibble(
+#'     # things to help find the right game (use "reg" or "post")
+#'     home_team = "GB",
+#'     away_team = "TB",
+#'     posteam = "GB",
+#'     type = "post",
+#'     season = 2020,
+#'
+#'     # information about the situation
+#'     qtr = 4,
+#'     quarter_seconds_remaining = 129,
+#'     ydstogo = 8,
+#'     yardline_100 = 8,
+#'     score_differential = -8,
+#'
+#'     home_opening_kickoff = 0,
+#'     posteam_timeouts_remaining = 3,
+#'     defteam_timeouts_remaining = 3
+#'   )
+#'
+#' nfl4th::add_4th_probs(play) %>%
+#' nfl4th::make_table_data()
+#'
+#' }
 make_table_data <- function(probs) {
 
   go <- tibble::tibble(
@@ -48,13 +75,38 @@ make_table_data <- function(probs) {
 }
 
 
-#' Get 2pt decision probs
+#' Get 2pt decision probabilities
 #'
 #' @description Get a table with the probabilities associated with a 2-pt decision.
 #'
-#' @param probs A data frame that has had `add_2pt_probs()` already run on it.
-#' @return A table showing the probabilities associated with each decision.
+#' @param probs A data frame consisting of one play that has had `add_2pt_probs()` already run on it.
+#' @return A table showing the probabilities associated with each possible choice.
 #' @export
+#' @examples
+#' \donttest{
+#' play <-
+#'   tibble::tibble(
+#'     # things to help find the right game (use "reg" or "post")
+#'     home_team = "GB",
+#'     away_team = "TB",
+#'     posteam = "GB",
+#'     type = "post",
+#'     season = 2020,
+#'
+#'     # information about the situation
+#'     qtr = 4,
+#'     quarter_seconds_remaining = 123,
+#'     score_differential = -2,
+#'
+#'     home_opening_kickoff = 0,
+#'     posteam_timeouts_remaining = 3,
+#'     defteam_timeouts_remaining = 3
+#'   )
+#'
+#' nfl4th::add_2pt_probs(play) %>%
+#' nfl4th::make_2pt_table_data()
+#'
+#' }
 make_2pt_table_data <- function(probs) {
 
   go <- tibble::tibble(
@@ -75,7 +127,6 @@ make_2pt_table_data <- function(probs) {
   ) %>%
     select(choice, choice_prob, success_prob, fail_wp, success_wp)
 
-
   for_return <- bind_rows(
     go, pat
   ) %>%
@@ -85,9 +136,6 @@ make_2pt_table_data <- function(probs) {
       fail_wp = 100 * fail_wp,
       success_wp = 100 * success_wp
     )
-
-  # more debugging
-  # global_data <<- for_return
 
   return(for_return)
 }

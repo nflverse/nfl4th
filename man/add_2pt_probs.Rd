@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{add_2pt_probs}
 \alias{add_2pt_probs}
-\title{Get 2pt decision probs}
+\title{Get 2pt decision probabilities}
 \usage{
 add_2pt_probs(df)
 }

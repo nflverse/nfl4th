@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{add_4th_probs}
 \alias{add_4th_probs}
-\title{Get 4th down decision probs}
+\title{Get 4th down decision probabilities}
 \usage{
 add_4th_probs(df)
 }
