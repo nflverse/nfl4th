@@ -28,6 +28,7 @@ Here's what the data obtained using `load_4th_pbp()` looks like:
 
 ```{r ex1}
 data %>%
+  dplyr::filter(!is.na(go_boost)) %>%
   utils::head(10) %>%
   dplyr::select(
     posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
