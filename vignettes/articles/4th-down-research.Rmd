@@ -65,19 +65,51 @@ plot <- pbp %>%
     binned_yardline = 5 * round(yardline_100 / 5)
     ) %>%
   select(binned_yardline, yardline_100, ydstogo, go_boost, decision, vegas_wp, score_differential, qtr, posteam, home_team, spread_line)
+
+plot_prepare <- function(df) {
+  
+  df %>%
+    # for getting percent of decisions for alpha in some plots
+    group_by(binned_yardline, ydstogo) %>%
+    mutate(tot_n = n()) %>%
+    ungroup() %>%
+    group_by(binned_yardline, ydstogo, decision) %>%
+    summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
+    group_by(binned_yardline, ydstogo) %>%
+    arrange(binned_yardline, ydstogo, -n) %>%
+    dplyr::slice(1) %>%
+    # for the charts: if you've been told to punt at 4th & X
+    # you should also be told to punt from that yardline at 4th & X and longer
+    # a better alternative would be some sort of smoother or picking a given game
+    # but ain't nobody got time for that
+    
+    # and same with FGs
+    group_by(binned_yardline) %>%
+    mutate(
+      has_punted = cumsum(decision == "Punt"),
+      has_kicked = cumsum(decision == "Field goal"),
+      decision = case_when(
+        has_punted > 0 ~ "Punt",
+        has_kicked > 0 ~ "Field goal",
+        TRUE ~ decision
+      )
+    ) %>%
+    # if you've been told to punt on 4th & X from a given yardline
+    # you should also be told to punt on 4th & X at a longer yardline
+    group_by(ydstogo) %>%
+    mutate(
+      has_punted = cumsum(decision == "Punt"),
+      decision = ifelse(has_punted > 0, "Punt", decision)
+    ) %>%
+    ungroup() %>%
+    return()
+}
+
 ```
 
 ```{r nfl4th, echo = FALSE, message = FALSE}
 fig1 <- plot %>%
-  group_by(binned_yardline, ydstogo) %>%
-  mutate(tot_n = n()) %>%
-  ungroup() %>%
-  group_by(binned_yardline, ydstogo, decision) %>%
-  summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
-  group_by(binned_yardline, ydstogo) %>%
-  arrange(binned_yardline, ydstogo, -n) %>%
-  dplyr::slice(1) %>%
-  ungroup() %>%
+  plot_prepare() %>%
   ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
   geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95), alpha = 0.75) +
   scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
@@ -186,7 +218,7 @@ p
 # ggsave("tmp.png", height = 5, width = 10)
 ```
 
-While `nfl4th` and NYT agree that teams should always go for 4th & 1, `nfl4th` also thinks this is the case for 4th-and-2 and even most 4th-and-3s. However, note that this is an oversimplification: the `nfl4th` plot on the left shows the most frequent recommendation at a given location, but the recommendations can change given game stat (for example, it will recommend that trailing teams play more aggressively).
+While `nfl4th` and NYT agree that teams should always go for 4th & 1, `nfl4th` also thinks this is the case for 4th-and-2 and even most 4th-and-3s. However, note that this is an oversimplification: the `nfl4th` plot on the left shows the most frequent recommendation at a given location, but the recommendations can change given game stat. For example, it will recommend that trailing teams play more aggressively, as shown below.
 
 ## `nfl4th` recommendations while leading and trailing
 
@@ -197,15 +229,7 @@ fig1 <- plot %>%
   filter(
     score_differential < -7
     ) %>%
-  group_by(binned_yardline, ydstogo) %>%
-  mutate(tot_n = n()) %>%
-  ungroup() %>%
-  group_by(binned_yardline, ydstogo, decision) %>%
-  summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
-  group_by(binned_yardline, ydstogo) %>%
-  arrange(binned_yardline, ydstogo, -n) %>%
-  dplyr::slice(1) %>%
-  ungroup() %>%
+  plot_prepare() %>%
   ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
   geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95, alpha = pct)) +
   scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
@@ -235,15 +259,7 @@ fig2 <- plot %>%
   filter(
     score_differential > 7
     ) %>%
-  group_by(binned_yardline, ydstogo) %>%
-  mutate(tot_n = n()) %>%
-  ungroup() %>%
-  group_by(binned_yardline, ydstogo, decision) %>%
-  summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
-  group_by(binned_yardline, ydstogo) %>%
-  arrange(binned_yardline, ydstogo, -n) %>%
-  dplyr::slice(1) %>%
-  ungroup() %>%
+  plot_prepare() %>%
   ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
   geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95, alpha = pct)) +
   scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
@@ -303,15 +319,7 @@ spread_plot <- function(spread, range = 2) {
     filter(
       between(posteam_spread, spread - range, spread + range)
     ) %>%
-    group_by(binned_yardline, ydstogo) %>%
-    mutate(tot_n = n()) %>%
-    ungroup() %>%
-    group_by(binned_yardline, ydstogo, decision) %>%
-    summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
-    group_by(binned_yardline, ydstogo) %>%
-    arrange(binned_yardline, ydstogo, -n) %>%
-    dplyr::slice(1) %>%
-    ungroup() %>%
+    plot_prepare() %>%
     ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
     geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95, alpha = pct)) +
     scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
@@ -338,10 +346,9 @@ spread_plot <- function(spread, range = 2) {
     annotate("text",x=20, y= 7, label = "Field goal", size = 6)
   
   return(fig1)
+  
 }
-```
 
-```{r make_spread_plot, echo = FALSE, warning = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 spread_plot(-7, 3)
 ```
 
