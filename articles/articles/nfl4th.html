@@ -125,6 +125,7 @@
 <p>Here’s what the data obtained using <code><a href="../../reference/load_4th_pbp.html">load_4th_pbp()</a></code> looks like:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">data</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
@@ -165,115 +166,10 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">SF</td>
-<td align="right">0</td>
-<td align="right">35</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">SF</td>
-<td align="right">10</td>
-<td align="right">75</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">SF</td>
-<td align="right">10</td>
-<td align="right">55</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">SF</td>
-<td align="right">10</td>
-<td align="right">41</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">SF</td>
-<td align="right">8</td>
-<td align="right">39</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">SF</td>
-<td align="right">14</td>
-<td align="right">45</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
 <td align="left">SF</td>
 <td align="right">3</td>
 <td align="right">34</td>
-<td align="right">1.4</td>
+<td align="right">1.40</td>
 <td align="right">0.55</td>
 <td align="right">0.69</td>
 <td align="right">0.78</td>
@@ -284,34 +180,139 @@
 <td align="right">0.73</td>
 <td align="right">0.72</td>
 </tr>
+<tr class="even">
+<td align="left">ARI</td>
+<td align="right">10</td>
+<td align="right">65</td>
+<td align="right">-2.49</td>
+<td align="right">0.27</td>
+<td align="right">0.18</td>
+<td align="right">0.28</td>
+<td align="right">0.21</td>
+<td align="right">0.00</td>
+<td align="right">0.18</td>
+<td align="right">0.29</td>
+<td align="right">0.18</td>
+<td align="right">0.24</td>
+</tr>
 <tr class="odd">
 <td align="left">ARI</td>
-<td align="right">0</td>
-<td align="right">35</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">7</td>
+<td align="right">72</td>
+<td align="right">-0.27</td>
+<td align="right">0.38</td>
+<td align="right">0.07</td>
+<td align="right">0.14</td>
+<td align="right">0.10</td>
+<td align="right">0.00</td>
+<td align="right">0.07</td>
+<td align="right">0.15</td>
+<td align="right">0.07</td>
+<td align="right">0.10</td>
+</tr>
+<tr class="even">
+<td align="left">SF</td>
+<td align="right">5</td>
+<td align="right">64</td>
+<td align="right">0.78</td>
+<td align="right">0.48</td>
+<td align="right">0.84</td>
+<td align="right">0.92</td>
+<td align="right">0.88</td>
+<td align="right">0.00</td>
+<td align="right">0.83</td>
+<td align="right">0.92</td>
+<td align="right">0.83</td>
+<td align="right">0.87</td>
+</tr>
+<tr class="odd">
+<td align="left">SF</td>
+<td align="right">3</td>
+<td align="right">68</td>
+<td align="right">1.71</td>
+<td align="right">0.55</td>
+<td align="right">0.65</td>
+<td align="right">0.81</td>
+<td align="right">0.74</td>
+<td align="right">0.00</td>
+<td align="right">0.62</td>
+<td align="right">0.80</td>
+<td align="right">0.62</td>
+<td align="right">0.72</td>
+</tr>
+<tr class="even">
+<td align="left">ARI</td>
+<td align="right">9</td>
+<td align="right">77</td>
+<td align="right">-1.06</td>
+<td align="right">0.30</td>
+<td align="right">0.16</td>
+<td align="right">0.28</td>
+<td align="right">0.19</td>
+<td align="right">0.00</td>
+<td align="right">0.15</td>
+<td align="right">0.28</td>
+<td align="right">0.15</td>
+<td align="right">0.20</td>
+</tr>
+<tr class="odd">
+<td align="left">SF</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3.22</td>
+<td align="right">0.63</td>
+<td align="right">0.78</td>
+<td align="right">0.89</td>
+<td align="right">0.85</td>
+<td align="right">0.99</td>
+<td align="right">0.76</td>
+<td align="right">0.82</td>
+<td align="right">0.82</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
 <td align="left">ARI</td>
-<td align="right">10</td>
-<td align="right">75</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">5</td>
+<td align="right">34</td>
+<td align="right">0.54</td>
+<td align="right">0.45</td>
+<td align="right">0.19</td>
+<td align="right">0.37</td>
+<td align="right">0.27</td>
+<td align="right">0.62</td>
+<td align="right">0.19</td>
+<td align="right">0.31</td>
+<td align="right">0.27</td>
+<td align="right">0.23</td>
+</tr>
+<tr class="odd">
+<td align="left">SF</td>
+<td align="right">9</td>
+<td align="right">36</td>
+<td align="right">-0.12</td>
+<td align="right">0.32</td>
+<td align="right">0.72</td>
+<td align="right">0.84</td>
+<td align="right">0.76</td>
+<td align="right">0.57</td>
+<td align="right">0.71</td>
+<td align="right">0.80</td>
+<td align="right">0.76</td>
+<td align="right">0.76</td>
+</tr>
+<tr class="even">
+<td align="left">SF</td>
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">1.88</td>
+<td align="right">0.54</td>
+<td align="right">0.77</td>
+<td align="right">0.89</td>
+<td align="right">0.83</td>
+<td align="right">0.98</td>
+<td align="right">0.75</td>
+<td align="right">0.81</td>
+<td align="right">0.81</td>
 <td align="right">NA</td>
 </tr>
 </tbody>
@@ -684,7 +685,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#uzneakzpvb .gt_table {
+#jmtmyysgtl .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -709,7 +710,7 @@
   border-left-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_heading {
+#jmtmyysgtl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -721,7 +722,7 @@
   border-right-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_title {
+#jmtmyysgtl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -731,7 +732,7 @@
   border-bottom-width: 0;
 }
 
-#uzneakzpvb .gt_subtitle {
+#jmtmyysgtl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -741,13 +742,13 @@
   border-top-width: 0;
 }
 
-#uzneakzpvb .gt_bottom_border {
+#jmtmyysgtl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_col_headings {
+#jmtmyysgtl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -762,7 +763,7 @@
   border-right-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_col_heading {
+#jmtmyysgtl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -782,7 +783,7 @@
   overflow-x: hidden;
 }
 
-#uzneakzpvb .gt_column_spanner_outer {
+#jmtmyysgtl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -794,15 +795,15 @@
   padding-right: 4px;
 }
 
-#uzneakzpvb .gt_column_spanner_outer:first-child {
+#jmtmyysgtl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#uzneakzpvb .gt_column_spanner_outer:last-child {
+#jmtmyysgtl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#uzneakzpvb .gt_column_spanner {
+#jmtmyysgtl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -814,7 +815,7 @@
   width: 100%;
 }
 
-#uzneakzpvb .gt_group_heading {
+#jmtmyysgtl .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -836,7 +837,7 @@
   vertical-align: middle;
 }
 
-#uzneakzpvb .gt_empty_group_heading {
+#jmtmyysgtl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -851,15 +852,15 @@
   vertical-align: middle;
 }
 
-#uzneakzpvb .gt_from_md > :first-child {
+#jmtmyysgtl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#uzneakzpvb .gt_from_md > :last-child {
+#jmtmyysgtl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#uzneakzpvb .gt_row {
+#jmtmyysgtl .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -878,7 +879,7 @@
   overflow-x: hidden;
 }
 
-#uzneakzpvb .gt_stub {
+#jmtmyysgtl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -890,7 +891,7 @@
   padding-left: 12px;
 }
 
-#uzneakzpvb .gt_summary_row {
+#jmtmyysgtl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -900,7 +901,7 @@
   padding-right: 5px;
 }
 
-#uzneakzpvb .gt_first_summary_row {
+#jmtmyysgtl .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -910,7 +911,7 @@
   border-top-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_grand_summary_row {
+#jmtmyysgtl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -920,7 +921,7 @@
   padding-right: 5px;
 }
 
-#uzneakzpvb .gt_first_grand_summary_row {
+#jmtmyysgtl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -930,11 +931,11 @@
   border-top-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_striped {
+#jmtmyysgtl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#uzneakzpvb .gt_table_body {
+#jmtmyysgtl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -943,7 +944,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_footnotes {
+#jmtmyysgtl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -957,13 +958,13 @@
   border-right-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_footnote {
+#jmtmyysgtl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#uzneakzpvb .gt_sourcenotes {
+#jmtmyysgtl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -977,46 +978,46 @@
   border-right-color: #D3D3D3;
 }
 
-#uzneakzpvb .gt_sourcenote {
+#jmtmyysgtl .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#uzneakzpvb .gt_left {
+#jmtmyysgtl .gt_left {
   text-align: left;
 }
 
-#uzneakzpvb .gt_center {
+#jmtmyysgtl .gt_center {
   text-align: center;
 }
 
-#uzneakzpvb .gt_right {
+#jmtmyysgtl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#uzneakzpvb .gt_font_normal {
+#jmtmyysgtl .gt_font_normal {
   font-weight: normal;
 }
 
-#uzneakzpvb .gt_font_bold {
+#jmtmyysgtl .gt_font_bold {
   font-weight: bold;
 }
 
-#uzneakzpvb .gt_font_italic {
+#jmtmyysgtl .gt_font_italic {
   font-style: italic;
 }
 
-#uzneakzpvb .gt_super {
+#jmtmyysgtl .gt_super {
   font-size: 65%;
 }
 
-#uzneakzpvb .gt_footnote_marks {
+#jmtmyysgtl .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="uzneakzpvb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="jmtmyysgtl" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <thead class="gt_header">
 <tr>
 <th colspan="3" class="gt_heading gt_title gt_font_normal" style>NFL team decision-making by go recommendation, 2020</th>
