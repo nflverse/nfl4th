@@ -21,5 +21,5 @@
 0 errors | 0 warnings | 1 note
 
 * This is a new release.
-* Added web references to data sources per CRAN request
+* Added web references to data sources in DESCRIPTION per CRAN request
 * Unwrapped \donttest{} from examples where feasible per CRAN request
