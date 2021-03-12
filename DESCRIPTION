@@ -11,7 +11,8 @@ Authors@R:
              role = "ctb",
              email = "mrcaseb@gmail.com"))
 Description: A set of functions to estimate outcomes of fourth down
-    plays in the National Football League.
+    plays in the National Football League and obtain fourth down plays
+    from <https://www.nfl.com/> and <https://www.espn.com/>.
 License: MIT + file LICENSE
 URL: https://www.nfl4th.com/, https://github.com/guga31bb/nfl4th/
 BugReports: https://github.com/guga31bb/nfl4th/issues

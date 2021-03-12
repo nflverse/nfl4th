@@ -29,7 +29,6 @@ Get various probabilities associated with each option on 4th downs (go
 for it, kick field goal, punt).
 }
 \examples{
-\donttest{
 play <-
   tibble::tibble(
     # things to help find the right game (use "reg" or "post")
@@ -54,5 +53,4 @@ play <-
 probs <- nfl4th::add_4th_probs(play)
 
 dplyr::glimpse(probs)
-}
 }
