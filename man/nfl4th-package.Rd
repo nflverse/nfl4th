@@ -9,7 +9,8 @@
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
 A set of functions to estimate outcomes of fourth down
-    plays in the National Football League.
+    plays in the National Football League and obtain fourth down plays
+    from <https://www.nfl.com/> and <https://www.espn.com/>.
 }
 \seealso{
 Useful links:
