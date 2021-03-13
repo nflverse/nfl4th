@@ -1,6 +1,6 @@
 ## Resubmission
 * Added web references to data sources in DESCRIPTION per CRAN request
-* Unwrapped \donttest{} from examples where feasible per CRAN request
+* Unwrapped \donttest{} from examples where feasible per CRAN request (many take more than 5 seconds)
 
 ## Test environments
 * Windows Server 2008 R2 SP1, R-oldrel, 32/64 bit
