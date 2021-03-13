@@ -59,7 +59,8 @@ add_4th_probs <- function(df) {
   if (!"type" %in% names(df)) {
     # message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
     modified_df <- original_df %>%
-      prepare_nflfastr_data()
+      prepare_nflfastr_data() %>%
+      filter(down == 4)
   }
 
   # message("Performing final preparation . . .")
