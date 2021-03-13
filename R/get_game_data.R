@@ -293,7 +293,7 @@ get_4th_plays <- function(gid) {
     },
     warning = function(w) {
       if (warn == 1) {
-        message(glue::glue("Warning: The requested GameID {espn_game_id} ({df$espn}) is invalid!"))
+        message(glue::glue("Warning: The requested GameID {df$espn} ({df$game_id}) is invalid!"))
       }
     },
     finally = {
