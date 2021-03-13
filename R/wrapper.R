@@ -25,6 +25,7 @@
 #' }
 #' @export
 #' @examples
+#' \donttest{
 #' play <-
 #'   tibble::tibble(
 #'     # things to help find the right game (use "reg" or "post")
@@ -49,6 +50,7 @@
 #' probs <- nfl4th::add_4th_probs(play)
 #'
 #' dplyr::glimpse(probs)
+#' }
 add_4th_probs <- function(df) {
 
   original_df <- df %>% mutate(index = 1 : n())

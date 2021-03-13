@@ -16,6 +16,7 @@ A table showing the probabilities associated with each possible choice.
 Get a table with the probabilities on 4th down.
 }
 \examples{
+\donttest{
 play <-
   tibble::tibble(
     # things to help find the right game (use "reg" or "post")
@@ -39,5 +40,5 @@ play <-
 
 probs <- nfl4th::add_4th_probs(play)
 nfl4th::make_table_data(probs)
-
+}
 }
