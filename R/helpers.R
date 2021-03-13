@@ -184,8 +184,7 @@ prepare_nflfastr_data <- function(pbp) {
       !is.na(half_seconds_remaining),
       !is.na(qtr),
       !is.na(posteam),
-      qtr <= 4,
-      down == 4
+      qtr <= 4
       )
 
   return(data)
