@@ -8,6 +8,10 @@
 [![R-CMD-check](https://github.com/guga31bb/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/guga31bb/nfl4th/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![Support
+Server](https://img.shields.io/discord/591914197219016707.svg?color=7289da&label=Support&logo=discord&style=flat-square)](https://discord.com/invite/5Er2FBnnQa)
 [![Twitter
 Follow](https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social)](https://twitter.com/ben_bot_baldwin)
 <!-- badges: end -->
@@ -24,14 +28,16 @@ here](https://github.com/guga31bb/fourth_calculator/blob/main/app.R).
 
 ## Installation
 
-You can install the released version of nfl4th from
-[CRAN](https://CRAN.R-project.org) with:
+The easiest way to get the released version of nfl4th is to install it
+from [CRAN](https://cran.r-project.org/package=nfl4th) with:
 
 ``` r
 install.packages("nfl4th")
 ```
 
-You can install nfl4th from [GitHub](https://github.com/) with:
+To get a bug fix or to use a feature from the development version, you
+can install the development version of nfl4th from
+[GitHub](https://github.com/guga31bb/nfl4th/) with:
 
 ``` r
 if (!require("remotes")) install.packages("remotes")
