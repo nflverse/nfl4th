@@ -58,7 +58,7 @@ add_gt_options <- function(gt_data) {
 }
 ```
 
-# Three basic examples of doing something with `nfl4th`
+# Four basic examples of doing something with `nfl4th`
 
 We begin by demonstrating the use of `nfl4th` to load all seasons for which 4th down calculations are available in one line of code. This will probably take a couple minutes unless you have a blazing fast computer.
 
@@ -102,6 +102,48 @@ pbp %>%
   annotate("label",x=-6, y= 15, label = "Teams almost always kick\nwhen they should...", size = 5) +
   annotate("label",x=6, y= 25, label = "...but frequently\n kick when they\nshould go for it", size = 5)
 ```
+
+
+## Check coaches' alignment with the model
+
+Here's how to create one of the tables shown in [the piece on The Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/):
+
+```{r decision-table, warning = FALSE}
+pbp %>%
+  dplyr::filter(season == 2020, !is.na(go_boost)) %>%
+  dplyr::mutate(type = dplyr::case_when(
+    go_boost >= 4 ~ "Definitely go for it",
+    go_boost > 1 & go_boost < 4 ~ "Probably go for it",
+    go_boost >= -1 & go_boost <= 1 ~ "Toss-up",
+    go_boost < -1 & go_boost > -4 ~ "Probably kick",
+    go_boost <= -4 ~ "Definitely kick"
+  )) %>%
+  dplyr::group_by(type) %>%
+  dplyr::summarize(go = mean(go), n = dplyr::n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(-go) %>%
+  gt::gt() %>%
+  gt::cols_label(
+    type = "Recommendation",
+    go = "Went for it %",
+    n = "Plays"
+  ) %>%
+  gt::tab_style(
+    style = gt::cell_text(color = "black", weight = "bold"),
+    locations = list(
+      gt::cells_column_labels(dplyr::everything())
+    )
+  ) %>% 
+  add_gt_options() %>%
+  gt::fmt_number(columns = dplyr::vars(go), decimals = 0) %>%
+  gt::cols_align(
+    columns = 2:3, align = "center"
+  ) %>% 
+  gt::tab_header(title = "NFL team decision-making by go recommendation, 2020") %>%
+  gt::tab_source_note(gt::md('**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points'))
+```
+
+Thus, we can see that the model is strongly aligned to what coaches do.
 
 ## Worst kick decisions of 2020
 
