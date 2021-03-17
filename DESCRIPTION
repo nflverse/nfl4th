@@ -26,7 +26,7 @@ Imports:
     jsonlite,
     magrittr,
     mgcv,
-    nflfastR,
+    nflfastR (>= 4.0.0),
     purrr,
     stringr,
     tibble,
