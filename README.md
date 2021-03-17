@@ -6,7 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/guga31bb/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/guga31bb/nfl4th/actions)
-<!-- [![CRAN status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th) -->
+[![CRAN
+status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
 [![Twitter
 Follow](https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social)](https://twitter.com/ben_bot_baldwin)
 <!-- badges: end -->
