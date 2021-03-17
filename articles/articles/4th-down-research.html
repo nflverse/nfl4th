@@ -112,9 +112,9 @@
 
     
     
-<div id="three-basic-examples-of-doing-something-with-nfl4th" class="section level1">
+<div id="four-basic-examples-of-doing-something-with-nfl4th" class="section level1">
 <h1 class="hasAnchor">
-<a href="#three-basic-examples-of-doing-something-with-nfl4th" class="anchor"></a>Three basic examples of doing something with <code>nfl4th</code>
+<a href="#four-basic-examples-of-doing-something-with-nfl4th" class="anchor"></a>Four basic examples of doing something with <code>nfl4th</code>
 </h1>
 <p>We begin by demonstrating the use of <code>nfl4th</code> to load all seasons for which 4th down calculations are available in one line of code. This will probably take a couple minutes unless you have a blazing fast computer.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -155,12 +155,433 @@
   <span class="fu">annotate</span><span class="op">(</span><span class="st">"label"</span>,x<span class="op">=</span><span class="fl">6</span>, y<span class="op">=</span> <span class="fl">25</span>, label <span class="op">=</span> <span class="st">"...but frequently\n kick when they\nshould go for it"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/league-1.png" width="7200"></p>
 </div>
+<div id="check-coaches-alignment-with-the-model" class="section level2">
+<h2 class="hasAnchor">
+<a href="#check-coaches-alignment-with-the-model" class="anchor"></a>Check coaches’ alignment with the model</h2>
+<p>Here’s how to create one of the tables shown in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/">the piece on The Athletic</a>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pbp</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op">==</span> <span class="fl">2020</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span>
+    <span class="va">go_boost</span> <span class="op">&gt;=</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"Definitely go for it"</span>,
+    <span class="va">go_boost</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">go_boost</span> <span class="op">&lt;</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"Probably go for it"</span>,
+    <span class="va">go_boost</span> <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">1</span> <span class="op">&amp;</span> <span class="va">go_boost</span> <span class="op">&lt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Toss-up"</span>,
+    <span class="va">go_boost</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">1</span> <span class="op">&amp;</span> <span class="va">go_boost</span> <span class="op">&gt;</span> <span class="op">-</span><span class="fl">4</span> <span class="op">~</span> <span class="st">"Probably kick"</span>,
+    <span class="va">go_boost</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">4</span> <span class="op">~</span> <span class="st">"Definitely kick"</span>
+  <span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">type</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>go <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">go</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">go</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>
+    type <span class="op">=</span> <span class="st">"Recommendation"</span>,
+    go <span class="op">=</span> <span class="st">"Went for it %"</span>,
+    n <span class="op">=</span> <span class="st">"Plays"</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_style.html">tab_style</a></span><span class="op">(</span>
+    style <span class="op">=</span> <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cell_text.html">cell_text</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, weight <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,
+    locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+      <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cells_column_labels.html">cells_column_labels</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">add_gt_options</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/fmt_number.html">fmt_number</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">go</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_align.html">cols_align</a></span><span class="op">(</span>
+    columns <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, align <span class="op">=</span> <span class="st">"center"</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NFL team decision-making by go recommendation, 2020"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">'**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,&lt;br&gt; "probably" 1-4 percentage points'</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#jrqkdbgtvi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #F2F2F2;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: black;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: white;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_heading {
+  background-color: #F2F2F2;
+  text-align: center;
+  border-bottom-color: #F2F2F2;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #F2F2F2;
+  border-bottom-width: 0;
+}
+
+#jrqkdbgtvi .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #F2F2F2;
+  border-top-width: 0;
+}
+
+#jrqkdbgtvi .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_col_heading {
+  color: #333333;
+  background-color: #F2F2F2;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#jrqkdbgtvi .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #F2F2F2;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#jrqkdbgtvi .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#jrqkdbgtvi .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#jrqkdbgtvi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#jrqkdbgtvi .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #F2F2F2;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: black;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#jrqkdbgtvi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #F2F2F2;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: black;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: black;
+  vertical-align: middle;
+}
+
+#jrqkdbgtvi .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#jrqkdbgtvi .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#jrqkdbgtvi .gt_row {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: white;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#jrqkdbgtvi .gt_stub {
+  color: #333333;
+  background-color: #F2F2F2;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#jrqkdbgtvi .gt_summary_row {
+  color: #333333;
+  background-color: #F2F2F2;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jrqkdbgtvi .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_grand_summary_row {
+  color: #333333;
+  background-color: #F2F2F2;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jrqkdbgtvi .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_striped {
+  background-color: #FFFFFF;
+}
+
+#jrqkdbgtvi .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_footnotes {
+  color: #333333;
+  background-color: #F2F2F2;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#jrqkdbgtvi .gt_sourcenotes {
+  color: #333333;
+  background-color: #F2F2F2;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jrqkdbgtvi .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#jrqkdbgtvi .gt_left {
+  text-align: left;
+}
+
+#jrqkdbgtvi .gt_center {
+  text-align: center;
+}
+
+#jrqkdbgtvi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#jrqkdbgtvi .gt_font_normal {
+  font-weight: normal;
+}
+
+#jrqkdbgtvi .gt_font_bold {
+  font-weight: bold;
+}
+
+#jrqkdbgtvi .gt_font_italic {
+  font-style: italic;
+}
+
+#jrqkdbgtvi .gt_super {
+  font-size: 65%;
+}
+
+#jrqkdbgtvi .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="jrqkdbgtvi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_header">
+<tr>
+<th colspan="3" class="gt_heading gt_title gt_font_normal" style>NFL team decision-making by go recommendation, 2020</th>
+    </tr>
+<tr>
+<th colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
+    </tr>
+</thead>
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Recommendation</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Went for it %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Plays</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_left">Definitely go for it</td>
+      <td class="gt_row gt_center">71</td>
+      <td class="gt_row gt_center">227</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left gt_striped">Probably go for it</td>
+      <td class="gt_row gt_center gt_striped">34</td>
+      <td class="gt_row gt_center gt_striped">665</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left">Toss-up</td>
+      <td class="gt_row gt_center">18</td>
+      <td class="gt_row gt_center">1626</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left gt_striped">Probably kick</td>
+      <td class="gt_row gt_center gt_striped">2</td>
+      <td class="gt_row gt_center gt_striped">918</td>
+    </tr>
+<tr>
+<td class="gt_row gt_left">Definitely kick</td>
+      <td class="gt_row gt_center">0</td>
+      <td class="gt_row gt_center">311</td>
+    </tr>
+</tbody>
+<tfoot class="gt_sourcenotes"><tr>
+<td class="gt_sourcenote" colspan="3">
+<strong>Notes</strong>: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points</td>
+    </tr></tfoot>
+</table></div>
+<p>Thus, we can see that the model is strongly aligned to what coaches do.</p>
+</div>
 <div id="worst-kick-decisions-of-2020" class="section level2">
 <h2 class="hasAnchor">
 <a href="#worst-kick-decisions-of-2020" class="anchor"></a>Worst kick decisions of 2020</h2>
 <p>Here are the worst instances of not going for it (and instead punting or kicking a field goal) in terms of total expected win probability lost.</p>
 <p>2020’s champion is Kliff Kingsbury.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pbp</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span>
     <span class="va">season</span> <span class="op">==</span> <span class="fl">2020</span>,
@@ -198,7 +619,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#wwxzzlqldv .gt_table {
+#jnyuaswxxe .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -223,7 +644,7 @@
   border-left-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_heading {
+#jnyuaswxxe .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -235,7 +656,7 @@
   border-right-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_title {
+#jnyuaswxxe .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -245,7 +666,7 @@
   border-bottom-width: 0;
 }
 
-#wwxzzlqldv .gt_subtitle {
+#jnyuaswxxe .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -255,13 +676,13 @@
   border-top-width: 0;
 }
 
-#wwxzzlqldv .gt_bottom_border {
+#jnyuaswxxe .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_col_headings {
+#jnyuaswxxe .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -276,7 +697,7 @@
   border-right-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_col_heading {
+#jnyuaswxxe .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -296,7 +717,7 @@
   overflow-x: hidden;
 }
 
-#wwxzzlqldv .gt_column_spanner_outer {
+#jnyuaswxxe .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -308,15 +729,15 @@
   padding-right: 4px;
 }
 
-#wwxzzlqldv .gt_column_spanner_outer:first-child {
+#jnyuaswxxe .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wwxzzlqldv .gt_column_spanner_outer:last-child {
+#jnyuaswxxe .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wwxzzlqldv .gt_column_spanner {
+#jnyuaswxxe .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -328,7 +749,7 @@
   width: 100%;
 }
 
-#wwxzzlqldv .gt_group_heading {
+#jnyuaswxxe .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #F2F2F2;
@@ -350,7 +771,7 @@
   vertical-align: middle;
 }
 
-#wwxzzlqldv .gt_empty_group_heading {
+#jnyuaswxxe .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -365,15 +786,15 @@
   vertical-align: middle;
 }
 
-#wwxzzlqldv .gt_from_md > :first-child {
+#jnyuaswxxe .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wwxzzlqldv .gt_from_md > :last-child {
+#jnyuaswxxe .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wwxzzlqldv .gt_row {
+#jnyuaswxxe .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -392,7 +813,7 @@
   overflow-x: hidden;
 }
 
-#wwxzzlqldv .gt_stub {
+#jnyuaswxxe .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -404,7 +825,7 @@
   padding-left: 12px;
 }
 
-#wwxzzlqldv .gt_summary_row {
+#jnyuaswxxe .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -414,7 +835,7 @@
   padding-right: 5px;
 }
 
-#wwxzzlqldv .gt_first_summary_row {
+#jnyuaswxxe .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -424,7 +845,7 @@
   border-top-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_grand_summary_row {
+#jnyuaswxxe .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -434,7 +855,7 @@
   padding-right: 5px;
 }
 
-#wwxzzlqldv .gt_first_grand_summary_row {
+#jnyuaswxxe .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -444,11 +865,11 @@
   border-top-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_striped {
+#jnyuaswxxe .gt_striped {
   background-color: #FFFFFF;
 }
 
-#wwxzzlqldv .gt_table_body {
+#jnyuaswxxe .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -457,7 +878,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_footnotes {
+#jnyuaswxxe .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -471,13 +892,13 @@
   border-right-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_footnote {
+#jnyuaswxxe .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#wwxzzlqldv .gt_sourcenotes {
+#jnyuaswxxe .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -491,46 +912,46 @@
   border-right-color: #D3D3D3;
 }
 
-#wwxzzlqldv .gt_sourcenote {
+#jnyuaswxxe .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#wwxzzlqldv .gt_left {
+#jnyuaswxxe .gt_left {
   text-align: left;
 }
 
-#wwxzzlqldv .gt_center {
+#jnyuaswxxe .gt_center {
   text-align: center;
 }
 
-#wwxzzlqldv .gt_right {
+#jnyuaswxxe .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wwxzzlqldv .gt_font_normal {
+#jnyuaswxxe .gt_font_normal {
   font-weight: normal;
 }
 
-#wwxzzlqldv .gt_font_bold {
+#jnyuaswxxe .gt_font_bold {
   font-weight: bold;
 }
 
-#wwxzzlqldv .gt_font_italic {
+#jnyuaswxxe .gt_font_italic {
   font-style: italic;
 }
 
-#wwxzzlqldv .gt_super {
+#jnyuaswxxe .gt_super {
   font-size: 65%;
 }
 
-#wwxzzlqldv .gt_footnote_marks {
+#jnyuaswxxe .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="wwxzzlqldv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="jnyuaswxxe" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <colgroup>
 <col style="width:30px;">
 <col style="width:50px;">
@@ -678,7 +1099,7 @@
 <div id="nfl-coaches-are-increasingly-adhering-to-nfl4th-recommendations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#nfl-coaches-are-increasingly-adhering-to-nfl4th-recommendations" class="anchor"></a>NFL coaches are increasingly adhering to <code>nfl4th</code> recommendations</h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># labels on the plot</span>
 <span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>
   label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"NFL coaches&lt;br&gt;in &lt;span style='color:#00BFC4'&gt;**2020**&lt;/span&gt;"</span>, <span class="st">"NFL coaches&lt;br&gt;in &lt;span style='color:#F8766D'&gt;**2014**&lt;/span&gt;"</span><span class="op">)</span>,
@@ -793,7 +1214,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zshkzzqtux .gt_table {
+#soshjcrami .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -818,7 +1239,7 @@
   border-left-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_heading {
+#soshjcrami .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -830,7 +1251,7 @@
   border-right-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_title {
+#soshjcrami .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -840,7 +1261,7 @@
   border-bottom-width: 0;
 }
 
-#zshkzzqtux .gt_subtitle {
+#soshjcrami .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -850,13 +1271,13 @@
   border-top-width: 0;
 }
 
-#zshkzzqtux .gt_bottom_border {
+#soshjcrami .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_col_headings {
+#soshjcrami .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -871,7 +1292,7 @@
   border-right-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_col_heading {
+#soshjcrami .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -891,7 +1312,7 @@
   overflow-x: hidden;
 }
 
-#zshkzzqtux .gt_column_spanner_outer {
+#soshjcrami .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -903,15 +1324,15 @@
   padding-right: 4px;
 }
 
-#zshkzzqtux .gt_column_spanner_outer:first-child {
+#soshjcrami .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zshkzzqtux .gt_column_spanner_outer:last-child {
+#soshjcrami .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zshkzzqtux .gt_column_spanner {
+#soshjcrami .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -923,7 +1344,7 @@
   width: 100%;
 }
 
-#zshkzzqtux .gt_group_heading {
+#soshjcrami .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #F2F2F2;
@@ -945,7 +1366,7 @@
   vertical-align: middle;
 }
 
-#zshkzzqtux .gt_empty_group_heading {
+#soshjcrami .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -960,15 +1381,15 @@
   vertical-align: middle;
 }
 
-#zshkzzqtux .gt_from_md > :first-child {
+#soshjcrami .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zshkzzqtux .gt_from_md > :last-child {
+#soshjcrami .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zshkzzqtux .gt_row {
+#soshjcrami .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -987,7 +1408,7 @@
   overflow-x: hidden;
 }
 
-#zshkzzqtux .gt_stub {
+#soshjcrami .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -999,7 +1420,7 @@
   padding-left: 12px;
 }
 
-#zshkzzqtux .gt_summary_row {
+#soshjcrami .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1009,7 +1430,7 @@
   padding-right: 5px;
 }
 
-#zshkzzqtux .gt_first_summary_row {
+#soshjcrami .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1019,7 +1440,7 @@
   border-top-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_grand_summary_row {
+#soshjcrami .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1029,7 +1450,7 @@
   padding-right: 5px;
 }
 
-#zshkzzqtux .gt_first_grand_summary_row {
+#soshjcrami .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1039,11 +1460,11 @@
   border-top-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_striped {
+#soshjcrami .gt_striped {
   background-color: #FFFFFF;
 }
 
-#zshkzzqtux .gt_table_body {
+#soshjcrami .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1052,7 +1473,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_footnotes {
+#soshjcrami .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1066,13 +1487,13 @@
   border-right-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_footnote {
+#soshjcrami .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#zshkzzqtux .gt_sourcenotes {
+#soshjcrami .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1086,46 +1507,46 @@
   border-right-color: #D3D3D3;
 }
 
-#zshkzzqtux .gt_sourcenote {
+#soshjcrami .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#zshkzzqtux .gt_left {
+#soshjcrami .gt_left {
   text-align: left;
 }
 
-#zshkzzqtux .gt_center {
+#soshjcrami .gt_center {
   text-align: center;
 }
 
-#zshkzzqtux .gt_right {
+#soshjcrami .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zshkzzqtux .gt_font_normal {
+#soshjcrami .gt_font_normal {
   font-weight: normal;
 }
 
-#zshkzzqtux .gt_font_bold {
+#soshjcrami .gt_font_bold {
   font-weight: bold;
 }
 
-#zshkzzqtux .gt_font_italic {
+#soshjcrami .gt_font_italic {
   font-style: italic;
 }
 
-#zshkzzqtux .gt_super {
+#soshjcrami .gt_super {
   font-size: 65%;
 }
 
-#zshkzzqtux .gt_footnote_marks {
+#soshjcrami .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="zshkzzqtux" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<div id="soshjcrami" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
 <colgroup>
 <col style="width:50px;">
 <col style="width:50px;">
