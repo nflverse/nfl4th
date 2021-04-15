@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/nflverse/nfl4thworkflows/R-CMD-check/badge.svg)](https://github.com/nflverse/nfl4thactions)
+[![R-CMD-check](https://github.com/nflverse/nfl4thworkflows/R-CMD-check/badge.svg)](https://github.com/nflverse/nfl4th/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
 [![Lifecycle:

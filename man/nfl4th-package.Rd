@@ -17,7 +17,7 @@ Useful links:
 \itemize{
   \item \url{https://www.nfl4th.com/}
   \item \url{https://github.com/nflverse/nfl4th}
-  \item Report bugs at \url{https://github.com/nflverse/nfl4thissues}
+  \item Report bugs at \url{https://github.com/nflverse/nfl4th/issues}
 }
 
 }
