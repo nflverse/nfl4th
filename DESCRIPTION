@@ -15,7 +15,7 @@ Description: A set of functions to estimate outcomes of fourth down
     from <https://www.nfl.com/> and <https://www.espn.com/>.
 License: MIT + file LICENSE
 URL: https://www.nfl4th.com/, https://github.com/nflverse/nfl4th
-BugReports: https://github.com/nflverse/nfl4thissues
+BugReports: https://github.com/nflverse/nfl4th/issues
 Depends: 
     R (>= 2.10)
 Imports: 
