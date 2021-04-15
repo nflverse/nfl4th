@@ -1,7 +1,7 @@
 library(tidyverse)
 library(tidymodels)
 # for getting data ready for the model
-source('https://raw.githubusercontent.com/mrcaseb/nflfastR/master/R/helper_add_nflscrapr_mutations.R')
+source('https://raw.githubusercontent.com/nflverse/nflfastR/master/R/helper_add_nflscrapr_mutations.R')
 
 # **************************************************************************************
 # data
@@ -9,7 +9,7 @@ seasons <- 2014:2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
-      glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.rds")
+      glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds")
     )
   )
 }) %>%
@@ -202,7 +202,7 @@ seasons <- 2010:2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
-      glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.rds")
+      glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds")
     )
   )
 }) %>%

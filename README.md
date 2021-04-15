@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/guga31bb/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/guga31bb/nfl4th/actions)
+[![R-CMD-check](https://github.com/nflverse/nfl4thworkflows/R-CMD-check/badge.svg)](https://github.com/nflverse/nfl4thactions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
 [![Lifecycle:
@@ -37,7 +37,7 @@ install.packages("nfl4th")
 
 To get a bug fix or to use a feature from the development version, you
 can install the development version of nfl4th from
-[GitHub](https://github.com/guga31bb/nfl4th/) with:
+[GitHub](https://github.com/nflverse/nfl4th) with:
 
 ``` r
 if (!require("remotes")) install.packages("remotes")
