@@ -1,0 +1,33 @@
+on:
+  schedule:
+    # runs every day at 9:00 AM UTC in jan, feb, aug-dec
+    - cron:  '0 9 * 1,2,9-12 *'
+  workflow_dispatch:
+
+name: Update Computed Numbers
+
+jobs:
+  update:
+    name: Update
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install remotes and nfl4th
+        run: |
+          install.packages("remotes")
+          remotes::install_github("nflverse/nfl4th", dependencies = TRUE, type = "binary")
+        shell: Rscript {0}
+      - name: Install necessary packages
+        run: |
+          install.packages(c("callr", "lubridate"), dependencies = TRUE, type = "binary")
+        shell: Rscript {0}
+      - name: Run update script
+        run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git pull
+          Rscript -e 'source("data-raw/_make_computed_numbers_commit.R")'
+          git push origin master || echo "No changes to commit"
