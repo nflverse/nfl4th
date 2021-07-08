@@ -147,8 +147,8 @@
        y <span class="op">=</span> <span class="st">"Go-for-it percentage"</span>,
        title <span class="op">=</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"NFL Go-for-it Rate on &lt;span style='color:red'&gt;4th down&lt;/span&gt;"</span><span class="op">)</span>
        <span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>,x<span class="op">=</span><span class="op">-</span><span class="fl">4</span>, y<span class="op">=</span> <span class="fl">90</span>, label <span class="op">=</span> <span class="st">"Should\nkick"</span>, color<span class="op">=</span><span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>,x<span class="op">=</span><span class="fl">3</span>, y<span class="op">=</span> <span class="fl">90</span>, label <span class="op">=</span> <span class="st">"Should\ngo for it"</span>, color<span class="op">=</span><span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">annotate</span><span class="op">(</span><span class="st">"label"</span>,x<span class="op">=</span><span class="op">-</span><span class="fl">6</span>, y<span class="op">=</span> <span class="fl">15</span>, label <span class="op">=</span> <span class="st">"Teams almost always kick\nwhen they should..."</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span>
@@ -173,30 +173,31 @@
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>go <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">go</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">go</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_label.html">cols_label</a></span><span class="op">(</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/cols_label.html">cols_label</a></span><span class="op">(</span>
     type <span class="op">=</span> <span class="st">"Recommendation"</span>,
     go <span class="op">=</span> <span class="st">"Went for it %"</span>,
     n <span class="op">=</span> <span class="st">"Plays"</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_style.html">tab_style</a></span><span class="op">(</span>
-    style <span class="op">=</span> <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cell_text.html">cell_text</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, weight <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_style.html">tab_style</a></span><span class="op">(</span>
+    style <span class="op">=</span> <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/cell_text.html">cell_text</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, weight <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,
     locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-      <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cells_column_labels.html">cells_column_labels</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+      <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/cells_column_labels.html">cells_column_labels</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
     <span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">add_gt_options</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/fmt_number.html">fmt_number</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">go</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/cols_align.html">cols_align</a></span><span class="op">(</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/fmt_number.html">fmt_number</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">go</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/cols_align.html">cols_align</a></span><span class="op">(</span>
     columns <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, align <span class="op">=</span> <span class="st">"center"</span>
   <span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NFL team decision-making by go recommendation, 2020"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/md.html">md</a></span><span class="op">(</span><span class="st">'**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,&lt;br&gt; "probably" 1-4 percentage points'</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_header.html">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NFL team decision-making by go recommendation, 2020"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_source_note.html">tab_source_note</a></span><span class="op">(</span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/md.html">md</a></span><span class="op">(</span><span class="st">'**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,&lt;br&gt; "probably" 1-4 percentage points'</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div id="ineisngqlf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#cvvjtvcfhw .gt_table {
+#ineisngqlf .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -221,7 +222,7 @@
   border-left-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_heading {
+#ineisngqlf .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -233,7 +234,7 @@
   border-right-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_title {
+#ineisngqlf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -243,7 +244,7 @@
   border-bottom-width: 0;
 }
 
-#cvvjtvcfhw .gt_subtitle {
+#ineisngqlf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -253,13 +254,13 @@
   border-top-width: 0;
 }
 
-#cvvjtvcfhw .gt_bottom_border {
+#ineisngqlf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_col_headings {
+#ineisngqlf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -274,7 +275,7 @@
   border-right-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_col_heading {
+#ineisngqlf .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -294,7 +295,7 @@
   overflow-x: hidden;
 }
 
-#cvvjtvcfhw .gt_column_spanner_outer {
+#ineisngqlf .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -306,15 +307,15 @@
   padding-right: 4px;
 }
 
-#cvvjtvcfhw .gt_column_spanner_outer:first-child {
+#ineisngqlf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cvvjtvcfhw .gt_column_spanner_outer:last-child {
+#ineisngqlf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cvvjtvcfhw .gt_column_spanner {
+#ineisngqlf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -326,7 +327,7 @@
   width: 100%;
 }
 
-#cvvjtvcfhw .gt_group_heading {
+#ineisngqlf .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #F2F2F2;
@@ -348,7 +349,7 @@
   vertical-align: middle;
 }
 
-#cvvjtvcfhw .gt_empty_group_heading {
+#ineisngqlf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -363,15 +364,15 @@
   vertical-align: middle;
 }
 
-#cvvjtvcfhw .gt_from_md > :first-child {
+#ineisngqlf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cvvjtvcfhw .gt_from_md > :last-child {
+#ineisngqlf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cvvjtvcfhw .gt_row {
+#ineisngqlf .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -390,7 +391,7 @@
   overflow-x: hidden;
 }
 
-#cvvjtvcfhw .gt_stub {
+#ineisngqlf .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -402,7 +403,7 @@
   padding-left: 12px;
 }
 
-#cvvjtvcfhw .gt_summary_row {
+#ineisngqlf .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -412,7 +413,7 @@
   padding-right: 5px;
 }
 
-#cvvjtvcfhw .gt_first_summary_row {
+#ineisngqlf .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -422,7 +423,7 @@
   border-top-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_grand_summary_row {
+#ineisngqlf .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -432,7 +433,7 @@
   padding-right: 5px;
 }
 
-#cvvjtvcfhw .gt_first_grand_summary_row {
+#ineisngqlf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -442,11 +443,11 @@
   border-top-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_striped {
+#ineisngqlf .gt_striped {
   background-color: #FFFFFF;
 }
 
-#cvvjtvcfhw .gt_table_body {
+#ineisngqlf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -455,7 +456,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_footnotes {
+#ineisngqlf .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -469,13 +470,13 @@
   border-right-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_footnote {
+#ineisngqlf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#cvvjtvcfhw .gt_sourcenotes {
+#ineisngqlf .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -489,54 +490,50 @@
   border-right-color: #D3D3D3;
 }
 
-#cvvjtvcfhw .gt_sourcenote {
+#ineisngqlf .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#cvvjtvcfhw .gt_left {
+#ineisngqlf .gt_left {
   text-align: left;
 }
 
-#cvvjtvcfhw .gt_center {
+#ineisngqlf .gt_center {
   text-align: center;
 }
 
-#cvvjtvcfhw .gt_right {
+#ineisngqlf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cvvjtvcfhw .gt_font_normal {
+#ineisngqlf .gt_font_normal {
   font-weight: normal;
 }
 
-#cvvjtvcfhw .gt_font_bold {
+#ineisngqlf .gt_font_bold {
   font-weight: bold;
 }
 
-#cvvjtvcfhw .gt_font_italic {
+#ineisngqlf .gt_font_italic {
   font-style: italic;
 }
 
-#cvvjtvcfhw .gt_super {
+#ineisngqlf .gt_super {
   font-size: 65%;
 }
 
-#cvvjtvcfhw .gt_footnote_marks {
+#ineisngqlf .gt_footnote_marks {
   font-style: italic;
+  font-weight: normal;
   font-size: 65%;
 }
 </style>
-<div id="cvvjtvcfhw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
-<thead class="gt_header">
-<tr>
-<th colspan="3" class="gt_heading gt_title gt_font_normal" style>NFL team decision-making by go recommendation, 2020</th>
-    </tr>
-<tr>
-<th colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
-    </tr>
-</thead>
+<table class="table gt_table">
+<thead class="gt_header"><tr>
+<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>NFL team decision-making by go recommendation, 2020</th>
+    </tr></thead>
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Recommendation</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Went for it %</th>
@@ -545,35 +542,36 @@
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_left">Definitely go for it</td>
-      <td class="gt_row gt_center">71</td>
-      <td class="gt_row gt_center">227</td>
-    </tr>
+<td class="gt_row gt_center">71</td>
+<td class="gt_row gt_center">227</td>
+</tr>
 <tr>
 <td class="gt_row gt_left gt_striped">Probably go for it</td>
-      <td class="gt_row gt_center gt_striped">34</td>
-      <td class="gt_row gt_center gt_striped">665</td>
-    </tr>
+<td class="gt_row gt_center gt_striped">34</td>
+<td class="gt_row gt_center gt_striped">665</td>
+</tr>
 <tr>
 <td class="gt_row gt_left">Toss-up</td>
-      <td class="gt_row gt_center">18</td>
-      <td class="gt_row gt_center">1626</td>
-    </tr>
+<td class="gt_row gt_center">18</td>
+<td class="gt_row gt_center">1626</td>
+</tr>
 <tr>
 <td class="gt_row gt_left gt_striped">Probably kick</td>
-      <td class="gt_row gt_center gt_striped">2</td>
-      <td class="gt_row gt_center gt_striped">918</td>
-    </tr>
+<td class="gt_row gt_center gt_striped">2</td>
+<td class="gt_row gt_center gt_striped">918</td>
+</tr>
 <tr>
 <td class="gt_row gt_left">Definitely kick</td>
-      <td class="gt_row gt_center">0</td>
-      <td class="gt_row gt_center">311</td>
-    </tr>
+<td class="gt_row gt_center">0</td>
+<td class="gt_row gt_center">311</td>
+</tr>
 </tbody>
 <tfoot class="gt_sourcenotes"><tr>
 <td class="gt_sourcenote" colspan="3">
 <strong>Notes</strong>: "Definitely" recommendations are greater than 4 percentage point advantage,<br> "probably" 1-4 percentage points</td>
     </tr></tfoot>
-</table></div>
+</table>
+</div>
 <p>Thus, we can see that the model is strongly aligned to what coaches do.</p>
 </div>
 <div id="worst-kick-decisions-of-2020" class="section level2">
@@ -615,11 +613,12 @@
   <span class="fu">fmt_number</span><span class="op">(</span>columns <span class="op">=</span> <span class="fu">vars</span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">cols_align</span><span class="op">(</span>columns <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">tab_header</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Worst kick decisions of 2020"</span><span class="op">)</span></code></pre></div>
+<div id="ifmvflhdvt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#kioyanyrvx .gt_table {
+#ifmvflhdvt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -644,7 +643,7 @@
   border-left-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_heading {
+#ifmvflhdvt .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -656,7 +655,7 @@
   border-right-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_title {
+#ifmvflhdvt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -666,7 +665,7 @@
   border-bottom-width: 0;
 }
 
-#kioyanyrvx .gt_subtitle {
+#ifmvflhdvt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -676,13 +675,13 @@
   border-top-width: 0;
 }
 
-#kioyanyrvx .gt_bottom_border {
+#ifmvflhdvt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_col_headings {
+#ifmvflhdvt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -697,7 +696,7 @@
   border-right-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_col_heading {
+#ifmvflhdvt .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -717,7 +716,7 @@
   overflow-x: hidden;
 }
 
-#kioyanyrvx .gt_column_spanner_outer {
+#ifmvflhdvt .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -729,15 +728,15 @@
   padding-right: 4px;
 }
 
-#kioyanyrvx .gt_column_spanner_outer:first-child {
+#ifmvflhdvt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kioyanyrvx .gt_column_spanner_outer:last-child {
+#ifmvflhdvt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kioyanyrvx .gt_column_spanner {
+#ifmvflhdvt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -749,7 +748,7 @@
   width: 100%;
 }
 
-#kioyanyrvx .gt_group_heading {
+#ifmvflhdvt .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #F2F2F2;
@@ -771,7 +770,7 @@
   vertical-align: middle;
 }
 
-#kioyanyrvx .gt_empty_group_heading {
+#ifmvflhdvt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -786,15 +785,15 @@
   vertical-align: middle;
 }
 
-#kioyanyrvx .gt_from_md > :first-child {
+#ifmvflhdvt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kioyanyrvx .gt_from_md > :last-child {
+#ifmvflhdvt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kioyanyrvx .gt_row {
+#ifmvflhdvt .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -813,7 +812,7 @@
   overflow-x: hidden;
 }
 
-#kioyanyrvx .gt_stub {
+#ifmvflhdvt .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -825,7 +824,7 @@
   padding-left: 12px;
 }
 
-#kioyanyrvx .gt_summary_row {
+#ifmvflhdvt .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -835,7 +834,7 @@
   padding-right: 5px;
 }
 
-#kioyanyrvx .gt_first_summary_row {
+#ifmvflhdvt .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -845,7 +844,7 @@
   border-top-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_grand_summary_row {
+#ifmvflhdvt .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -855,7 +854,7 @@
   padding-right: 5px;
 }
 
-#kioyanyrvx .gt_first_grand_summary_row {
+#ifmvflhdvt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -865,11 +864,11 @@
   border-top-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_striped {
+#ifmvflhdvt .gt_striped {
   background-color: #FFFFFF;
 }
 
-#kioyanyrvx .gt_table_body {
+#ifmvflhdvt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -878,7 +877,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_footnotes {
+#ifmvflhdvt .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -892,13 +891,13 @@
   border-right-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_footnote {
+#ifmvflhdvt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#kioyanyrvx .gt_sourcenotes {
+#ifmvflhdvt .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -912,46 +911,47 @@
   border-right-color: #D3D3D3;
 }
 
-#kioyanyrvx .gt_sourcenote {
+#ifmvflhdvt .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#kioyanyrvx .gt_left {
+#ifmvflhdvt .gt_left {
   text-align: left;
 }
 
-#kioyanyrvx .gt_center {
+#ifmvflhdvt .gt_center {
   text-align: center;
 }
 
-#kioyanyrvx .gt_right {
+#ifmvflhdvt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kioyanyrvx .gt_font_normal {
+#ifmvflhdvt .gt_font_normal {
   font-weight: normal;
 }
 
-#kioyanyrvx .gt_font_bold {
+#ifmvflhdvt .gt_font_bold {
   font-weight: bold;
 }
 
-#kioyanyrvx .gt_font_italic {
+#ifmvflhdvt .gt_font_italic {
   font-style: italic;
 }
 
-#kioyanyrvx .gt_super {
+#ifmvflhdvt .gt_super {
   font-size: 65%;
 }
 
-#kioyanyrvx .gt_footnote_marks {
+#ifmvflhdvt .gt_footnote_marks {
   font-style: italic;
+  font-weight: normal;
   font-size: 65%;
 }
 </style>
-<div id="kioyanyrvx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<table class="table gt_table">
 <colgroup>
 <col style="width:30px;">
 <col style="width:50px;">
@@ -963,14 +963,9 @@
 <col style="width:80px;">
 <col style="width:400px;">
 </colgroup>
-<thead class="gt_header">
-<tr>
-<th colspan="9" class="gt_heading gt_title gt_font_normal" style>Worst kick decisions of 2020</th>
-    </tr>
-<tr>
-<th colspan="9" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
-    </tr>
-</thead>
+<thead class="gt_header"><tr>
+<th colspan="9" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Worst kick decisions of 2020</th>
+    </tr></thead>
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;"></th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Team</th>
@@ -985,116 +980,117 @@
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">9</td>
-      <td class="gt_row gt_center">4</td>
-      <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center">-3</td>
-      <td class="gt_row gt_center">13.4</td>
-      <td class="gt_row gt_left">(1:58) 5-Z.Gonzalez 49 yard field goal is No Good, Short, Center-46-A.Brewer, Holder-4-A.Lee.</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png" style="height:30px;"></td>
+<td class="gt_row gt_center">9</td>
+<td class="gt_row gt_center">4</td>
+<td class="gt_row gt_center">1</td>
+<td class="gt_row gt_center">-3</td>
+<td class="gt_row gt_center">13.4</td>
+<td class="gt_row gt_left">(1:58) 5-Z.Gonzalez 49 yard field goal is No Good, Short, Center-46-A.Brewer, Holder-4-A.Lee.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">2</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">18</td>
-      <td class="gt_row gt_center gt_striped">4</td>
-      <td class="gt_row gt_center gt_striped">1</td>
-      <td class="gt_row gt_center gt_striped">-12</td>
-      <td class="gt_row gt_center gt_striped">9.0</td>
-      <td class="gt_row gt_left gt_striped">(15:00) (Punt formation) PENALTY on PIT, Delay of Game, 5 yards, enforced at PIT 46 - No Play.</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">18</td>
+<td class="gt_row gt_center gt_striped">4</td>
+<td class="gt_row gt_center gt_striped">1</td>
+<td class="gt_row gt_center gt_striped">-12</td>
+<td class="gt_row gt_center gt_striped">9.0</td>
+<td class="gt_row gt_left gt_striped">(15:00) (Punt formation) PENALTY on PIT, Delay of Game, 5 yards, enforced at PIT 46 - No Play.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">3</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SF.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">16</td>
-      <td class="gt_row gt_center">4</td>
-      <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center">2</td>
-      <td class="gt_row gt_center">8.6</td>
-      <td class="gt_row gt_left">(10:22) 6-M.Wishnowsky punts 44 yards to ARI 27, Center-46-T.Pepper, out of bounds.</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SF.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
+<td class="gt_row gt_center">16</td>
+<td class="gt_row gt_center">4</td>
+<td class="gt_row gt_center">1</td>
+<td class="gt_row gt_center">2</td>
+<td class="gt_row gt_center">8.6</td>
+<td class="gt_row gt_left">(10:22) 6-M.Wishnowsky punts 44 yards to ARI 27, Center-46-T.Pepper, out of bounds.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">4</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">18</td>
-      <td class="gt_row gt_center gt_striped">4</td>
-      <td class="gt_row gt_center gt_striped">2</td>
-      <td class="gt_row gt_center gt_striped">-4</td>
-      <td class="gt_row gt_center gt_striped">7.9</td>
-      <td class="gt_row gt_left gt_striped">(10:06) 6-B.Kern punts 25 yards to BAL 15, Center-47-M.Overton, fair catch by 13-D.Duvernay.</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">18</td>
+<td class="gt_row gt_center gt_striped">4</td>
+<td class="gt_row gt_center gt_striped">2</td>
+<td class="gt_row gt_center gt_striped">-4</td>
+<td class="gt_row gt_center gt_striped">7.9</td>
+<td class="gt_row gt_left gt_striped">(10:06) 6-B.Kern punts 25 yards to BAL 15, Center-47-M.Overton, fair catch by 13-D.Duvernay.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">5</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">17</td>
-      <td class="gt_row gt_center">3</td>
-      <td class="gt_row gt_center">2</td>
-      <td class="gt_row gt_center">-4</td>
-      <td class="gt_row gt_center">7.7</td>
-      <td class="gt_row gt_left">(3:10) 8-B.McManus 26 yard field goal is GOOD, Center-46-J.Bobenmoyer, Holder-6-S.Martin.</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
+<td class="gt_row gt_center">17</td>
+<td class="gt_row gt_center">3</td>
+<td class="gt_row gt_center">2</td>
+<td class="gt_row gt_center">-4</td>
+<td class="gt_row gt_center">7.7</td>
+<td class="gt_row gt_left">(3:10) 8-B.McManus 26 yard field goal is GOOD, Center-46-J.Bobenmoyer, Holder-6-S.Martin.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">6</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">1</td>
-      <td class="gt_row gt_center gt_striped">4</td>
-      <td class="gt_row gt_center gt_striped">1</td>
-      <td class="gt_row gt_center gt_striped">-1</td>
-      <td class="gt_row gt_center gt_striped">7.3</td>
-      <td class="gt_row gt_left gt_striped">(7:32) (Run formation) PENALTY on TEN, Delay of Game, 4 yards, enforced at TEN 34 - No Play.</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">1</td>
+<td class="gt_row gt_center gt_striped">4</td>
+<td class="gt_row gt_center gt_striped">1</td>
+<td class="gt_row gt_center gt_striped">-1</td>
+<td class="gt_row gt_center gt_striped">7.3</td>
+<td class="gt_row gt_left gt_striped">(7:32) (Run formation) PENALTY on TEN, Delay of Game, 4 yards, enforced at TEN 34 - No Play.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">7</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/KC.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TB.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">12</td>
-      <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center">0</td>
-      <td class="gt_row gt_center">7.3</td>
-      <td class="gt_row gt_left">(12:18) 7-H.Butker 19 yard field goal is GOOD, Center-41-J.Winchester, Holder-5-T.Townsend.</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/KC.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TB.png" style="height:30px;"></td>
+<td class="gt_row gt_center">12</td>
+<td class="gt_row gt_center">1</td>
+<td class="gt_row gt_center">1</td>
+<td class="gt_row gt_center">0</td>
+<td class="gt_row gt_center">7.3</td>
+<td class="gt_row gt_left">(12:18) 7-H.Butker 19 yard field goal is GOOD, Center-41-J.Winchester, Holder-5-T.Townsend.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">8</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">4</td>
-      <td class="gt_row gt_center gt_striped">3</td>
-      <td class="gt_row gt_center gt_striped">2</td>
-      <td class="gt_row gt_center gt_striped">-4</td>
-      <td class="gt_row gt_center gt_striped">7.1</td>
-      <td class="gt_row gt_left gt_striped">(8:41) 2-D.Carlson 25 yard field goal is GOOD, Center-47-T.Sieg, Holder-6-A.Cole.</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">4</td>
+<td class="gt_row gt_center gt_striped">3</td>
+<td class="gt_row gt_center gt_striped">2</td>
+<td class="gt_row gt_center gt_striped">-4</td>
+<td class="gt_row gt_center gt_striped">7.1</td>
+<td class="gt_row gt_left gt_striped">(8:41) 2-D.Carlson 25 yard field goal is GOOD, Center-47-T.Sieg, Holder-6-A.Cole.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">9</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">14</td>
-      <td class="gt_row gt_center">2</td>
-      <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center">-10</td>
-      <td class="gt_row gt_center">6.9</td>
-      <td class="gt_row gt_left">(2:24) 6-T.Morstead punts 48 yards to PHI 4, Center-49-Z.Wood, out of bounds.</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
+<td class="gt_row gt_center">14</td>
+<td class="gt_row gt_center">2</td>
+<td class="gt_row gt_center">1</td>
+<td class="gt_row gt_center">-10</td>
+<td class="gt_row gt_center">6.9</td>
+<td class="gt_row gt_left">(2:24) 6-T.Morstead punts 48 yards to PHI 4, Center-49-Z.Wood, out of bounds.</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">10</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CAR.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">8</td>
-      <td class="gt_row gt_center gt_striped">1</td>
-      <td class="gt_row gt_center gt_striped">1</td>
-      <td class="gt_row gt_center gt_striped">0</td>
-      <td class="gt_row gt_center gt_striped">6.7</td>
-      <td class="gt_row gt_left gt_striped">(11:17) 7-Y.Koo 20 yard field goal is GOOD, Center-47-J.Harris, Holder-4-S.Hofrichter.</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CAR.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">8</td>
+<td class="gt_row gt_center gt_striped">1</td>
+<td class="gt_row gt_center gt_striped">1</td>
+<td class="gt_row gt_center gt_striped">0</td>
+<td class="gt_row gt_center gt_striped">6.7</td>
+<td class="gt_row gt_left gt_striped">(11:17) 7-Y.Koo 20 yard field goal is GOOD, Center-47-J.Harris, Holder-4-S.Hofrichter.</td>
+</tr>
 </tbody>
-</table></div>
+</table>
+</div>
 </div>
 <div id="nfl-coaches-are-increasingly-adhering-to-nfl4th-recommendations" class="section level2">
 <h2 class="hasAnchor">
@@ -1132,8 +1128,8 @@
     axis.title.x <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">14</span>, face<span class="op">=</span><span class="st">"bold"</span><span class="op">)</span>,
     axis.title.y <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">14</span>, face<span class="op">=</span><span class="st">"bold"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org//reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/breaks_pretty.html">pretty_breaks</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>, x<span class="op">=</span> <span class="op">-</span><span class="fl">1.2</span>, y<span class="op">=</span> <span class="fl">70</span>, label <span class="op">=</span> <span class="st">"Should\nkick"</span>, color<span class="op">=</span><span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>, x<span class="op">=</span> <span class="fl">1.2</span>, y<span class="op">=</span> <span class="fl">70</span>, label <span class="op">=</span> <span class="st">"Should\ngo for it"</span>, color<span class="op">=</span><span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_segment</span><span class="op">(</span>
@@ -1210,11 +1206,41 @@
 <h2 class="hasAnchor">
 <a href="#worst-playoff-games-in-terms-of-total-wp-loss" class="anchor"></a>Worst playoff games in terms of total WP loss</h2>
 <p>The worst playoff games since 2014 in terms of total win probability lost by conservative decisions on 4th downs. Five of these happened in 2020!</p>
+<pre><code>#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead
+
+#&gt; Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+#&gt; * please use `columns = c(...)` instead</code></pre>
+<div id="vehwxsvsna" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#isrnoyymdn .gt_table {
+#vehwxsvsna .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1239,7 +1265,7 @@
   border-left-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_heading {
+#vehwxsvsna .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -1251,7 +1277,7 @@
   border-right-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_title {
+#vehwxsvsna .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1261,7 +1287,7 @@
   border-bottom-width: 0;
 }
 
-#isrnoyymdn .gt_subtitle {
+#vehwxsvsna .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1271,13 +1297,13 @@
   border-top-width: 0;
 }
 
-#isrnoyymdn .gt_bottom_border {
+#vehwxsvsna .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_col_headings {
+#vehwxsvsna .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1292,7 +1318,7 @@
   border-right-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_col_heading {
+#vehwxsvsna .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1312,7 +1338,7 @@
   overflow-x: hidden;
 }
 
-#isrnoyymdn .gt_column_spanner_outer {
+#vehwxsvsna .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1324,15 +1350,15 @@
   padding-right: 4px;
 }
 
-#isrnoyymdn .gt_column_spanner_outer:first-child {
+#vehwxsvsna .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#isrnoyymdn .gt_column_spanner_outer:last-child {
+#vehwxsvsna .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#isrnoyymdn .gt_column_spanner {
+#vehwxsvsna .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: black;
@@ -1344,7 +1370,7 @@
   width: 100%;
 }
 
-#isrnoyymdn .gt_group_heading {
+#vehwxsvsna .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #F2F2F2;
@@ -1366,7 +1392,7 @@
   vertical-align: middle;
 }
 
-#isrnoyymdn .gt_empty_group_heading {
+#vehwxsvsna .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -1381,15 +1407,15 @@
   vertical-align: middle;
 }
 
-#isrnoyymdn .gt_from_md > :first-child {
+#vehwxsvsna .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#isrnoyymdn .gt_from_md > :last-child {
+#vehwxsvsna .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#isrnoyymdn .gt_row {
+#vehwxsvsna .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -1408,7 +1434,7 @@
   overflow-x: hidden;
 }
 
-#isrnoyymdn .gt_stub {
+#vehwxsvsna .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1420,7 +1446,7 @@
   padding-left: 12px;
 }
 
-#isrnoyymdn .gt_summary_row {
+#vehwxsvsna .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1430,7 +1456,7 @@
   padding-right: 5px;
 }
 
-#isrnoyymdn .gt_first_summary_row {
+#vehwxsvsna .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1440,7 +1466,7 @@
   border-top-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_grand_summary_row {
+#vehwxsvsna .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1450,7 +1476,7 @@
   padding-right: 5px;
 }
 
-#isrnoyymdn .gt_first_grand_summary_row {
+#vehwxsvsna .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1460,11 +1486,11 @@
   border-top-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_striped {
+#vehwxsvsna .gt_striped {
   background-color: #FFFFFF;
 }
 
-#isrnoyymdn .gt_table_body {
+#vehwxsvsna .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1473,7 +1499,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_footnotes {
+#vehwxsvsna .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1487,13 +1513,13 @@
   border-right-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_footnote {
+#vehwxsvsna .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#isrnoyymdn .gt_sourcenotes {
+#vehwxsvsna .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1507,46 +1533,47 @@
   border-right-color: #D3D3D3;
 }
 
-#isrnoyymdn .gt_sourcenote {
+#vehwxsvsna .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#isrnoyymdn .gt_left {
+#vehwxsvsna .gt_left {
   text-align: left;
 }
 
-#isrnoyymdn .gt_center {
+#vehwxsvsna .gt_center {
   text-align: center;
 }
 
-#isrnoyymdn .gt_right {
+#vehwxsvsna .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#isrnoyymdn .gt_font_normal {
+#vehwxsvsna .gt_font_normal {
   font-weight: normal;
 }
 
-#isrnoyymdn .gt_font_bold {
+#vehwxsvsna .gt_font_bold {
   font-weight: bold;
 }
 
-#isrnoyymdn .gt_font_italic {
+#vehwxsvsna .gt_font_italic {
   font-style: italic;
 }
 
-#isrnoyymdn .gt_super {
+#vehwxsvsna .gt_super {
   font-size: 65%;
 }
 
-#isrnoyymdn .gt_footnote_marks {
+#vehwxsvsna .gt_footnote_marks {
   font-style: italic;
+  font-weight: normal;
   font-size: 65%;
 }
 </style>
-<div id="isrnoyymdn" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<table class="table gt_table">
 <colgroup>
 <col style="width:50px;">
 <col style="width:50px;">
@@ -1561,14 +1588,9 @@
 <col style="width:50px;">
 <col style="width:80px;">
 </colgroup>
-<thead class="gt_header">
-<tr>
-<th colspan="12" class="gt_heading gt_title gt_font_normal" style>Win probability lost by kicking in playoff games, 2014-2020</th>
-    </tr>
-<tr>
-<th colspan="12" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
-    </tr>
-</thead>
+<thead class="gt_header"><tr>
+<th colspan="12" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Win probability lost by kicking in playoff games, 2014-2020</th>
+    </tr></thead>
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;"> </th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: black; font-weight: bold;">Team</th>
@@ -1586,146 +1608,147 @@
 <tbody class="gt_table_body">
 <tr>
 <td class="gt_row gt_center">1</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2014</td>
-      <td class="gt_row gt_center">WC</td>
-      <td class="gt_row gt_center">16.5</td>
-      <td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">11</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CHI.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2018</td>
-      <td class="gt_row gt_center">WC</td>
-      <td class="gt_row gt_center">11.9</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2014</td>
+<td class="gt_row gt_center">WC</td>
+<td class="gt_row gt_center">16.5</td>
+<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">11</td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CHI.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2018</td>
+<td class="gt_row gt_center">WC</td>
+<td class="gt_row gt_center">11.9</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">2</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/IND.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2014</td>
-      <td class="gt_row gt_center gt_striped">DIV</td>
-      <td class="gt_row gt_center gt_striped">15.5</td>
-      <td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">12</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/KC.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2020</td>
-      <td class="gt_row gt_center gt_striped">CONF</td>
-      <td class="gt_row gt_center gt_striped">11.8</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/IND.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2014</td>
+<td class="gt_row gt_center gt_striped">DIV</td>
+<td class="gt_row gt_center gt_striped">15.5</td>
+<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">12</td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/KC.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2020</td>
+<td class="gt_row gt_center gt_striped">CONF</td>
+<td class="gt_row gt_center gt_striped">11.8</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">3</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2019</td>
-      <td class="gt_row gt_center">WC</td>
-      <td class="gt_row gt_center">15.2</td>
-      <td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">13</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2014</td>
-      <td class="gt_row gt_center">CONF</td>
-      <td class="gt_row gt_center">11.3</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2019</td>
+<td class="gt_row gt_center">WC</td>
+<td class="gt_row gt_center">15.2</td>
+<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">13</td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2014</td>
+<td class="gt_row gt_center">CONF</td>
+<td class="gt_row gt_center">11.3</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">4</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2020</td>
-      <td class="gt_row gt_center gt_striped">WC</td>
-      <td class="gt_row gt_center gt_striped">13.5</td>
-      <td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">14</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2016</td>
-      <td class="gt_row gt_center gt_striped">DIV</td>
-      <td class="gt_row gt_center gt_striped">10.9</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2020</td>
+<td class="gt_row gt_center gt_striped">WC</td>
+<td class="gt_row gt_center gt_striped">13.5</td>
+<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">14</td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2016</td>
+<td class="gt_row gt_center gt_striped">DIV</td>
+<td class="gt_row gt_center gt_striped">10.9</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">5</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2018</td>
-      <td class="gt_row gt_center">CONF</td>
-      <td class="gt_row gt_center">13.0</td>
-      <td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">15</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2018</td>
-      <td class="gt_row gt_center">SB</td>
-      <td class="gt_row gt_center">10.1</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2018</td>
+<td class="gt_row gt_center">CONF</td>
+<td class="gt_row gt_center">13.0</td>
+<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">15</td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2018</td>
+<td class="gt_row gt_center">SB</td>
+<td class="gt_row gt_center">10.1</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">6</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2017</td>
-      <td class="gt_row gt_center gt_striped">WC</td>
-      <td class="gt_row gt_center gt_striped">12.7</td>
-      <td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">16</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LAC.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2018</td>
-      <td class="gt_row gt_center gt_striped">WC</td>
-      <td class="gt_row gt_center gt_striped">10.1</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2017</td>
+<td class="gt_row gt_center gt_striped">WC</td>
+<td class="gt_row gt_center gt_striped">12.7</td>
+<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">16</td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LAC.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2018</td>
+<td class="gt_row gt_center gt_striped">WC</td>
+<td class="gt_row gt_center gt_striped">10.1</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">7</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2017</td>
-      <td class="gt_row gt_center">CONF</td>
-      <td class="gt_row gt_center">12.3</td>
-      <td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">17</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2020</td>
-      <td class="gt_row gt_center">WC</td>
-      <td class="gt_row gt_center">9.9</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2017</td>
+<td class="gt_row gt_center">CONF</td>
+<td class="gt_row gt_center">12.3</td>
+<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">17</td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2020</td>
+<td class="gt_row gt_center">WC</td>
+<td class="gt_row gt_center">9.9</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">8</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DET.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2014</td>
-      <td class="gt_row gt_center gt_striped">WC</td>
-      <td class="gt_row gt_center gt_striped">12.3</td>
-      <td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">18</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TB.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2020</td>
-      <td class="gt_row gt_center gt_striped">DIV</td>
-      <td class="gt_row gt_center gt_striped">9.8</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DET.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2014</td>
+<td class="gt_row gt_center gt_striped">WC</td>
+<td class="gt_row gt_center gt_striped">12.3</td>
+<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">18</td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TB.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2020</td>
+<td class="gt_row gt_center gt_striped">DIV</td>
+<td class="gt_row gt_center gt_striped">9.8</td>
+</tr>
 <tr>
 <td class="gt_row gt_center">9</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2020</td>
-      <td class="gt_row gt_center">WC</td>
-      <td class="gt_row gt_center">12.2</td>
-      <td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">19</td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/HOU.png" style="height:30px;"></td>
-      <td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
-      <td class="gt_row gt_center">2016</td>
-      <td class="gt_row gt_center">WC</td>
-      <td class="gt_row gt_center">9.6</td>
-    </tr>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2020</td>
+<td class="gt_row gt_center">WC</td>
+<td class="gt_row gt_center">12.2</td>
+<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">19</td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/HOU.png" style="height:30px;"></td>
+<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
+<td class="gt_row gt_center">2016</td>
+<td class="gt_row gt_center">WC</td>
+<td class="gt_row gt_center">9.6</td>
+</tr>
 <tr>
 <td class="gt_row gt_center gt_striped">10</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2017</td>
-      <td class="gt_row gt_center gt_striped">WC</td>
-      <td class="gt_row gt_center gt_striped">12.1</td>
-      <td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">20</td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
-      <td class="gt_row gt_center gt_striped">2017</td>
-      <td class="gt_row gt_center gt_striped">DIV</td>
-      <td class="gt_row gt_center gt_striped">8.6</td>
-    </tr>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2017</td>
+<td class="gt_row gt_center gt_striped">WC</td>
+<td class="gt_row gt_center gt_striped">12.1</td>
+<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">20</td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
+<td class="gt_row gt_center gt_striped">2017</td>
+<td class="gt_row gt_center gt_striped">DIV</td>
+<td class="gt_row gt_center gt_striped">8.6</td>
+</tr>
 </tbody>
-</table></div>
+</table>
+</div>
 <p>More coming, maybe. . .</p>
 </div>
 </div>
