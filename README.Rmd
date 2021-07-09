@@ -35,7 +35,7 @@ The easiest way to get the released version of nfl4th is to install it from [CRA
 install.packages("nfl4th")
 ```
 
-To get a bug fix or to use a feature from the development version, you can install the development version of nfl4th from [GitHub](https://github.com/nflverse/nfl4th) with:
+To get a bug fix or to use a feature from the development version, you can install the development version of nfl4th from [GitHub](https://github.com/nflverse/nfl4th/) with:
 
 ``` r
 if (!require("remotes")) install.packages("remotes")
