@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 # **nfl4th** <img src="man/figures/logo.png" align="right" width="25%" min-width="120px"/>
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/nflverse/nfl4thworkflows/R-CMD-check/badge.svg)](https://github.com/nflverse/nfl4th/actions)
+[![R-CMD-check](https://github.com/nflverse/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/nflverse/nfl4th/actions)
 [![CRAN status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Support Server](https://img.shields.io/discord/591914197219016707.svg?color=7289da&label=Support&logo=discord&style=flat-square)](https://discord.com/invite/5Er2FBnnQa)
@@ -39,7 +39,7 @@ To get a bug fix or to use a feature from the development version, you can insta
 
 ``` r
 if (!require("remotes")) install.packages("remotes")
-remotes::install_github("guga31bb/nfl4th")
+remotes::install_github("nflverse/nfl4th")
 ```
 
 ## Features
