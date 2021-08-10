@@ -238,7 +238,7 @@ pbp %>%
   )
 ```
 
-For the remainder of this page, the code that generates the tables and figures won't be shown in order to make it more readable, but [all of the code can be viewed here](https://github.com/guga31bb/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd).
+For the remainder of this page, the code that generates the tables and figures won't be shown in order to make it more readable, but [all of the code can be viewed here](https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd).
 
 # Comparison of `nfl4th` and New York Times model recommendations
 
@@ -783,7 +783,7 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
 
 ## Timelines of teams over time
 
-This includes a function for making the timeline for a given team, so if you're interested in seeing another team, [see the source code here](https://github.com/guga31bb/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd).
+This includes a function for making the timeline for a given team, so if you're interested in seeing another team, [see the source code here](https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd).
 
 ```{r tlfunction, echo = FALSE}
 # function to make team timeline
