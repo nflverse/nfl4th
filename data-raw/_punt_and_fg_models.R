@@ -7,7 +7,7 @@ seasons <- 2010:2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
-      glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.rds")
+      glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds")
     )
   ) %>% filter(play_type_nfl == "PUNT")
 })
@@ -172,7 +172,7 @@ seasons <- 2014:2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
-      glue::glue("https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_{x}.rds")
+      glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds")
     )
   ) %>%
     filter(
