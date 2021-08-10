@@ -413,7 +413,7 @@ p
 # ggsave("tmp.png", height = 5, width = 10)
 ```
 
-While `nfl4th` and NYT agree that teams should always go for 4th & 1, `nfl4th` also thinks this is the case for 4th-and-2 and even most 4th-and-3s. However, note that this is an oversimplification: the `nfl4th` plot on the left shows the most frequent recommendation at a given location, but the recommendations can change given game stat. For example, it will recommend that trailing teams play more aggressively, as shown below.
+While `nfl4th` and NYT agree that teams should always go for 4th & 1, `nfl4th` also thinks this is the case for 4th-and-2 and even most 4th-and-3s. However, note that this is an oversimplification: the `nfl4th` plot on the left shows the most frequent recommendation at a given location, but the recommendations can change given game state. For example, it will recommend that trailing teams play more aggressively, as shown below.
 
 ## `nfl4th` recommendations while leading and trailing
 
@@ -865,7 +865,7 @@ make_timeline("SEA")
 
 The worst playoff games since 2014 in terms of total win probability lost by conservative decisions on 4th downs. Five of these happened in 2020!
 
-```{r wp_playoff, echo = FALSE, message = FALSE}
+```{r wp_playoff, echo = FALSE, message = FALSE, warning = FALSE}
 current <- pbp %>%
   filter(go_boost > 0, go == 0, season_type != "REG") %>%
   group_by(game_id, posteam, defteam) %>%
