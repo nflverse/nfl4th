@@ -15,7 +15,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
       - name: Install remotes and nfl4th
         run: |
-          install.packages("pak")
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
           pak::pak("nflverse/nfl4th", dependencies = TRUE)
         shell: Rscript {0}
       - name: Install necessary packages
