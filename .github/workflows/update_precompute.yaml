@@ -16,7 +16,7 @@ jobs:
       - name: Install remotes and nfl4th
         run: |
           install.packages("remotes")
-          remotes::install_github("nflverse/nfl4th", dependencies = TRUE, type = "binary")
+          remotes::install_github("nflverse/nfl4th", dependencies = TRUE, type = "binary", auth_token = NULL)
         shell: Rscript {0}
       - name: Install necessary packages
         run: |
