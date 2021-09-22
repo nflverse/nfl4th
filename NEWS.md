@@ -1,5 +1,7 @@
 # nfl4th (development version)
 
+* Fix for aborted plays on punts being called going for it
+
 # nfl4th 1.0.0
 
 * Initial public release
