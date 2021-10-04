@@ -4,7 +4,7 @@ on:
     - cron:  '0 9 * 1,2,9-12 *'
   workflow_dispatch:
 
-name: Update Computed Numbers
+name: update-computed-numbers
 
 jobs:
   update:
