@@ -1,6 +1,7 @@
 # nfl4th (development version)
 
 * Fix for aborted plays on punts being called going for it
+* Re-categorized some plays as unknown (i.e., `NA`) `go`: False Start or defensive encroachment along with being lined up to go for it (run formation or pass formation)
 
 # nfl4th 1.0.0
 

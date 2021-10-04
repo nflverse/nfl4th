@@ -16,7 +16,7 @@ A set of functions to estimate outcomes of fourth down
 Useful links:
 \itemize{
   \item \url{https://www.nfl4th.com/}
-  \item \url{https://github.com/nflverse/nfl4th}
+  \item \url{https://github.com/nflverse/nfl4th/}
   \item Report bugs at \url{https://github.com/nflverse/nfl4th/issues}
 }
 

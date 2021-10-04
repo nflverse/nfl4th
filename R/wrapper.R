@@ -138,6 +138,12 @@ load_4th_pbp <- function(seasons) {
       go = ifelse(
         aborted_play == 1 & stringr::str_detect(desc, "Punt formation"),
         0, go
+      ),
+      # if it's a run formation or pass formation and there's a dead ball penalty, set go to NA
+      # since we can't know the intention of the play
+      go = case_when(
+        stringr::str_detect(desc, "(Run formation)|(Pass formation)|(Shotgun)") & stringr::str_detect(desc, "(False Start)|(Neutral Zone Infraction)") ~ NA_real_,
+        TRUE ~ go
       )
     ) %>%
     return()
