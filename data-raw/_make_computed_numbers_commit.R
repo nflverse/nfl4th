@@ -1,4 +1,4 @@
-message <- sprintf("Updated %s (ET) using nfl4th version %s", lubridate::now("America/New_York"), utils::packageVersion("nfl4th"))
+message <- sprintf("Updated using nfl4th version %s", utils::packageVersion("nfl4th"))
 
 git <- function(..., echo_cmd = TRUE, echo = TRUE, error_on_status = FALSE) {
   callr::run("git", c(...),

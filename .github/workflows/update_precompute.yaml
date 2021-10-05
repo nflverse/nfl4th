@@ -20,7 +20,7 @@ jobs:
         shell: Rscript {0}
       - name: Install necessary packages
         run: |
-          install.packages(c("callr", "lubridate"), dependencies = TRUE, type = "binary")
+          install.packages(c("callr"), dependencies = TRUE, type = "binary")
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
@@ -28,6 +28,9 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
+          Rscript -e 'writeLines(paste0("export NFL4TH_VERSION=",as.character(packageVersion("nfl4th"))),".ver")'
+          source .ver
           git pull
-          Rscript -e 'source("data-raw/_make_computed_numbers_commit.R")'
+          git add data-raw
+          git commit -m "Updated on `date` using nfl4th version $NFL4TH_VERSION"  || echo "No changes to commit"
           git push origin master || echo "No changes to commit"
