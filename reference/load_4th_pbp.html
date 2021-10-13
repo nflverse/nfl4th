@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nfl4th</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9004</span>
       </span>
     </div>
 
@@ -152,7 +152,7 @@
     <p>Load calculated 4th down probabilities from <code>nflfastR</code> data.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_4th_pbp</span><span class='op'>(</span><span class='va'>seasons</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>load_4th_pbp</span><span class='op'>(</span><span class='va'>seasons</span>, fast <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,6 +160,10 @@
     <tr>
       <th>seasons</th>
       <td><p>Seasons to load. Must be 2014 and later.</p></td>
+    </tr>
+    <tr>
+      <th>fast</th>
+      <td><p>Defaults to FALSE. If TRUE, loads pre-computed decisions from repository</p></td>
     </tr>
     </table>
 
