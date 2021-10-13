@@ -101,6 +101,7 @@ add_4th_probs <- function(df) {
 #' @description Load calculated 4th down probabilities from `nflfastR` data.
 #'
 #' @param seasons Seasons to load. Must be 2014 and later.
+#' @param fast Defaults to FALSE. If TRUE, loads pre-computed decisions from repository
 #' @return `nflfastR` data on 4th downs with the `add_4th_probs()` columns added and also the following:
 #' \describe{
 #' \item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times going for it.}
@@ -116,19 +117,30 @@ add_4th_probs <- function(df) {
 #' future::plan("sequential")
 #' }
 #' }
-load_4th_pbp <- function(seasons) {
+load_4th_pbp <- function(seasons, fast = FALSE) {
 
   if (min(seasons) < 2014) {
     stop("Season before 2014 supplied. Please try again with nothing before 2014.")
   }
 
-  # this is less likely to result in crashes due to memory
-  purrr::map_df(seasons, ~{
-    message(glue::glue("Loading season {.x}"))
-    nflfastR::load_pbp(.x) %>%
-      nfl4th::add_4th_probs() %>%
-      return()
-    }) %>%
+  # season-by-season = less likely to result in crashes due to memory
+  if (fast) {
+    data <- purrr::map_df(seasons, ~{
+      message(glue::glue("Loading season {.x}"))
+      nflfastR::load_pbp(.x) %>%
+        left_join(readRDS(url("https://github.com/nflverse/nfl4th/blob/master/data-raw/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id")) %>%
+        return()
+    })
+  } else {
+    data <- purrr::map_df(seasons, ~{
+      message(glue::glue("Loading season {.x}"))
+      nflfastR::load_pbp(.x) %>%
+        nfl4th::add_4th_probs() %>%
+        return()
+    })
+  }
+
+  data %>%
     dplyr::mutate(
       go = ifelse(
         (rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
@@ -150,60 +162,6 @@ load_4th_pbp <- function(seasons) {
 
 }
 
-#' Load calculated 4th down probabilities from `nflfastR` data from data repo
-#'
-#' @description Load calculated 4th down probabilities from `nflfastR` data from data repo. This relies on pre-computed 4th down numbers saved in a data repository
-#' and maybe not be as reliable as `load_4th_pbp`, which uses `nfl4th` to caclulate probabilities.
-#'
-#' @param seasons Seasons to load. Must be 2014 and later.
-#' @return `nflfastR` data on 4th downs with the `add_4th_probs()` columns added and also the following:
-#' \describe{
-#' \item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times going for it.}
-#' }
-#' @export
-#' @examples
-#' \donttest{
-#' probs <- load_4th_pbp_fast(2019:2020)
-#'
-#' dplyr::glimpse(probs)
-#' \dontshow{
-#' # Close open connections for R CMD Check
-#' future::plan("sequential")
-#' }
-#' }
-load_4th_pbp_fast <- function(seasons) {
-
-  if (min(seasons) < 2014) {
-    stop("Season before 2014 supplied. Please try again with nothing before 2014.")
-  }
-
-  # this is less likely to result in crashes due to memory
-  purrr::map_df(seasons, ~{
-    message(glue::glue("Loading season {.x}"))
-    nflfastR::load_pbp(.x) %>%
-      left_join(readRDS(url("https://github.com/nflverse/nfl4th/blob/master/data-raw/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id")) %>%
-      return()
-  }) %>%
-    dplyr::mutate(
-      go = ifelse(
-        (rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
-        100, 0
-      ),
-      # if it's an aborted snap in punt formation, call it a punt
-      go = ifelse(
-        aborted_play == 1 & stringr::str_detect(desc, "Punt formation"),
-        0, go
-      ),
-      # if it's a run formation or pass formation and there's a dead ball penalty, set go to NA
-      # since we can't know the intention of the play
-      go = case_when(
-        stringr::str_detect(desc, "(Run formation)|(Pass formation)|(Shotgun)") & stringr::str_detect(desc, "(False Start)|(Neutral Zone Infraction)") ~ NA_real_,
-        TRUE ~ go
-      )
-    ) %>%
-    return()
-
-}
 
 #' Get 2pt decision probabilities
 #'

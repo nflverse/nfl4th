@@ -2,6 +2,7 @@
 
 * Fix for aborted plays on punts being called going for it
 * Re-categorized some plays as unknown (i.e., `NA`) `go`: False Start or defensive encroachment along with being lined up to go for it (run formation or pass formation)
+* Added `fast` argument to `load_4th_pbp()` which allows for loading pre-computed `go_boost` rather than needing to calculate it
 
 # nfl4th 1.0.0
 
