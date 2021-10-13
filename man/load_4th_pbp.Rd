@@ -4,10 +4,12 @@
 \alias{load_4th_pbp}
 \title{Load calculated 4th down probabilities from \code{nflfastR} data}
 \usage{
-load_4th_pbp(seasons)
+load_4th_pbp(seasons, fast = FALSE)
 }
 \arguments{
 \item{seasons}{Seasons to load. Must be 2014 and later.}
+
+\item{fast}{Defaults to FALSE. If TRUE, loads pre-computed decisions from repository}
 }
 \value{
 \code{nflfastR} data on 4th downs with the \code{add_4th_probs()} columns added and also the following:
