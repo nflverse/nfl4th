@@ -1,4 +1,5 @@
-away_team <-
+aborted_play <-
+  away_team <-
   away_timeouts_remaining <-
   away_total <-
   conv_1pt <-
