@@ -124,4 +124,5 @@ aborted_play <-
   type_text <-
   yardline <-
   yardline_number <-
-  yardline_side <- NULL
+  yardline_side <-
+  aborted_play <- NULL
