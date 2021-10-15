@@ -1,7 +1,10 @@
-## Resubmission
-* Added web references to data sources in DESCRIPTION per CRAN request
-* Unwrapped \donttest{} from examples that run in < 5 seconds per CRAN request
-* Added `testthat` unit tests for longer-running functions
+## Release summary
+
+This is a minor release that
+
+* fixes bugs
+* fixes the LazyData note
+* fixes a URL that was redirecting
 
 ## Test environments
 * Windows Server 2008 R2 SP1, R-oldrel, 32/64 bit
@@ -16,6 +19,4 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
+0 errors | 0 warnings | 0 notes
