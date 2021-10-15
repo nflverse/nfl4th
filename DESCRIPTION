@@ -27,6 +27,7 @@ Imports:
     magrittr,
     mgcv,
     nflfastR (>= 4.0.0),
+    nflreadr,
     purrr,
     stringr,
     tibble,
