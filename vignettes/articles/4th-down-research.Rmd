@@ -110,7 +110,7 @@ Here's how to create one of the tables shown in [the piece on The Athletic](http
 
 ```{r decision-table, warning = FALSE}
 pbp %>%
-  dplyr::filter(season == 2020, !is.na(go_boost)) %>%
+  dplyr::filter(season == 2020, !is.na(go_boost), !is.na(go)) %>%
   dplyr::mutate(type = dplyr::case_when(
     go_boost >= 4 ~ "Definitely go for it",
     go_boost > 1 & go_boost < 4 ~ "Probably go for it",
