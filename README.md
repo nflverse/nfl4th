@@ -11,7 +11,7 @@ status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Support
-Server](https://img.shields.io/discord/591914197219016707.svg?color=7289da&label=Support&logo=discord&style=flat-square)](https://discord.com/invite/5Er2FBnnQa)
+Server](https://img.shields.io/discord/789805604076126219.svg?color=7289da&label=Support&logo=discord&style=flat-square)](https://discord.com/invite/5Er2FBnnQa)
 [![Twitter
 Follow](https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social)](https://twitter.com/ben_bot_baldwin)
 <!-- badges: end -->
