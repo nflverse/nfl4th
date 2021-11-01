@@ -124,14 +124,14 @@
 <a href="#easy-mode-using-nflfastr-data" class="anchor"></a>Easy mode: using nflfastR data</h2>
 <p>Here’s what the data obtained using <code><a href="../../reference/load_4th_pbp.html">load_4th_pbp()</a></code> looks like:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">data</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">data</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
     <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
     <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <colgroup>
@@ -319,13 +319,13 @@
 </table>
 <p>Or we can add some filters to look up a certain game:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">data</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">week</span> <span class="op">==</span> <span class="fl">20</span>, <span class="va">posteam</span> <span class="op">==</span> <span class="st">"GB"</span>, <span class="va">down</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">data</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">week</span> <span class="op">==</span> <span class="fl">20</span>, <span class="va">posteam</span> <span class="op">==</span> <span class="st">"GB"</span>, <span class="va">down</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
     <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
     <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <colgroup>
@@ -465,13 +465,13 @@
   defteam_timeouts_remaining <span class="op">=</span> <span class="fl">3</span>
 <span class="op">)</span>
 
-<span class="va">one_play</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">one_play</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">posteam</span>, <span class="va">ydstogo</span>, <span class="va">yardline_100</span>, <span class="va">posteam</span>, <span class="va">go_boost</span>, <span class="va">first_down_prob</span>, 
     <span class="va">wp_fail</span>, <span class="va">wp_succeed</span>, <span class="va">go_wp</span>, <span class="va">fg_make_prob</span>, <span class="va">miss_fg_wp</span>, <span class="va">make_fg_wp</span>, 
     <span class="va">fg_wp</span>, <span class="va">punt_wp</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; Computing probabilities for 1 plays. . .</span></code></pre></div>
 <table class="table">
@@ -528,9 +528,9 @@
 <a href="#make-a-summary-table" class="anchor"></a>Make a summary table</h2>
 <p>Let’s put the play above into a table using the provided function <code><a href="../../reference/make_table_data.html">make_table_data()</a></code>, which makes it easier to interpret the recommendations for a play. This function only works with one play at a time since it makes a table using the results from the play.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">one_play</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">one_play</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="co">#&gt; Computing probabilities for 1 plays. . .</span></code></pre></div>
 <table class="table">
@@ -591,9 +591,9 @@
   defteam_timeouts_remaining <span class="op">=</span> <span class="fl">3</span>
 <span class="op">)</span>
 
-<span class="va">another_play</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_2pt_probs.html">add_2pt_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_2pt_table_data.html">make_2pt_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">another_play</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_2pt_probs.html">add_2pt_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_2pt_table_data.html">make_2pt_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="co">#&gt; Computing probabilities for  1 plays. . .</span></code></pre></div>
 <table class="table">
@@ -628,19 +628,19 @@
 <a href="#getting-4th-down-plays-from-a-live-game" class="anchor"></a>Getting 4th down plays from a live game</h2>
 <p><code>nflfastR</code> isn’t available for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With thanks to the ESPN API, which can be accessed using <code><a href="../../reference/get_4th_plays.html">get_4th_plays()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">plays</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/get_4th_plays.html">get_4th_plays</a></span><span class="op">(</span><span class="st">"2020_20_TB_GB"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">plays</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/get_4th_plays.html">get_4th_plays</a></span><span class="op">(</span><span class="st">"2020_20_TB_GB"</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 
-<span class="va">plays</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="va">desc</span>, <span class="va">quarter_seconds_remaining</span><span class="op">)</span>
+<span class="va">plays</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">desc</span>, <span class="va">quarter_seconds_remaining</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1 × 2</span>
 <span class="co">#&gt;   desc                             quarter_seconds_remaining</span>
 <span class="co">#&gt;   &lt;chr&gt;                                                &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 "Mason Crosby 26 Yd Field Goal "                       125</span>
 
-<span class="va">plays</span> <span class="op">%&gt;%</span> 
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">plays</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/add_4th_probs.html">add_4th_probs</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">nfl4th</span><span class="fu">::</span><span class="fu"><a href="../../reference/make_table_data.html">make_table_data</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://gt.rstudio.com/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="co">#&gt; Computing probabilities for 1 plays. . .</span></code></pre></div>
 <table class="table">

@@ -168,37 +168,39 @@
     <p>A table showing the probabilities associated with each possible choice.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='va'>play</span> <span class='op'>&lt;-</span>
-  <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span>
-    <span class='co'># things to help find the right game (use "reg" or "post")</span>
-    home_team <span class='op'>=</span> <span class='st'>"GB"</span>,
-    away_team <span class='op'>=</span> <span class='st'>"TB"</span>,
-    posteam <span class='op'>=</span> <span class='st'>"GB"</span>,
-    type <span class='op'>=</span> <span class='st'>"post"</span>,
-    season <span class='op'>=</span> <span class='fl'>2020</span>,
-
-    <span class='co'># information about the situation</span>
-    qtr <span class='op'>=</span> <span class='fl'>4</span>,
-    quarter_seconds_remaining <span class='op'>=</span> <span class='fl'>129</span>,
-    ydstogo <span class='op'>=</span> <span class='fl'>8</span>,
-    yardline_100 <span class='op'>=</span> <span class='fl'>8</span>,
-    score_differential <span class='op'>=</span> <span class='op'>-</span><span class='fl'>8</span>,
-
-    home_opening_kickoff <span class='op'>=</span> <span class='fl'>0</span>,
-    posteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span>,
-    defteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span>
-  <span class='op'>)</span>
-
-<span class='va'>probs</span> <span class='op'>&lt;-</span> <span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'><a href='add_4th_probs.html'>add_4th_probs</a></span><span class='op'>(</span><span class='va'>play</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Computing probabilities for 1 plays. . .</span></div><div class='input'><span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'>make_table_data</span><span class='op'>(</span><span class='va'>probs</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 3 × 5</span>
-#&gt;   choice             choice_prob success_prob fail_wp success_wp
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>                    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>        <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span> Go for it                12.7          32.7    3.53      31.5 
-#&gt; <span style='color: #BCBCBC;'>2</span> Field goal attempt        8.90         97.5    2.99       9.05
-#&gt; <span style='color: #BCBCBC;'>3</span> Punt                     <span style='color: #BB0000;'>NA</span>            <span style='color: #BB0000;'>NA</span>     <span style='color: #BB0000;'>NA</span>         <span style='color: #BB0000;'>NA</span>   </div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='va'>play</span> <span class='op'>&lt;-</span></span>
+<span class='r-in'>  <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='co'># things to help find the right game (use "reg" or "post")</span></span>
+<span class='r-in'>    home_team <span class='op'>=</span> <span class='st'>"GB"</span>,</span>
+<span class='r-in'>    away_team <span class='op'>=</span> <span class='st'>"TB"</span>,</span>
+<span class='r-in'>    posteam <span class='op'>=</span> <span class='st'>"GB"</span>,</span>
+<span class='r-in'>    type <span class='op'>=</span> <span class='st'>"post"</span>,</span>
+<span class='r-in'>    season <span class='op'>=</span> <span class='fl'>2020</span>,</span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'># information about the situation</span></span>
+<span class='r-in'>    qtr <span class='op'>=</span> <span class='fl'>4</span>,</span>
+<span class='r-in'>    quarter_seconds_remaining <span class='op'>=</span> <span class='fl'>129</span>,</span>
+<span class='r-in'>    ydstogo <span class='op'>=</span> <span class='fl'>8</span>,</span>
+<span class='r-in'>    yardline_100 <span class='op'>=</span> <span class='fl'>8</span>,</span>
+<span class='r-in'>    score_differential <span class='op'>=</span> <span class='op'>-</span><span class='fl'>8</span>,</span>
+<span class='r-in'></span>
+<span class='r-in'>    home_opening_kickoff <span class='op'>=</span> <span class='fl'>0</span>,</span>
+<span class='r-in'>    posteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span>,</span>
+<span class='r-in'>    defteam_timeouts_remaining <span class='op'>=</span> <span class='fl'>3</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>probs</span> <span class='op'>&lt;-</span> <span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'><a href='add_4th_probs.html'>add_4th_probs</a></span><span class='op'>(</span><span class='va'>play</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Computing probabilities for 1 plays. . .</span>
+<span class='r-in'><span class='fu'>nfl4th</span><span class='fu'>::</span><span class='fu'>make_table_data</span><span class='op'>(</span><span class='va'>probs</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 3 × 5</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   choice             choice_prob success_prob fail_wp success_wp</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>                    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>        <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span> Go for it                12.7          32.7    3.53      31.5 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span> Field goal attempt        8.90         97.5    2.99       9.05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span> Punt                     <span style='color: #BB0000;'>NA</span>            <span style='color: #BB0000;'>NA</span>     <span style='color: #BB0000;'>NA</span>         <span style='color: #BB0000;'>NA</span>   </span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
