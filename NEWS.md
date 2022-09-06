@@ -2,6 +2,10 @@
 
 * Re-export xgboost models to get rid of annoying warning message
 
+# nfl4th 1.0.2
+
+* Nothing changed. Forced update to documentation to not get kicked off CRAN
+
 # nfl4th 1.0.1
 
 * Fix for aborted plays on punts being called going for it
