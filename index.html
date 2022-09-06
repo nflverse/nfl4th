@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,20 +42,14 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nfl4th</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="articles/articles/nfl4th.html">Get started</a>
+  <a href="articles/nfl4th.html">Get started</a>
 </li>
 <li>
   <a href="reference/index.html">Functions</a>
@@ -64,28 +60,16 @@
 <li>
   <a href="news/index.html">Changelog</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="articles/articles/4th-down-research.html">4th down research</a>
-    </li>
-  </ul>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="http://twitter.com/ben_bot_baldwin">
+  <a href="http://twitter.com/ben_bot_baldwin" class="external-link">
     <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/nflverse/nfl4th/">
+  <a href="https://github.com/nflverse/nfl4th/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -102,37 +86,36 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="nfl4th-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#nfl4th-" class="anchor"></a><strong>nfl4th</strong> <img src="reference/figures/logo.png" align="right" width="25%" min-width="120px">
+<div class="section level1">
+<div class="page-header"><h1 id="nfl4th-">
+<strong>nfl4th</strong> <img src="reference/figures/logo.png" align="right" width="25%" min-width="120px"><a class="anchor" aria-label="anchor" href="#nfl4th-"></a>
 </h1></div>
 <!-- badges: start -->
-
-<p>This is the package that powers the <a href="https://rbsdm.com/stats/fourth_calculator/">fourth down calculator</a> introduced in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/">this piece on The Athletic</a>.</p>
-<p>The code that powers the Twitter fourth down bot <a href="https://github.com/guga31bb/fourth_calculator/tree/main/bot">is in this folder here</a> and the <a href="https://github.com/guga31bb/fourth_calculator/blob/main/app.R">code that runs the Shiny app is here</a>.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>The easiest way to get the released version of nfl4th is to install it from <a href="https://cran.r-project.org/package=nfl4th">CRAN</a> with:</p>
+<p>This is the package that powers the <a href="https://rbsdm.com/stats/fourth_calculator/" class="external-link">fourth down calculator</a> introduced in <a href="https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/" class="external-link">this piece on The Athletic</a>.</p>
+<p>The code that powers the Twitter fourth down bot <a href="https://github.com/guga31bb/fourth_calculator/tree/main/bot" class="external-link">is in this folder here</a> and the <a href="https://github.com/guga31bb/fourth_calculator/blob/main/app.R" class="external-link">code that runs the Shiny app is here</a>.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>The easiest way to get the released version of nfl4th is to install it from <a href="https://cran.r-project.org/package=nfl4th" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"nfl4th"</span><span class="op">)</span></code></pre></div>
-<p>To get a bug fix or to use a feature from the development version, you can install the development version of nfl4th from <a href="https://github.com/nflverse/nfl4th/">GitHub</a> with:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nfl4th"</span><span class="op">)</span></span></code></pre></div>
+<p>To get a bug fix or to use a feature from the development version, you can install the development version of nfl4th from <a href="https://github.com/nflverse/nfl4th/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org">"remotes"</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"nflverse/nfl4th"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org" class="external-link">"remotes"</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"nflverse/nfl4th"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="features" class="section level2">
-<h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
 <ul>
 <li>The <strong>go for it</strong> model gives probabilities for possibilities of yards gained and includes the possibility of earning a first down via defensive penalty</li>
 <li>The <strong>punt</strong> model includes the possibility for getting blocked, returned for a touchdown, or fumbled on the return</li>
 <li>The <strong>field goal</strong> model is a simple model of field goal % by distance and roof type</li>
 </ul>
 </div>
-<div id="current-limitations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#current-limitations" class="anchor"></a>Current limitations</h2>
+<div class="section level2">
+<h2 id="current-limitations">Current limitations<a class="anchor" aria-label="anchor" href="#current-limitations"></a>
+</h2>
 <p>There are some edge cases that are not accounted for. These should only make a marginal difference to the recommendations as they are largely edge cases (e.g. the possibility for a field goal to be blocked and returned).</p>
 <ul>
 <li>The <strong>go for it</strong> model does not allow for the possibility of a turnover return. However, long returns are extremely rare: For example, in 2018 and 2019 there were only four defensive touchdowns on plays where teams went for fourth downs out of 1,236 plays, and all of these happened when the game was well in hand for the other team.</li>
@@ -140,9 +123,9 @@
 <li>The <strong>field goal</strong> model doesn’t account for who the kicker is, what the weather is (only relevant for outdoor games), or the possibility of a kick being blocked and returned for a touchdown</li>
 </ul>
 </div>
-<div id="get-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-started" class="anchor"></a>Get Started</h2>
+<div class="section level2">
+<h2 id="get-started">Get Started<a class="anchor" aria-label="anchor" href="#get-started"></a>
+</h2>
 <p>To get started with nfl4th please see <a href="https://www.nfl4th.com/articles/articles/nfl4th.html">this article</a>. Some examples of 4th down research using the package <a href="https://www.nfl4th.com/articles/articles/4th-down-research.html">can be found here</a>.</p>
 </div>
 </div>
@@ -150,52 +133,62 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=nfl4th">https://​cloud.r-project.org/​package=nfl4th</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/nflverse/nfl4th/">https://​github.com/​nflverse/​nfl4th/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/nflverse/nfl4th/issues">https://​github.com/​nflverse/​nfl4th/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://twitter.com/benbbaldwin">Ben Baldwin</a> <br><small class="roles"> Author, maintainer, copyright holder </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="https://cloud.r-project.org/package=nfl4th" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/nflverse/nfl4th/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/nflverse/nfl4th/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/nflverse/nfl4th/actions"><img src="https://github.com/nflverse/nfl4th/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://CRAN.R-project.org/package=nfl4th"><img src="https://www.r-pkg.org/badges/version-last-release/nfl4th" alt="CRAN status"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
-<li><a href="https://discord.com/invite/5Er2FBnnQa"><img src="https://img.shields.io/discord/789805604076126219.svg?color=7289da&amp;label=Support&amp;logo=discord&amp;style=flat-square" alt="Support Server"></a></li>
-<li><a href="https://twitter.com/ben_bot_baldwin"><img src="https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social" alt="Twitter Follow"></a></li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing nfl4th</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>
+<a href="https://twitter.com/benbbaldwin" class="external-link">Ben Baldwin</a> <br><small class="roles"> Author, maintainer, copyright holder </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/nflverse/nfl4th/actions" class="external-link"><img src="https://github.com/nflverse/nfl4th/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://CRAN.R-project.org/package=nfl4th" class="external-link"><img src="https://www.r-pkg.org/badges/version-last-release/nfl4th" alt="CRAN status"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://discord.com/invite/5Er2FBnnQa" class="external-link"><img src="https://img.shields.io/discord/789805604076126219.svg?color=7289da&amp;label=Support&amp;logo=discord&amp;style=flat-square" alt="Support Server"></a></li>
+<li><a href="https://twitter.com/ben_bot_baldwin" class="external-link"><img src="https://img.shields.io/twitter/follow/ben_bot_baldwin.svg?style=social" alt="Twitter Follow"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://twitter.com/benbbaldwin">Ben Baldwin</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://twitter.com/benbbaldwin" class="external-link">Ben Baldwin</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -203,6 +196,8 @@
 
   
 
+
+  
 
   </body>
 </html>
