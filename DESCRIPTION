@@ -37,6 +37,7 @@ Imports:
 Suggests: 
     future,
     gt,
+    nflplotR,
     rmarkdown,
     tictoc,
     tidyverse,
