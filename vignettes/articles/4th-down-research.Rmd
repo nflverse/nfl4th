@@ -21,7 +21,7 @@ library(ggthemes)
 library(gt)
 library(magick)
 library(cowplot)
-library(ggpmisc)
+library(nflplotR)
 library(patchwork)
 
 # basic helper to use 538 theme and make axes look better
@@ -308,8 +308,8 @@ fig1 <- plot %>%
   plot_prepare() %>%
   ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
   geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95), alpha = 0.75) +
-  scale_y_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
-  scale_x_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
   theme_fivethirtyeight() +
   theme(
     plot.margin = margin(1, 1, 1, 1, "cm"),
@@ -370,8 +370,8 @@ fig2 <- plot %>%
   ungroup() %>%
   ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
   geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95), alpha = .75) +
-  scale_y_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
-  scale_x_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
   theme_fivethirtyeight() +
   theme(
     plot.margin = margin(1, 1, 1, 1, "cm"),
@@ -522,7 +522,6 @@ spread_plot <- function(spread, range = 2) {
     scale_x_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
     theme_fivethirtyeight() +
     theme(
-      plot.margin = margin(0, 0, 0, 0, "cm"),
       legend.position = "none",
       plot.title = element_markdown(size = 18, hjust = 0.5),
       plot.subtitle = element_markdown(size = 10, hjust = 0.5),
@@ -589,7 +588,7 @@ divs <- teamcolors::teamcolors %>%
   filter(league == "nfl") %>%
   select(name, division) %>%
   mutate(name = case_when(
-    name == "Washington Redskins" ~ "Washington Football Team",
+    name == "Washington Redskins" ~ "Washington Commanders",
     name == "Oakland Raiders" ~ "Las Vegas Raiders",
     TRUE ~ name
   ))
@@ -666,7 +665,7 @@ Seeing teams like the Ravens, Colts, and Browns high up here should not be surpr
 ```{r goshould, echo = FALSE, message = FALSE, results = 'hide', fig.keep = 'all', dpi = 600}
 current <- pbp %>%
   filter(season == 2020) %>%
-  filter(go_boost > 1.5) %>%
+  filter(go_boost > 1.5, !is.na(go_boost), !is.na(go)) %>%
   filter(vegas_wp > .2) %>%
   group_by(posteam) %>%
   summarize(go = mean(go), n = n()) %>%
@@ -676,28 +675,12 @@ current <- pbp %>%
   mutate(rank = 1:n()) %>%
   arrange(posteam)
 
-ids <- nflfastR::teams_colors_logos %>%
-  filter(!team_abbr %in% c('LAR', 'OAK', 'SD', 'STL'))
-images <- magick::image_read(ids%>% pull(team_logo_espn)) 
-
-logos <- tibble(
-  x = current$rank + .25, 
-  y = current$go + .02,
-  width = .035,
-  grob = 
-    map(1:32, function(x) {
-      grid::rasterGrob(images[x])
-    })
-)
-
 my_title <- glue::glue("Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> 2020")
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(data = current, aes(fill = ifelse(posteam=="SEA", team_color2, team_color)), 
            width = 0.5, alpha = .6, show.legend = FALSE
   ) +
-  geom_grob(data = logos, 
-            aes(x, y, label = grob, vp.width = width),
-            hjust = 0.7) +
+  nflplotR::geom_nfl_logos(aes(team_abbr = posteam), width = 0.035) +
   scale_fill_identity(aesthetics = c("fill", "colour")) +
   theme_ben +
   theme(
@@ -741,29 +724,12 @@ current <- pbp %>%
   mutate(rank = 1:n()) %>%
   arrange(posteam)
 
-ids <- nflfastR::teams_colors_logos %>%
-  filter(!team_abbr %in% c('LAR', 'OAK', 'SD', 'STL')) %>%
-  filter(team_abbr %in% current$posteam)
-images <- magick::image_read(ids%>% pull(team_logo_espn)) 
-
-logos <- tibble(
-  x = current$rank + .25, 
-  y = current$go + .02,
-  width = .035,
-  grob = 
-    map(1:length(images), function(x) {
-      grid::rasterGrob(images[x])
-    })
-)
-
 my_title <- glue::glue("WP per game <span style='color:red'>lost by kicking in go situations</span>, 2020")
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(data = current, aes(fill = ifelse(posteam=="SEA", team_color2, team_color)), 
            width = 0.5, alpha = .6, show.legend = FALSE
   ) +
-  geom_grob(data = logos, 
-            aes(x, y, label = grob, vp.width = width),
-            hjust = 0.7) +
+  nflplotR::geom_nfl_logos(aes(team_abbr = posteam), width = 0.035) +
   scale_fill_identity(aesthetics = c("fill", "colour")) +
   theme_ben +
   theme(
@@ -772,7 +738,6 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
     axis.text.x=element_blank(),
     axis.ticks.x=element_blank()
   ) +
-  # scale_y_continuous(expand=c(0,0), limits=c(0, max(current$go + 5))) +
   scale_y_continuous(n.breaks = 10) +
   labs(
     x = "",
@@ -791,7 +756,7 @@ This includes a function for making the timeline for a given team, so if you're 
 make_timeline <- function(team) {
   
   current <- pbp %>%
-    filter(go_boost > 1.5) %>%
+    filter(go_boost > 1.5, !is.na(go), !is.na(go_boost)) %>%
     filter(vegas_wp > .2) %>%
     group_by(posteam, season) %>%
     summarize(go = mean(go), n = n()) %>%
