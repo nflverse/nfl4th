@@ -1,5 +1,7 @@
 # nfl4th (development version)
 
+* Re-export xgboost models to get rid of annoying warning message
+
 # nfl4th 1.0.1
 
 * Fix for aborted plays on punts being called going for it
