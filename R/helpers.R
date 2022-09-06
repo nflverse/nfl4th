@@ -211,7 +211,7 @@ rds_from_url <- function(.url){
 
 load_fd_model <- function() {
   fd_model <- NULL
-  con <- url("https://github.com/guga31bb/fourth_calculator/blob/main/data/fd_model.Rdata?raw=true")
+  con <- url("https://github.com/guga31bb/fourth_calculator/blob/main/data/fd_model_v2.Rdata?raw=true")
   try(load(con), silent = TRUE)
   close(con)
   fd_model
