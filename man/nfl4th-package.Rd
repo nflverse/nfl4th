@@ -6,11 +6,9 @@
 \alias{nfl4th-package}
 \title{nfl4th: Functions to Calculate Optimal Fourth Down Decisions in the National Football League}
 \description{
-\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-A set of functions to estimate outcomes of fourth down
-    plays in the National Football League and obtain fourth down plays
-    from <https://www.nfl.com/> and <https://www.espn.com/>.
+A set of functions to estimate outcomes of fourth down plays in the National Football League and obtain fourth down plays from \url{https://www.nfl.com/} and \url{https://www.espn.com/}.
 }
 \seealso{
 Useful links:

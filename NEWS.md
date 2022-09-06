@@ -1,5 +1,9 @@
 # nfl4th (development version)
 
+# nfl4th 1.0.2
+
+* Nothing changed. Forced update to documentation to not get kicked off CRAN
+
 # nfl4th 1.0.1
 
 * Fix for aborted plays on punts being called going for it
