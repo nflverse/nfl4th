@@ -180,7 +180,7 @@ prepare_nflfastr_data <- function(pbp) {
       type = ifelse(tolower(season_type) == "reg", "reg", "post")
     ) %>%
     filter(
-      game_seconds_remaining > 30,
+      game_seconds_remaining > 15,
       !is.na(half_seconds_remaining),
       !is.na(qtr),
       !is.na(posteam),
