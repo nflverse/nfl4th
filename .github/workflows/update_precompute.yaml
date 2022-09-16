@@ -20,7 +20,7 @@ jobs:
         shell: Rscript {0}
       - name: Install necessary packages
         run: |
-          install.packages(c("callr"), dependencies = TRUE, type = "binary")
+          install.packages(c("callr"), dependencies = TRUE)
         shell: Rscript {0}
       - name: Run update script
         run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
