@@ -241,7 +241,7 @@ get_go_wp <- function(pbp) {
 
   # get model output from situation
   preds_df <- stats::predict(
-    fd_model,
+    fd_model(),
     as.matrix(data)
   ) %>%
     tibble::as_tibble() %>%
