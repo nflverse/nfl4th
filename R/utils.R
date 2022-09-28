@@ -1,22 +1,15 @@
-# loads required data if not in package environment
-# replaces loading .onLoad
-init_nfl4th <- function() {
-  pkg_env <- ls("package:nfl4th")
-  env <- loadNamespace("nfl4th")
-
-  if (!".games_nfl4th" %in% pkg_env){
+.games_nfl4th <- function(){
+  if (!".games_nfl4th" %in% ls(envir = .nfl4th_env)){
     .games_nfl4th <- get_games_file()
-    unlockBinding(".games_nfl4th", env)
-    assign(".games_nfl4th", .games_nfl4th, envir = asNamespace("nfl4th"))
-    lockBinding(".games_nfl4th", env)
+    assign(".games_nfl4th", .games_nfl4th, envir = .nfl4th_env)
   }
-
-  if (!"fd_model" %in% pkg_env){
-    fd_model <- load_fd_model()
-    unlockBinding("fd_model", env)
-    assign("fd_model", fd_model, envir = asNamespace("nfl4th"))
-    lockBinding("fd_model", env)
-  }
+  get(".games_nfl4th", envir = .nfl4th_env)
 }
 
-.games_nfl4th <- fd_model <- NULL
+fd_model <- function(){
+  if (!"fd_model" %in% ls(envir = .nfl4th_env)){
+    fd_model <- load_fd_model()
+    assign("fd_model", fd_model, envir = .nfl4th_env)
+  }
+  get("fd_model", envir = .nfl4th_env)
+}

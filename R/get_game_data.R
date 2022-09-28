@@ -30,10 +30,7 @@
 #' }
 get_4th_plays <- function(gid) {
 
-  # triggers download of games and fd model, if necessary
-  init_nfl4th()
-
-  df <- .games_nfl4th %>%
+  df <- .games_nfl4th() %>%
     filter(game_id == gid)
 
   plays <- data.frame()
