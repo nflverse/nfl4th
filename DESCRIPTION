@@ -19,6 +19,7 @@ BugReports: https://github.com/nflverse/nfl4th/issues
 Depends: 
     R (>= 3.6)
 Imports: 
+    curl,
     dplyr,
     glue,
     httr,
