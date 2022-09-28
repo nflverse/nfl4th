@@ -2,6 +2,7 @@
 
 * Re-export xgboost models to get rid of annoying warning message
 * Tweak how close to end of game it will calculate probabilities
+* Required data isn't loaded directly with the package. Instead the download is triggered when necessary.
 
 # nfl4th 1.0.2
 

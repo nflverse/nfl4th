@@ -53,6 +53,9 @@
 #' }
 add_4th_probs <- function(df) {
 
+  # triggers download of games and fd model, if necessary
+  init_nfl4th()
+
   original_df <- df %>% mutate(index = 1 : n())
   modified_df <- original_df
 
@@ -205,6 +208,9 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #'
 #' dplyr::glimpse(probs)
 add_2pt_probs <- function(df) {
+
+  # triggers download of games and fd model, if necessary
+  init_nfl4th()
 
   original_df <- df %>% mutate(index = 1 : n())
   modified_df <- original_df
