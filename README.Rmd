@@ -37,10 +37,17 @@ install.packages("nfl4th")
 
 To get a bug fix or to use a feature from the development version, you can install the development version of nfl4th from [GitHub](https://github.com/nflverse/nfl4th/) with:
 
+```r
+install.packages("nfl4th", repos = c("https://nflverse.r-universe.dev", getOption("repos")))
+```
+
+or by using remotes:
+
 ``` r
 if (!require("remotes")) install.packages("remotes")
 remotes::install_github("nflverse/nfl4th")
 ```
+
 
 ## Features
 
