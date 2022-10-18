@@ -579,6 +579,41 @@ pbp %>%
   scale_x_continuous(breaks = scales::pretty_breaks(n = 20)) 
 ```
 
+When do teams start going for it?
+
+```{r}
+pbp %>%
+  mutate(
+    wp = 100 * wp,
+    quarter = case_when(
+      qtr == 1 ~ "1",
+      qtr == 4 ~ "4",
+      TRUE ~ "2-3"
+    )
+    ) %>%
+  filter(qtr <= 4, go_boost > 2, wp <= 50) %>%
+  ggplot(aes(wp, go, color = factor(quarter), group = factor(quarter))) + 
+  geom_smooth(se = F, size = 3, formula = y ~ splines::bs(x, 3))+
+  theme_ben +
+  labs(x = "Win probability prior to play",
+       y = "Go-for-it percentage",
+       subtitle = glue::glue("Expected WP gain at least 2 percentage points | 2014 - 2021"),
+       title = my_title) +
+  theme(
+    plot.title = element_markdown(size = 22, hjust = 0.5),
+    plot.subtitle = element_markdown(size = 12, hjust = 0.5),
+    strip.text = element_text(size = 16, face = "bold"),
+    panel.background = element_rect(color = "black", linetype = "solid")
+  ) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5), limits = c(0, 100)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5), expand = c(0, 0)) +
+  annotate("text", x = 10, y = 20, label = "Q1", size = 5) +
+  annotate("text", x = 5, y = 45, label = "Q2/Q3", size = 5) +
+  annotate("text", x = 5, y = 90, label = "Q4", size = 5)
+
+```
+
+
 # Some team-specific numbers
 
 ## Every decision for every team in 2020
