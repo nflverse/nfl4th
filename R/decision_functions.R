@@ -23,39 +23,19 @@ get_punt_wp <- function(pbp) {
         TRUE ~ posteam
       ),
 
-      posteam_timeouts_remaining = case_when(
-        (yardline_after == 100 | muff == 1) & original_posteam == home_team ~ home_timeouts_remaining,
-        (yardline_after == 100 | muff == 1) & original_posteam == away_team ~ away_timeouts_remaining,
-        TRUE ~ posteam_timeouts_remaining
-      ),
+      # muff / return TD stuff
+      yardline_100 = ifelse(muff == 1, as.integer(100 - yardline_100), yardline_100),
+      yardline_100 = ifelse(yardline_after == 100, as.integer(75), as.integer(yardline_100)),
 
-      defteam_timeouts_remaining = case_when(
-        (yardline_after == 100 | muff == 1) & original_posteam == home_team ~ away_timeouts_remaining,
-        (yardline_after == 100 | muff == 1) & original_posteam == away_team ~ home_timeouts_remaining,
-        TRUE ~ defteam_timeouts_remaining
-      ),
-
-      # return TD and muff for yardline
-      yardline_100 = if_else(yardline_after == 100, as.integer(75), as.integer(yardline_100)),
-      yardline_100 = if_else(muff == 1, as.integer(100 - yardline_100), yardline_100),
-
+      # muff / return TD stuff
       score_differential = if_else(yardline_after == 100, as.integer(-score_differential - 7), as.integer(score_differential)),
       score_differential = if_else(muff == 1, as.integer(-score_differential), as.integer(score_differential)),
 
-      receive_2h_ko = case_when(
-        qtr <= 2 & receive_2h_ko == 0 & (yardline_after == 100 | muff == 1) ~ 1,
-        qtr <= 2 & receive_2h_ko == 1 & (yardline_after == 100 | muff == 1) ~ 0,
-        TRUE ~ receive_2h_ko
-      ),
-
-      ydstogo = if_else(yardline_100 < 10, yardline_100, as.integer(ydstogo))
+      ydstogo = ifelse(yardline_100 < 10, yardline_100, as.integer(ydstogo))
 
     ) %>%
     flip_half() %>%
-    nflfastR::calculate_win_probability() %>%
-    mutate(
-      vegas_wp = if_else(posteam != original_posteam, 1 - vegas_wp, vegas_wp)
-    ) %>%
+    calculate_win_probability() %>%
     end_game_fn() %>%
     mutate(
       wt_wp = pct * vegas_wp
@@ -96,22 +76,23 @@ get_fg_wp <- function(pbp) {
       fg_index = 1 : n()
     )
 
+  # win prob after receiving kickoff for touchback and other team has 3 more points
   make_df <- dat %>%
-    flip_team() %>%
+
     # win prob after receiving kickoff for touchback and other team has 3 more points
+    flip_team() %>%
     mutate(
       yardline_100 = 75,
       score_differential = score_differential - 3
     ) %>%
+
     # for end of 1st half stuff
     flip_half() %>%
-    nflfastR::calculate_win_probability() %>%
-    mutate(
-      vegas_wp = if_else(posteam != original_posteam, 1 - vegas_wp, vegas_wp)
-    ) %>%
+    calculate_win_probability() %>%
     end_game_fn() %>%
     select(fg_index, make_fg_wp = vegas_wp)
 
+  # win prob after missed FG
   miss_df <- dat %>%
     flip_team() %>%
     mutate(
@@ -122,10 +103,7 @@ get_fg_wp <- function(pbp) {
     ) %>%
     # for end of 1st half stuff
     flip_half() %>%
-    nflfastR::calculate_win_probability() %>%
-    mutate(
-      vegas_wp = if_else(posteam != original_posteam, 1 - vegas_wp, vegas_wp)
-    ) %>%
+    calculate_win_probability() %>%
     end_game_fn() %>%
     select(fg_index, miss_fg_wp = vegas_wp)
 
@@ -176,19 +154,10 @@ get_2pt_wp <- function(pbp) {
     pbp %>% mutate(pts = 2, score_differential = -score_differential - 2)
   ) %>%
     mutate(
-      # switch posteam, timeouts and kickoff indicator
+      # switch posteam
       posteam = case_when(
         home_team == posteam ~ away_team,
         away_team == posteam ~ home_team
-      ),
-
-      posteam_timeouts_remaining = ifelse(original_posteam == home_team, away_timeouts_remaining, home_timeouts_remaining),
-      defteam_timeouts_remaining = ifelse(original_posteam == home_team, home_timeouts_remaining, away_timeouts_remaining),
-
-      receive_2h_ko = case_when(
-        qtr <= 2 & receive_2h_ko == 0 ~ 1,
-        qtr <= 2 & receive_2h_ko == 1 ~ 0,
-        TRUE ~ receive_2h_ko
       ),
 
       # 1st & 10 after touchback
@@ -198,8 +167,7 @@ get_2pt_wp <- function(pbp) {
 
     ) %>%
     flip_half() %>%
-    nflfastR::calculate_win_probability() %>%
-    mutate(vegas_wp = if_else(posteam != original_posteam, 1 - vegas_wp, vegas_wp)) %>%
+    calculate_win_probability() %>%
     arrange(index_2pt, pts) %>%
     select(index_2pt, pts, vegas_wp, prob_2pt, prob_1pt) %>%
     group_by(index_2pt) %>%
@@ -278,25 +246,6 @@ get_go_wp <- function(pbp) {
       # # note: touchdowns are dealt with separately later
       yardline_100 = ifelse(turnover == 1, 100 - yardline_100, yardline_100),
 
-      posteam_timeouts_remaining = case_when(
-        turnover == 1 & original_posteam == home_team ~ away_timeouts_remaining,
-        turnover == 1 & original_posteam == away_team ~ home_timeouts_remaining,
-        TRUE ~ posteam_timeouts_remaining
-      ),
-
-      defteam_timeouts_remaining = case_when(
-        turnover == 1 & original_posteam == home_team ~ home_timeouts_remaining,
-        turnover == 1 & original_posteam == away_team ~ away_timeouts_remaining,
-        TRUE ~ defteam_timeouts_remaining
-      ),
-
-      # flip receive_2h_ko var if turnover
-      receive_2h_ko = case_when(
-        qtr <= 2 & receive_2h_ko == 0 & turnover == 1 ~ 1,
-        qtr <= 2 & receive_2h_ko == 1 & turnover == 1 ~ 0,
-        TRUE ~ receive_2h_ko
-      ),
-
       # switch posteam if turnover
       posteam = case_when(
         home_team == posteam & turnover == 1 ~ away_team,
@@ -348,15 +297,13 @@ get_go_wp <- function(pbp) {
   preds <- preds_df %>%
     left_join(tds_df, by = c("go_index", "yardline_100")) %>%
     flip_half() %>%
-    nflfastR::calculate_win_probability() %>%
+    calculate_win_probability() %>%
     mutate(
-      # flip WP for possession change (turnover)
-      vegas_wp = if_else(posteam != original_posteam, 1 - vegas_wp, vegas_wp),
-
       # get the TD probs computed separately
       vegas_wp = ifelse(yardline_100 == 0, wp_td, vegas_wp),
 
       # fill in end of game situation when team can kneel out clock after successful non-td conversion
+      defteam_timeouts_remaining = ifelse(posteam == home_team, away_timeouts_remaining, home_timeouts_remaining),
       vegas_wp = case_when(
         score_differential > 0 & turnover == 0 & yardline_100 > 0 & game_seconds_remaining < 120 & defteam_timeouts_remaining == 0 ~ 1,
         score_differential > 0 & turnover == 0 & yardline_100 > 0 & game_seconds_remaining < 80 & defteam_timeouts_remaining == 1 ~ 1,
