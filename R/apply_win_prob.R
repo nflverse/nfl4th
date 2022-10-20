@@ -33,11 +33,14 @@ get_preds_wp <- function(pbp) {
   return(preds)
 }
 
+drop.me <- c("vegas_wp", "ep")
+
 # apply the actual probabilities
 calculate_win_probability <- function(pbp_data) {
 
   # drop existing values of ep and the probs before making new ones
-  pbp_data <- pbp_data %>% dplyr::select(-tidyselect::any_of("vegas_wp"))
+  pbp_data <- pbp_data %>% dplyr::select(-tidyselect::any_of(drop.me))
+  pbp_data <- pbp_data %>% dplyr::select(-ends_with("_prob"))
 
   model_data <- pbp_data %>%
     nflfastR::calculate_expected_points() %>%
@@ -62,3 +65,4 @@ calculate_win_probability <- function(pbp_data) {
 
   return(preds)
 }
+
