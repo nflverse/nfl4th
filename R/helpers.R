@@ -20,7 +20,7 @@ team_name_fn <- function(var) {
 
 # helper column to avoid join errors
 drop.cols <- c(
-  "game_id", "week",  "model_roof", "era3", "era4", "era", "home_total", "away_total", "total_line", "spread_line",
+  "game_id", "week",  "model_roof", "roof", "era3", "era4", "era", "home_total", "away_total", "total_line", "spread_line",
   "retractable", "dome", "outdoors"
 )
 
@@ -137,6 +137,9 @@ flip_half <- function(df) {
       yardline_100 = ifelse(end_of_half == 1, 75L, yardline_100),
       half_seconds_remaining = ifelse(end_of_half == 1, 1800, half_seconds_remaining),
       game_seconds_remaining = ifelse(end_of_half == 1, 1800, game_seconds_remaining),
+      score_differential = ifelse(
+        posteam != prior_posteam & end_of_half == 1, -score_differential, score_differential
+      ),
       home_receive_2h_ko = ifelse(end_of_half == 1, 0, home_receive_2h_ko)
     ) %>%
     select(-prior_posteam, -end_of_half) %>%
