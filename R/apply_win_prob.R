@@ -33,7 +33,7 @@ get_preds_wp <- function(pbp) {
   return(preds)
 }
 
-drop.me <- c("vegas_wp", "ep")
+drop.me <- c("vegas_wp", "vegas_home_wp", "ep")
 
 # apply the actual probabilities
 calculate_win_probability <- function(pbp_data) {
