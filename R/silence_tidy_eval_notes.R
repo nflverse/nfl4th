@@ -71,6 +71,7 @@ aborted_play <-
   type <-
   value <-
   vegas_wp <-
+  vegas_home_wp <-
   week <-
   wp_0 <-
   wp_1 <-
