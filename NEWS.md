@@ -2,6 +2,7 @@
 
 * Re-export xgboost models to get rid of annoying warning message
 * Tweak how close to end of game it will calculate probabilities
+* Update win probability model. Instead of only using `nflfastR`, it stacks `nflfastR` with another model
 
 # nfl4th 1.0.2
 
