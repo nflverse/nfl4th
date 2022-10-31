@@ -217,7 +217,7 @@ load_fd_model <- function() {
 
 load_wp_model <- function() {
   wp_model <- NULL
-  con <- url("https://github.com/guga31bb/metrics/blob/master/data-raw/wp_model.Rdata?raw=true")
+  con <- url("https://github.com/guga31bb/fourth_calculator/blob/main/data/home_wp_model.Rdata?raw=true")
   try(load(con), silent = TRUE)
   close(con)
   wp_model
