@@ -4,10 +4,18 @@ nfl4th_fdmodel_path <- file.path(nfl4th_cache_dir, "fd_model.rds")
 nfl4th_wpmodel_path <- file.path(nfl4th_cache_dir, "wp_model.rds")
 
 .onLoad <- function(libname,pkgname){
+  
+  is_online <- !is.null(curl::nslookup("github.com", error = FALSE))
+  keep_games <- isTRUE(getOption("nfl4th.keep_games", FALSE))
+  
+  if(!is_online && !keep_games) rlang::warn("GitHub.com seems offline, and `options(nfl4th.keep_games)` is not set to TRUE. Deleting the games cache, and predictions may not be available without an internet connection.") 
+  
+  if(!is_online && keep_games) rlang::warn("GitHub.com seems offline, and `options(nfl4th.keep_games)` is set to TRUE. To get updates, clear the games cache with `nfl4th::nfl4th_clear_cache()`")
+
   # create package cache directory if it doesn't exist
   if (!dir.exists(nfl4th_cache_dir)){
     dir.create(nfl4th_cache_dir, recursive = TRUE, showWarnings = FALSE)
-  } else if (file.exists(nfl4th_games_path) && !getOption("nfl4th.keep_games", FALSE)){
+  } else if (file.exists(nfl4th_games_path) && !keep_games){
     # remove games from package cache on load so it updates
     # only runs if options(nfl4th.keep_games) != TRUE
     # If option is not set, the file will be removed.
