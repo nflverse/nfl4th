@@ -8,7 +8,11 @@ aborted_play <-
   dome <-
   down <-
   end_of_half <-
+  home_receive_2h_ko <-
+  ep <-
   era <-
+  era0 <-
+  era1 <-
   era2 <-
   era3 <-
   era4 <-
@@ -67,6 +71,7 @@ aborted_play <-
   type <-
   value <-
   vegas_wp <-
+  vegas_home_wp <-
   week <-
   wp_0 <-
   wp_1 <-
