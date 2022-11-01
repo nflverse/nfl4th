@@ -3,6 +3,7 @@
 * Re-export xgboost models to get rid of annoying warning message
 * Tweak how close to end of game it will calculate probabilities
 * Required data isn't loaded directly with the package. Instead the download is triggered when necessary and cached in a local package cache. The cache can be cleared with the new function `nfl4th_clear_cache()`. The package resets the cache partly when loaded. This can be prevented with `options(nfl4th.keep_games = TRUE)`.
+* Update win probability model. Instead of only using `nflfastR`, it stacks `nflfastR` with another model
 
 # nfl4th 1.0.2
 
