@@ -4,14 +4,16 @@
 \alias{nfl4th_clear_cache}
 \title{Reset nfl4th Package Cache}
 \usage{
-nfl4th_clear_cache(type = c("games", "fd_model", "all"))
+nfl4th_clear_cache(type = c("games", "fd_model", "wp_model", "all"))
 }
 \arguments{
 \item{type}{One of \code{"games"} (the default), \code{"fd_model"}, or \code{"all"}.
 \code{"games"} will remove an internally used games file.
 \code{"fd_model"} will remove the nfl4th 4th down model (only necessary in the
 unlikely case of a model update).
-\code{"all"} will remove both of the above.}
+\code{"wp_model"} will remove the nfl4th win probability model (only necessary in the
+unlikely case of a model update).
+\code{"all"} will remove all of the above.}
 }
 \value{
 Returns \code{TRUE} invisibly if cache has been cleared.

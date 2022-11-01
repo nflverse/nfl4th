@@ -1,6 +1,7 @@
 nfl4th_cache_dir <- rappdirs::user_cache_dir("nfl4th", "nflverse")
 nfl4th_games_path <- file.path(nfl4th_cache_dir, "games_nfl4th.rds")
-nfl4th_model_path <- file.path(nfl4th_cache_dir, "fd_model.rds")
+nfl4th_fdmodel_path <- file.path(nfl4th_cache_dir, "fd_model.rds")
+nfl4th_wpmodel_path <- file.path(nfl4th_cache_dir, "wp_model.rds")
 
 .onLoad <- function(libname,pkgname){
   is_online <- !is.null(curl::nslookup("github.com", error = FALSE))
@@ -13,11 +14,4 @@ nfl4th_model_path <- file.path(nfl4th_cache_dir, "fd_model.rds")
     # to github.com. If option is not set, the file will be removed is online.
     file.remove(nfl4th_games_path)
   }
-#.onLoad <- function(libname, pkgname) {
-#  .games_nfl4th <- get_games_file()
-#  fd_model <- load_fd_model()
-#  wp_model <- load_wp_model()
-#  assign(".games_nfl4th", .games_nfl4th, envir = parent.env(environment()))
-#  assign("fd_model", fd_model, envir = parent.env(environment()))
-#  assign("wp_model", wp_model, envir = parent.env(environment()))
-#}
+}
