@@ -9,10 +9,17 @@
 }
 
 fd_model <- function(){
-  if (!file.exists(nfl4th_model_path)){
-    saveRDS(load_fd_model(), nfl4th_model_path)
+  if (!file.exists(nfl4th_fdmodel_path)){
+    saveRDS(load_fd_model(), nfl4th_fdmodel_path)
   }
-  readRDS(nfl4th_model_path)
+  readRDS(nfl4th_fdmodel_path)
+}
+
+wp_model <- function(){
+  if (!file.exists(nfl4th_wpmodel_path)){
+    saveRDS(load_wp_model(), nfl4th_wpmodel_path)
+  }
+  readRDS(nfl4th_wpmodel_path)
 }
 
 #' Reset nfl4th Package Cache
@@ -21,19 +28,22 @@ fd_model <- function(){
 #'   `"games"` will remove an internally used games file.
 #'   `"fd_model"` will remove the nfl4th 4th down model (only necessary in the
 #'   unlikely case of a model update).
-#'   `"all"` will remove both of the above.
+#'   `"wp_model"` will remove the nfl4th win probability model (only necessary in the
+#'   unlikely case of a model update).
+#'   `"all"` will remove all of the above.
 #'
 #' @return Returns `TRUE` invisibly if cache has been cleared.
 #' @export
 #'
 #' @examples
 #' nfl4th_clear_cache()
-nfl4th_clear_cache <- function(type = c("games", "fd_model", "all")){
+nfl4th_clear_cache <- function(type = c("games", "fd_model", "wp_model", "all")){
   type <- rlang::arg_match(type)
   to_delete <- switch (type,
     "games" = nfl4th_games_path,
-    "fd_model" = nfl4th_model_path,
-    "all" = c(nfl4th_games_path, nfl4th_model_path)
+    "fd_model" = nfl4th_fdmodel_path,
+    "wp_model" = nfl4th_wpmodel_path,
+    "all" = c(nfl4th_games_path, nfl4th_fdmodel_path)
   )
   file.remove(to_delete[file.exists(to_delete)])
   invisible(TRUE)
