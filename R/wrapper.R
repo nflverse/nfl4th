@@ -134,7 +134,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
   } else {
     data <- purrr::map_df(seasons, ~{
       message(glue::glue("Loading season {.x}"))
-      nflfastR::load_pbp(.x) %>%
+      nflreadr::load_pbp(.x) %>%
         nfl4th::add_4th_probs() %>%
         return()
     })
