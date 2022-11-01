@@ -43,7 +43,7 @@ nfl4th_clear_cache <- function(type = c("games", "fd_model", "wp_model", "all"))
     "games" = nfl4th_games_path,
     "fd_model" = nfl4th_fdmodel_path,
     "wp_model" = nfl4th_wpmodel_path,
-    "all" = c(nfl4th_games_path, nfl4th_fdmodel_path)
+    "all" = c(nfl4th_games_path, nfl4th_fdmodel_path, nfl4th_wpmodel_path)
   )
   file.remove(to_delete[file.exists(to_delete)])
   invisible(TRUE)
