@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nfl4th</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2.9004</span>
       </span>
     </div>
 
@@ -63,6 +63,7 @@
 <h2 class="page-header" data-toc-text="development version" id="nfl4th-development-version">nfl4th (development version)<a class="anchor" aria-label="anchor" href="#nfl4th-development-version"></a></h2>
 <ul><li>Re-export xgboost models to get rid of annoying warning message</li>
 <li>Tweak how close to end of game it will calculate probabilities</li>
+<li>Required data isn’t loaded directly with the package. Instead the download is triggered when necessary and cached in a local package cache. The cache can be cleared with the new function <code><a href="../reference/nfl4th_clear_cache.html">nfl4th_clear_cache()</a></code>. The package resets the cache partly when loaded. This can be prevented with <code>options(nfl4th.keep_games = TRUE)</code>.</li>
 <li>Update win probability model. Instead of only using <code>nflfastR</code>, it stacks <code>nflfastR</code> with another model</li>
 </ul></div>
     <div class="section level2">
