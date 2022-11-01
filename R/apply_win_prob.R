@@ -28,7 +28,7 @@ wp_model_select <- function(pbp) {
 # apply the predictions
 get_preds_wp <- function(pbp) {
 
-  preds <- stats::predict(wp_model, as.matrix(pbp %>% wp_model_select()))
+  preds <- stats::predict(wp_model(), as.matrix(pbp %>% wp_model_select()))
 
   return(preds)
 }
