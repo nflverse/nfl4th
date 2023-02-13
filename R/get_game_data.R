@@ -30,7 +30,7 @@
 #' }
 get_4th_plays <- function(gid) {
 
-  df <- .games_nfl4th() %>%
+  df <- .games_nfl4th %>%
     filter(game_id == gid)
 
   plays <- data.frame()
