@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nfl4th</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2.9004</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2.9005</span>
       </span>
     </div>
 
@@ -137,8 +137,10 @@
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>,x<span class="op">=</span><span class="fl">3</span>, y<span class="op">=</span> <span class="fl">90</span>, label <span class="op">=</span> <span class="st">"Should\ngo for it"</span>, color<span class="op">=</span><span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"label"</span>,x<span class="op">=</span><span class="op">-</span><span class="fl">6</span>, y<span class="op">=</span> <span class="fl">15</span>, label <span class="op">=</span> <span class="st">"Teams almost always kick\nwhen they should..."</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"label"</span>,x<span class="op">=</span><span class="fl">6</span>, y<span class="op">=</span> <span class="fl">25</span>, label <span class="op">=</span> <span class="st">"...but frequently\n kick when they\nshould go for it"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 11 rows containing non-finite values (stat_smooth).</span></span>
-<span><span class="co">#&gt; Warning: Removed 11 rows containing missing values (geom_point).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; Warning: Removed 11 rows containing non-finite values (`stat_smooth()`).</span></span>
+<span><span class="co">#&gt; Warning: Removed 11 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/league-1.png" width="7200"></p>
 </div>
 <div class="section level3">
@@ -178,12 +180,12 @@
 <span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_header.html" class="external-link">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NFL team decision-making by go recommendation, 2020"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_source_note.html" class="external-link">tab_source_note</a></span><span class="op">(</span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/md.html" class="external-link">md</a></span><span class="op">(</span><span class="st">'**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,&lt;br&gt; "probably" 1-4 percentage points'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div id="gtmclmevku" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="okobqmzeqm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#gtmclmevku .gt_table {
+#okobqmzeqm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -208,7 +210,7 @@
   border-left-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_heading {
+#okobqmzeqm .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -220,7 +222,12 @@
   border-right-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_title {
+#okobqmzeqm .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#okobqmzeqm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -232,7 +239,7 @@
   border-bottom-width: 0;
 }
 
-#gtmclmevku .gt_subtitle {
+#okobqmzeqm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -244,13 +251,13 @@
   border-top-width: 0;
 }
 
-#gtmclmevku .gt_bottom_border {
+#okobqmzeqm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_col_headings {
+#okobqmzeqm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -265,7 +272,7 @@
   border-right-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_col_heading {
+#okobqmzeqm .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -285,7 +292,7 @@
   overflow-x: hidden;
 }
 
-#gtmclmevku .gt_column_spanner_outer {
+#okobqmzeqm .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -297,15 +304,15 @@
   padding-right: 4px;
 }
 
-#gtmclmevku .gt_column_spanner_outer:first-child {
+#okobqmzeqm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gtmclmevku .gt_column_spanner_outer:last-child {
+#okobqmzeqm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gtmclmevku .gt_column_spanner {
+#okobqmzeqm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -317,7 +324,7 @@
   width: 100%;
 }
 
-#gtmclmevku .gt_group_heading {
+#okobqmzeqm .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -340,9 +347,10 @@
   border-right-width: 1px;
   border-right-color: #D3D3D3;
   vertical-align: middle;
+  text-align: left;
 }
 
-#gtmclmevku .gt_empty_group_heading {
+#okobqmzeqm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -357,15 +365,15 @@
   vertical-align: middle;
 }
 
-#gtmclmevku .gt_from_md > :first-child {
+#okobqmzeqm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gtmclmevku .gt_from_md > :last-child {
+#okobqmzeqm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gtmclmevku .gt_row {
+#okobqmzeqm .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -384,7 +392,7 @@
   overflow-x: hidden;
 }
 
-#gtmclmevku .gt_stub {
+#okobqmzeqm .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -397,7 +405,7 @@
   padding-right: 5px;
 }
 
-#gtmclmevku .gt_stub_row_group {
+#okobqmzeqm .gt_stub_row_group {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -411,11 +419,11 @@
   vertical-align: top;
 }
 
-#gtmclmevku .gt_row_group_first td {
+#okobqmzeqm .gt_row_group_first td {
   border-top-width: 3px;
 }
 
-#gtmclmevku .gt_summary_row {
+#okobqmzeqm .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -425,16 +433,16 @@
   padding-right: 5px;
 }
 
-#gtmclmevku .gt_first_summary_row {
+#okobqmzeqm .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_first_summary_row.thick {
+#okobqmzeqm .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#gtmclmevku .gt_last_summary_row {
+#okobqmzeqm .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -444,7 +452,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_grand_summary_row {
+#okobqmzeqm .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -454,7 +462,7 @@
   padding-right: 5px;
 }
 
-#gtmclmevku .gt_first_grand_summary_row {
+#okobqmzeqm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -464,11 +472,11 @@
   border-top-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_striped {
+#okobqmzeqm .gt_striped {
   background-color: #FFFFFF;
 }
 
-#gtmclmevku .gt_table_body {
+#okobqmzeqm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -477,7 +485,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_footnotes {
+#okobqmzeqm .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -491,7 +499,7 @@
   border-right-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_footnote {
+#okobqmzeqm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -500,7 +508,7 @@
   padding-right: 5px;
 }
 
-#gtmclmevku .gt_sourcenotes {
+#okobqmzeqm .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -514,7 +522,7 @@
   border-right-color: #D3D3D3;
 }
 
-#gtmclmevku .gt_sourcenote {
+#okobqmzeqm .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -522,64 +530,64 @@
   padding-right: 5px;
 }
 
-#gtmclmevku .gt_left {
+#okobqmzeqm .gt_left {
   text-align: left;
 }
 
-#gtmclmevku .gt_center {
+#okobqmzeqm .gt_center {
   text-align: center;
 }
 
-#gtmclmevku .gt_right {
+#okobqmzeqm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gtmclmevku .gt_font_normal {
+#okobqmzeqm .gt_font_normal {
   font-weight: normal;
 }
 
-#gtmclmevku .gt_font_bold {
+#okobqmzeqm .gt_font_bold {
   font-weight: bold;
 }
 
-#gtmclmevku .gt_font_italic {
+#okobqmzeqm .gt_font_italic {
   font-style: italic;
 }
 
-#gtmclmevku .gt_super {
+#okobqmzeqm .gt_super {
   font-size: 65%;
 }
 
-#gtmclmevku .gt_footnote_marks {
+#okobqmzeqm .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#gtmclmevku .gt_asterisk {
+#okobqmzeqm .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#gtmclmevku .gt_indent_1 {
+#okobqmzeqm .gt_indent_1 {
   text-indent: 5px;
 }
 
-#gtmclmevku .gt_indent_2 {
+#okobqmzeqm .gt_indent_2 {
   text-indent: 10px;
 }
 
-#gtmclmevku .gt_indent_3 {
+#okobqmzeqm .gt_indent_3 {
   text-indent: 15px;
 }
 
-#gtmclmevku .gt_indent_4 {
+#okobqmzeqm .gt_indent_4 {
   text-indent: 20px;
 }
 
-#gtmclmevku .gt_indent_5 {
+#okobqmzeqm .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -588,35 +596,35 @@
 <td colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>NFL team decision-making by go recommendation, 2020</td>
     </tr></thead>
 <thead class="gt_col_headings"><tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Recommendation</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Went for it %</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Plays</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Recommendation">Recommendation</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Went for it %">Went for it %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Plays">Plays</th>
     </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td class="gt_row gt_left">Definitely go for it</td>
-<td class="gt_row gt_center">74</td>
-<td class="gt_row gt_center">226</td>
+<td headers="type" class="gt_row gt_left">Definitely go for it</td>
+<td headers="go" class="gt_row gt_center">74</td>
+<td headers="n" class="gt_row gt_center">226</td>
 </tr>
 <tr>
-<td class="gt_row gt_left gt_striped">Probably go for it</td>
-<td class="gt_row gt_center gt_striped">35</td>
-<td class="gt_row gt_center gt_striped">651</td>
+<td headers="type" class="gt_row gt_left gt_striped">Probably go for it</td>
+<td headers="go" class="gt_row gt_center gt_striped">35</td>
+<td headers="n" class="gt_row gt_center gt_striped">651</td>
 </tr>
 <tr>
-<td class="gt_row gt_left">Toss-up</td>
-<td class="gt_row gt_center">17</td>
-<td class="gt_row gt_center">1717</td>
+<td headers="type" class="gt_row gt_left">Toss-up</td>
+<td headers="go" class="gt_row gt_center">17</td>
+<td headers="n" class="gt_row gt_center">1717</td>
 </tr>
 <tr>
-<td class="gt_row gt_left gt_striped">Probably kick</td>
-<td class="gt_row gt_center gt_striped">2</td>
-<td class="gt_row gt_center gt_striped">889</td>
+<td headers="type" class="gt_row gt_left gt_striped">Probably kick</td>
+<td headers="go" class="gt_row gt_center gt_striped">2</td>
+<td headers="n" class="gt_row gt_center gt_striped">889</td>
 </tr>
 <tr>
-<td class="gt_row gt_left">Definitely kick</td>
-<td class="gt_row gt_center">0</td>
-<td class="gt_row gt_center">272</td>
+<td headers="type" class="gt_row gt_left">Definitely kick</td>
+<td headers="go" class="gt_row gt_center">0</td>
+<td headers="n" class="gt_row gt_center">272</td>
 </tr>
 </tbody>
 <tfoot class="gt_sourcenotes"><tr>
@@ -666,12 +674,12 @@
 <span>  <span class="fu">fmt_number</span><span class="op">(</span>columns <span class="op">=</span> <span class="fu">vars</span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">cols_align</span><span class="op">(</span>columns <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">tab_header</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Worst kick decisions of 2020"</span><span class="op">)</span></span></code></pre></div>
-<div id="gotqzwuyix" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="twoidxgudh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#gotqzwuyix .gt_table {
+#twoidxgudh .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -696,7 +704,7 @@
   border-left-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_heading {
+#twoidxgudh .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -708,7 +716,12 @@
   border-right-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_title {
+#twoidxgudh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#twoidxgudh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -720,7 +733,7 @@
   border-bottom-width: 0;
 }
 
-#gotqzwuyix .gt_subtitle {
+#twoidxgudh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -732,13 +745,13 @@
   border-top-width: 0;
 }
 
-#gotqzwuyix .gt_bottom_border {
+#twoidxgudh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_col_headings {
+#twoidxgudh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -753,7 +766,7 @@
   border-right-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_col_heading {
+#twoidxgudh .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -773,7 +786,7 @@
   overflow-x: hidden;
 }
 
-#gotqzwuyix .gt_column_spanner_outer {
+#twoidxgudh .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -785,15 +798,15 @@
   padding-right: 4px;
 }
 
-#gotqzwuyix .gt_column_spanner_outer:first-child {
+#twoidxgudh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gotqzwuyix .gt_column_spanner_outer:last-child {
+#twoidxgudh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gotqzwuyix .gt_column_spanner {
+#twoidxgudh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -805,7 +818,7 @@
   width: 100%;
 }
 
-#gotqzwuyix .gt_group_heading {
+#twoidxgudh .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -828,9 +841,10 @@
   border-right-width: 1px;
   border-right-color: #D3D3D3;
   vertical-align: middle;
+  text-align: left;
 }
 
-#gotqzwuyix .gt_empty_group_heading {
+#twoidxgudh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -845,15 +859,15 @@
   vertical-align: middle;
 }
 
-#gotqzwuyix .gt_from_md > :first-child {
+#twoidxgudh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gotqzwuyix .gt_from_md > :last-child {
+#twoidxgudh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gotqzwuyix .gt_row {
+#twoidxgudh .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -872,7 +886,7 @@
   overflow-x: hidden;
 }
 
-#gotqzwuyix .gt_stub {
+#twoidxgudh .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -885,7 +899,7 @@
   padding-right: 5px;
 }
 
-#gotqzwuyix .gt_stub_row_group {
+#twoidxgudh .gt_stub_row_group {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -899,11 +913,11 @@
   vertical-align: top;
 }
 
-#gotqzwuyix .gt_row_group_first td {
+#twoidxgudh .gt_row_group_first td {
   border-top-width: 3px;
 }
 
-#gotqzwuyix .gt_summary_row {
+#twoidxgudh .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -913,16 +927,16 @@
   padding-right: 5px;
 }
 
-#gotqzwuyix .gt_first_summary_row {
+#twoidxgudh .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_first_summary_row.thick {
+#twoidxgudh .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#gotqzwuyix .gt_last_summary_row {
+#twoidxgudh .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -932,7 +946,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_grand_summary_row {
+#twoidxgudh .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -942,7 +956,7 @@
   padding-right: 5px;
 }
 
-#gotqzwuyix .gt_first_grand_summary_row {
+#twoidxgudh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -952,11 +966,11 @@
   border-top-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_striped {
+#twoidxgudh .gt_striped {
   background-color: #FFFFFF;
 }
 
-#gotqzwuyix .gt_table_body {
+#twoidxgudh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -965,7 +979,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_footnotes {
+#twoidxgudh .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -979,7 +993,7 @@
   border-right-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_footnote {
+#twoidxgudh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -988,7 +1002,7 @@
   padding-right: 5px;
 }
 
-#gotqzwuyix .gt_sourcenotes {
+#twoidxgudh .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1002,7 +1016,7 @@
   border-right-color: #D3D3D3;
 }
 
-#gotqzwuyix .gt_sourcenote {
+#twoidxgudh .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1010,64 +1024,64 @@
   padding-right: 5px;
 }
 
-#gotqzwuyix .gt_left {
+#twoidxgudh .gt_left {
   text-align: left;
 }
 
-#gotqzwuyix .gt_center {
+#twoidxgudh .gt_center {
   text-align: center;
 }
 
-#gotqzwuyix .gt_right {
+#twoidxgudh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gotqzwuyix .gt_font_normal {
+#twoidxgudh .gt_font_normal {
   font-weight: normal;
 }
 
-#gotqzwuyix .gt_font_bold {
+#twoidxgudh .gt_font_bold {
   font-weight: bold;
 }
 
-#gotqzwuyix .gt_font_italic {
+#twoidxgudh .gt_font_italic {
   font-style: italic;
 }
 
-#gotqzwuyix .gt_super {
+#twoidxgudh .gt_super {
   font-size: 65%;
 }
 
-#gotqzwuyix .gt_footnote_marks {
+#twoidxgudh .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#gotqzwuyix .gt_asterisk {
+#twoidxgudh .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#gotqzwuyix .gt_indent_1 {
+#twoidxgudh .gt_indent_1 {
   text-indent: 5px;
 }
 
-#gotqzwuyix .gt_indent_2 {
+#twoidxgudh .gt_indent_2 {
   text-indent: 10px;
 }
 
-#gotqzwuyix .gt_indent_3 {
+#twoidxgudh .gt_indent_3 {
   text-indent: 15px;
 }
 
-#gotqzwuyix .gt_indent_4 {
+#twoidxgudh .gt_indent_4 {
   text-indent: 20px;
 }
 
-#gotqzwuyix .gt_indent_5 {
+#twoidxgudh .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1087,126 +1101,126 @@
 <td colspan="9" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Worst kick decisions of 2020</td>
     </tr></thead>
 <thead class="gt_col_headings"><tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col"></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Team</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Opp</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Week</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Qtr</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">YTG</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Diff</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">WP loss</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Play</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id=""></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Team">Team</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Opp">Opp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Week">Week</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Qtr">Qtr</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="YTG">YTG</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Diff">Diff</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="WP loss">WP loss</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Play">Play</th>
     </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td class="gt_row gt_center">1</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png" style="height:30px;"></td>
-<td class="gt_row gt_center">9</td>
-<td class="gt_row gt_center">4</td>
-<td class="gt_row gt_center">1</td>
-<td class="gt_row gt_center">-3</td>
-<td class="gt_row gt_center">11.2</td>
-<td class="gt_row gt_left">(1:58) 5-Z.Gonzalez 49 yard field goal is No Good, Short, Center-46-A.Brewer, Holder-4-A.Lee.</td>
+<td headers="rank" class="gt_row gt_center">1</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center">9</td>
+<td headers="qtr" class="gt_row gt_center">4</td>
+<td headers="ydstogo" class="gt_row gt_center">1</td>
+<td headers="score_differential" class="gt_row gt_center">-3</td>
+<td headers="go_boost" class="gt_row gt_center">11.2</td>
+<td headers="desc" class="gt_row gt_left">(1:58) 5-Z.Gonzalez 49 yard field goal is No Good, Short, Center-46-A.Brewer, Holder-4-A.Lee.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">2</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">1</td>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped">1</td>
-<td class="gt_row gt_center gt_striped">-1</td>
-<td class="gt_row gt_center gt_striped">8.4</td>
-<td class="gt_row gt_left gt_striped">(7:32) (Run formation) PENALTY on TEN, Delay of Game, 4 yards, enforced at TEN 34 - No Play.</td>
+<td headers="rank" class="gt_row gt_center gt_striped">2</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center gt_striped">1</td>
+<td headers="qtr" class="gt_row gt_center gt_striped">4</td>
+<td headers="ydstogo" class="gt_row gt_center gt_striped">1</td>
+<td headers="score_differential" class="gt_row gt_center gt_striped">-1</td>
+<td headers="go_boost" class="gt_row gt_center gt_striped">8.4</td>
+<td headers="desc" class="gt_row gt_left gt_striped">(7:32) (Run formation) PENALTY on TEN, Delay of Game, 4 yards, enforced at TEN 34 - No Play.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">3</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SF.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
-<td class="gt_row gt_center">16</td>
-<td class="gt_row gt_center">4</td>
-<td class="gt_row gt_center">1</td>
-<td class="gt_row gt_center">2</td>
-<td class="gt_row gt_center">8.2</td>
-<td class="gt_row gt_left">(10:22) 6-M.Wishnowsky punts 44 yards to ARI 27, Center-46-T.Pepper, out of bounds.</td>
+<td headers="rank" class="gt_row gt_center">3</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SF.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center">16</td>
+<td headers="qtr" class="gt_row gt_center">4</td>
+<td headers="ydstogo" class="gt_row gt_center">1</td>
+<td headers="score_differential" class="gt_row gt_center">2</td>
+<td headers="go_boost" class="gt_row gt_center">8.2</td>
+<td headers="desc" class="gt_row gt_left">(10:22) 6-M.Wishnowsky punts 44 yards to ARI 27, Center-46-T.Pepper, out of bounds.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">18</td>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped">2</td>
-<td class="gt_row gt_center gt_striped">-4</td>
-<td class="gt_row gt_center gt_striped">8.0</td>
-<td class="gt_row gt_left gt_striped">(10:06) 6-B.Kern punts 25 yards to BAL 15, Center-47-M.Overton, fair catch by 13-D.Duvernay.</td>
+<td headers="rank" class="gt_row gt_center gt_striped">4</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center gt_striped">18</td>
+<td headers="qtr" class="gt_row gt_center gt_striped">4</td>
+<td headers="ydstogo" class="gt_row gt_center gt_striped">2</td>
+<td headers="score_differential" class="gt_row gt_center gt_striped">-4</td>
+<td headers="go_boost" class="gt_row gt_center gt_striped">8.0</td>
+<td headers="desc" class="gt_row gt_left gt_striped">(10:06) 6-B.Kern punts 25 yards to BAL 15, Center-47-M.Overton, fair catch by 13-D.Duvernay.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">5</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
-<td class="gt_row gt_center">17</td>
-<td class="gt_row gt_center">3</td>
-<td class="gt_row gt_center">2</td>
-<td class="gt_row gt_center">-4</td>
-<td class="gt_row gt_center">7.7</td>
-<td class="gt_row gt_left">(3:10) 8-B.McManus 26 yard field goal is GOOD, Center-46-J.Bobenmoyer, Holder-6-S.Martin.</td>
+<td headers="rank" class="gt_row gt_center">5</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center">17</td>
+<td headers="qtr" class="gt_row gt_center">3</td>
+<td headers="ydstogo" class="gt_row gt_center">2</td>
+<td headers="score_differential" class="gt_row gt_center">-4</td>
+<td headers="go_boost" class="gt_row gt_center">7.7</td>
+<td headers="desc" class="gt_row gt_left">(3:10) 8-B.McManus 26 yard field goal is GOOD, Center-46-J.Bobenmoyer, Holder-6-S.Martin.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">6</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">18</td>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped">1</td>
-<td class="gt_row gt_center gt_striped">-12</td>
-<td class="gt_row gt_center gt_striped">7.6</td>
-<td class="gt_row gt_left gt_striped">(15:00) (Punt formation) PENALTY on PIT, Delay of Game, 5 yards, enforced at PIT 46 - No Play.</td>
+<td headers="rank" class="gt_row gt_center gt_striped">6</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center gt_striped">18</td>
+<td headers="qtr" class="gt_row gt_center gt_striped">4</td>
+<td headers="ydstogo" class="gt_row gt_center gt_striped">1</td>
+<td headers="score_differential" class="gt_row gt_center gt_striped">-12</td>
+<td headers="go_boost" class="gt_row gt_center gt_striped">7.6</td>
+<td headers="desc" class="gt_row gt_left gt_striped">(15:00) (Punt formation) PENALTY on PIT, Delay of Game, 5 yards, enforced at PIT 46 - No Play.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">7</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
-<td class="gt_row gt_center">4</td>
-<td class="gt_row gt_center">3</td>
-<td class="gt_row gt_center">2</td>
-<td class="gt_row gt_center">-4</td>
-<td class="gt_row gt_center">7.3</td>
-<td class="gt_row gt_left">(8:41) 2-D.Carlson 25 yard field goal is GOOD, Center-47-T.Sieg, Holder-6-A.Cole.</td>
+<td headers="rank" class="gt_row gt_center">7</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LV.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center">4</td>
+<td headers="qtr" class="gt_row gt_center">3</td>
+<td headers="ydstogo" class="gt_row gt_center">2</td>
+<td headers="score_differential" class="gt_row gt_center">-4</td>
+<td headers="go_boost" class="gt_row gt_center">7.3</td>
+<td headers="desc" class="gt_row gt_left">(8:41) 2-D.Carlson 25 yard field goal is GOOD, Center-47-T.Sieg, Holder-6-A.Cole.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">8</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">8</td>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped">1</td>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped">6.9</td>
-<td class="gt_row gt_left gt_striped">(:59) 4-J.Berry punts 48 yards to BAL 37, Center-57-K.Canaday, fair catch by 11-J.Proche.</td>
+<td headers="rank" class="gt_row gt_center gt_striped">8</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center gt_striped">8</td>
+<td headers="qtr" class="gt_row gt_center gt_striped">4</td>
+<td headers="ydstogo" class="gt_row gt_center gt_striped">1</td>
+<td headers="score_differential" class="gt_row gt_center gt_striped">4</td>
+<td headers="go_boost" class="gt_row gt_center gt_striped">6.9</td>
+<td headers="desc" class="gt_row gt_left gt_striped">(:59) 4-J.Berry punts 48 yards to BAL 37, Center-57-K.Canaday, fair catch by 11-J.Proche.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">9</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center">1</td>
-<td class="gt_row gt_center">4</td>
-<td class="gt_row gt_center">1</td>
-<td class="gt_row gt_center">3</td>
-<td class="gt_row gt_center">6.8</td>
-<td class="gt_row gt_left">(2:35) 6-J.Hekker punts 42 yards to DAL 9, Center-44-J.McQuaide, fair catch by 11-C.Wilson.</td>
+<td headers="rank" class="gt_row gt_center">9</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center">1</td>
+<td headers="qtr" class="gt_row gt_center">4</td>
+<td headers="ydstogo" class="gt_row gt_center">1</td>
+<td headers="score_differential" class="gt_row gt_center">3</td>
+<td headers="go_boost" class="gt_row gt_center">6.8</td>
+<td headers="desc" class="gt_row gt_left">(2:35) 6-J.Hekker punts 42 yards to DAL 9, Center-44-J.McQuaide, fair catch by 11-C.Wilson.</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">10</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">14</td>
-<td class="gt_row gt_center gt_striped">2</td>
-<td class="gt_row gt_center gt_striped">1</td>
-<td class="gt_row gt_center gt_striped">-10</td>
-<td class="gt_row gt_center gt_striped">6.6</td>
-<td class="gt_row gt_left gt_striped">(2:24) 6-T.Morstead punts 48 yards to PHI 4, Center-49-Z.Wood, out of bounds.</td>
+<td headers="rank" class="gt_row gt_center gt_striped">10</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
+<td headers="week" class="gt_row gt_center gt_striped">14</td>
+<td headers="qtr" class="gt_row gt_center gt_striped">2</td>
+<td headers="ydstogo" class="gt_row gt_center gt_striped">1</td>
+<td headers="score_differential" class="gt_row gt_center gt_striped">-10</td>
+<td headers="go_boost" class="gt_row gt_center gt_striped">6.6</td>
+<td headers="desc" class="gt_row gt_left gt_striped">(2:24) 6-T.Morstead punts 48 yards to PHI 4, Center-49-Z.Wood, out of bounds.</td>
 </tr>
 </tbody>
 </table>
@@ -1262,7 +1276,7 @@
 <span>    arrow <span class="op">=</span> <span class="fu">arrow</span><span class="op">(</span>length <span class="op">=</span> <span class="fu">unit</span><span class="op">(</span><span class="fl">0.05</span>, <span class="st">"npc"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 24 rows containing non-finite values (stat_smooth).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 24 rows containing non-finite values (`stat_smooth()`).</span></span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/time-1.png" width="7200"></p>
 <p>For the remainder of this page, the code that generates the tables and figures won’t be shown in order to make it more readable, but <a href="https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd" class="external-link">all of the code can be viewed here</a>.</p>
 </div>
@@ -1292,7 +1306,7 @@
 <h2 id="league-behavior-based-on-win-probability">League behavior based on win probability<a class="anchor" aria-label="anchor" href="#league-behavior-based-on-win-probability"></a>
 </h2>
 <p>Holding the expected “go” gain constant, coaches are more likely to go for it when ahead by a lot or trailing by a lot. This makes sense as their decision is less likely to make the difference between a win and a loss (and thus open the coach up to being blamed for a loss).</p>
-<pre><code><span><span class="co">#&gt; Warning: Removed 7 rows containing non-finite values (stat_smooth).</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Warning: Removed 7 rows containing non-finite values (`stat_smooth()`).</span></span></code></pre>
 <p><img src="4th-down-research_files/figure-html/wp-1.png" width="7200"></p>
 <p>When do teams start going for it?</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -1325,7 +1339,7 @@
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">5</span>, y <span class="op">=</span> <span class="fl">45</span>, label <span class="op">=</span> <span class="st">"Q2/Q3"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">5</span>, y <span class="op">=</span> <span class="fl">90</span>, label <span class="op">=</span> <span class="st">"Q4"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using method = 'gam'</span></span>
-<span><span class="co">#&gt; Warning: Removed 41 rows containing non-finite values (stat_smooth).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 41 rows containing non-finite values (`stat_smooth()`).</span></span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/unnamed-chunk-2-1.png" width="1152"></p>
 </div>
 <div class="section level2">
@@ -1363,12 +1377,12 @@
 <h3 id="worst-playoff-games-in-terms-of-total-wp-loss">Worst playoff games in terms of total WP loss<a class="anchor" aria-label="anchor" href="#worst-playoff-games-in-terms-of-total-wp-loss"></a>
 </h3>
 <p>The worst playoff games since 2014 in terms of total win probability lost by conservative decisions on 4th downs. Five of these happened in 2020!</p>
-<div id="wosadnudny" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ltlzqurdqu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#wosadnudny .gt_table {
+#ltlzqurdqu .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1393,7 +1407,7 @@
   border-left-color: #D3D3D3;
 }
 
-#wosadnudny .gt_heading {
+#ltlzqurdqu .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -1405,7 +1419,12 @@
   border-right-color: #D3D3D3;
 }
 
-#wosadnudny .gt_title {
+#ltlzqurdqu .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ltlzqurdqu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1417,7 +1436,7 @@
   border-bottom-width: 0;
 }
 
-#wosadnudny .gt_subtitle {
+#ltlzqurdqu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1429,13 +1448,13 @@
   border-top-width: 0;
 }
 
-#wosadnudny .gt_bottom_border {
+#ltlzqurdqu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wosadnudny .gt_col_headings {
+#ltlzqurdqu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1450,7 +1469,7 @@
   border-right-color: #D3D3D3;
 }
 
-#wosadnudny .gt_col_heading {
+#ltlzqurdqu .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1470,7 +1489,7 @@
   overflow-x: hidden;
 }
 
-#wosadnudny .gt_column_spanner_outer {
+#ltlzqurdqu .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1482,15 +1501,15 @@
   padding-right: 4px;
 }
 
-#wosadnudny .gt_column_spanner_outer:first-child {
+#ltlzqurdqu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wosadnudny .gt_column_spanner_outer:last-child {
+#ltlzqurdqu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wosadnudny .gt_column_spanner {
+#ltlzqurdqu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1502,7 +1521,7 @@
   width: 100%;
 }
 
-#wosadnudny .gt_group_heading {
+#ltlzqurdqu .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1525,9 +1544,10 @@
   border-right-width: 1px;
   border-right-color: #D3D3D3;
   vertical-align: middle;
+  text-align: left;
 }
 
-#wosadnudny .gt_empty_group_heading {
+#ltlzqurdqu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -1542,15 +1562,15 @@
   vertical-align: middle;
 }
 
-#wosadnudny .gt_from_md > :first-child {
+#ltlzqurdqu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wosadnudny .gt_from_md > :last-child {
+#ltlzqurdqu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wosadnudny .gt_row {
+#ltlzqurdqu .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -1569,7 +1589,7 @@
   overflow-x: hidden;
 }
 
-#wosadnudny .gt_stub {
+#ltlzqurdqu .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1582,7 +1602,7 @@
   padding-right: 5px;
 }
 
-#wosadnudny .gt_stub_row_group {
+#ltlzqurdqu .gt_stub_row_group {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1596,11 +1616,11 @@
   vertical-align: top;
 }
 
-#wosadnudny .gt_row_group_first td {
+#ltlzqurdqu .gt_row_group_first td {
   border-top-width: 3px;
 }
 
-#wosadnudny .gt_summary_row {
+#ltlzqurdqu .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1610,16 +1630,16 @@
   padding-right: 5px;
 }
 
-#wosadnudny .gt_first_summary_row {
+#ltlzqurdqu .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#wosadnudny .gt_first_summary_row.thick {
+#ltlzqurdqu .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#wosadnudny .gt_last_summary_row {
+#ltlzqurdqu .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1629,7 +1649,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#wosadnudny .gt_grand_summary_row {
+#ltlzqurdqu .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1639,7 +1659,7 @@
   padding-right: 5px;
 }
 
-#wosadnudny .gt_first_grand_summary_row {
+#ltlzqurdqu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1649,11 +1669,11 @@
   border-top-color: #D3D3D3;
 }
 
-#wosadnudny .gt_striped {
+#ltlzqurdqu .gt_striped {
   background-color: #FFFFFF;
 }
 
-#wosadnudny .gt_table_body {
+#ltlzqurdqu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1662,7 +1682,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#wosadnudny .gt_footnotes {
+#ltlzqurdqu .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1676,7 +1696,7 @@
   border-right-color: #D3D3D3;
 }
 
-#wosadnudny .gt_footnote {
+#ltlzqurdqu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1685,7 +1705,7 @@
   padding-right: 5px;
 }
 
-#wosadnudny .gt_sourcenotes {
+#ltlzqurdqu .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1699,7 +1719,7 @@
   border-right-color: #D3D3D3;
 }
 
-#wosadnudny .gt_sourcenote {
+#ltlzqurdqu .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1707,64 +1727,64 @@
   padding-right: 5px;
 }
 
-#wosadnudny .gt_left {
+#ltlzqurdqu .gt_left {
   text-align: left;
 }
 
-#wosadnudny .gt_center {
+#ltlzqurdqu .gt_center {
   text-align: center;
 }
 
-#wosadnudny .gt_right {
+#ltlzqurdqu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wosadnudny .gt_font_normal {
+#ltlzqurdqu .gt_font_normal {
   font-weight: normal;
 }
 
-#wosadnudny .gt_font_bold {
+#ltlzqurdqu .gt_font_bold {
   font-weight: bold;
 }
 
-#wosadnudny .gt_font_italic {
+#ltlzqurdqu .gt_font_italic {
   font-style: italic;
 }
 
-#wosadnudny .gt_super {
+#ltlzqurdqu .gt_super {
   font-size: 65%;
 }
 
-#wosadnudny .gt_footnote_marks {
+#ltlzqurdqu .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#wosadnudny .gt_asterisk {
+#ltlzqurdqu .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#wosadnudny .gt_indent_1 {
+#ltlzqurdqu .gt_indent_1 {
   text-indent: 5px;
 }
 
-#wosadnudny .gt_indent_2 {
+#ltlzqurdqu .gt_indent_2 {
   text-indent: 10px;
 }
 
-#wosadnudny .gt_indent_3 {
+#ltlzqurdqu .gt_indent_3 {
   text-indent: 15px;
 }
 
-#wosadnudny .gt_indent_4 {
+#ltlzqurdqu .gt_indent_4 {
   text-indent: 20px;
 }
 
-#wosadnudny .gt_indent_5 {
+#ltlzqurdqu .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1787,159 +1807,159 @@
 <td colspan="12" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Win probability lost by kicking in playoff games, 2014-2020</td>
     </tr></thead>
 <thead class="gt_col_headings"><tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col"> </th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Team</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Opp</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Season</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Week</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">WP Lost</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col"> </th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Team</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Opp</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Season</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">Week</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col">WP Lost</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id=" "> </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Team">Team</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Opp">Opp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Season">Season</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Week">Week</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="WP Lost">WP Lost</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id=" "> </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Team">Team</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Opp">Opp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Season">Season</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="Week">Week</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id="WP Lost">WP Lost</th>
     </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td class="gt_row gt_center">1</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2019</td>
-<td class="gt_row gt_center">WC</td>
-<td class="gt_row gt_center">18.0</td>
-<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">11</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2018</td>
-<td class="gt_row gt_center">CONF</td>
-<td class="gt_row gt_center">12.4</td>
+<td headers="rank" class="gt_row gt_center">1</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center">2019</td>
+<td headers="week" class="gt_row gt_center">WC</td>
+<td headers="go" class="gt_row gt_center">18.0</td>
+<td headers="rank1" class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">11</td>
+<td headers="posteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center">2018</td>
+<td headers="week1" class="gt_row gt_center">CONF</td>
+<td headers="go1" class="gt_row gt_center">12.4</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">2</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2014</td>
-<td class="gt_row gt_center gt_striped">WC</td>
-<td class="gt_row gt_center gt_striped">14.8</td>
-<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">12</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TB.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2020</td>
-<td class="gt_row gt_center gt_striped">DIV</td>
-<td class="gt_row gt_center gt_striped">12.4</td>
+<td headers="rank" class="gt_row gt_center gt_striped">2</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center gt_striped">2014</td>
+<td headers="week" class="gt_row gt_center gt_striped">WC</td>
+<td headers="go" class="gt_row gt_center gt_striped">14.8</td>
+<td headers="rank1" class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">12</td>
+<td headers="posteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TB.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NO.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center gt_striped">2020</td>
+<td headers="week1" class="gt_row gt_center gt_striped">DIV</td>
+<td headers="go1" class="gt_row gt_center gt_striped">12.4</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">3</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/IND.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2014</td>
-<td class="gt_row gt_center">DIV</td>
-<td class="gt_row gt_center">13.8</td>
-<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">13</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/KC.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2020</td>
-<td class="gt_row gt_center">CONF</td>
-<td class="gt_row gt_center">11.3</td>
+<td headers="rank" class="gt_row gt_center">3</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/IND.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center">2014</td>
+<td headers="week" class="gt_row gt_center">DIV</td>
+<td headers="go" class="gt_row gt_center">13.8</td>
+<td headers="rank1" class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">13</td>
+<td headers="posteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/KC.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center">2020</td>
+<td headers="week1" class="gt_row gt_center">CONF</td>
+<td headers="go1" class="gt_row gt_center">11.3</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">4</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2020</td>
-<td class="gt_row gt_center gt_striped">WC</td>
-<td class="gt_row gt_center gt_striped">13.0</td>
-<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">14</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2014</td>
-<td class="gt_row gt_center gt_striped">CONF</td>
-<td class="gt_row gt_center gt_striped">10.7</td>
+<td headers="rank" class="gt_row gt_center gt_striped">4</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center gt_striped">2020</td>
+<td headers="week" class="gt_row gt_center gt_striped">WC</td>
+<td headers="go" class="gt_row gt_center gt_striped">13.0</td>
+<td headers="rank1" class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">14</td>
+<td headers="posteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center gt_striped">2014</td>
+<td headers="week1" class="gt_row gt_center gt_striped">CONF</td>
+<td headers="go1" class="gt_row gt_center gt_striped">10.7</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">5</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2018</td>
-<td class="gt_row gt_center">SB</td>
-<td class="gt_row gt_center">12.7</td>
-<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">15</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2017</td>
-<td class="gt_row gt_center">WC</td>
-<td class="gt_row gt_center">10.2</td>
+<td headers="rank" class="gt_row gt_center">5</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center">2018</td>
+<td headers="week" class="gt_row gt_center">SB</td>
+<td headers="go" class="gt_row gt_center">12.7</td>
+<td headers="rank1" class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">15</td>
+<td headers="posteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center">2017</td>
+<td headers="week1" class="gt_row gt_center">WC</td>
+<td headers="go1" class="gt_row gt_center">10.2</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">6</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2020</td>
-<td class="gt_row gt_center gt_striped">WC</td>
-<td class="gt_row gt_center gt_striped">12.7</td>
-<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">16</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2020</td>
-<td class="gt_row gt_center gt_striped">WC</td>
-<td class="gt_row gt_center gt_striped">9.9</td>
+<td headers="rank" class="gt_row gt_center gt_striped">6</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center gt_striped">2020</td>
+<td headers="week" class="gt_row gt_center gt_striped">WC</td>
+<td headers="go" class="gt_row gt_center gt_striped">12.7</td>
+<td headers="rank1" class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">16</td>
+<td headers="posteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center gt_striped">2020</td>
+<td headers="week1" class="gt_row gt_center gt_striped">WC</td>
+<td headers="go1" class="gt_row gt_center gt_striped">9.9</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">7</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CHI.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2018</td>
-<td class="gt_row gt_center">WC</td>
-<td class="gt_row gt_center">12.6</td>
-<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">17</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NYG.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2016</td>
-<td class="gt_row gt_center">WC</td>
-<td class="gt_row gt_center">9.8</td>
+<td headers="rank" class="gt_row gt_center">7</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CHI.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center">2018</td>
+<td headers="week" class="gt_row gt_center">WC</td>
+<td headers="go" class="gt_row gt_center">12.6</td>
+<td headers="rank1" class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">17</td>
+<td headers="posteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NYG.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/GB.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center">2016</td>
+<td headers="week1" class="gt_row gt_center">WC</td>
+<td headers="go1" class="gt_row gt_center">9.8</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">8</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CIN.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2021</td>
-<td class="gt_row gt_center gt_striped">NA</td>
-<td class="gt_row gt_center gt_striped">12.5</td>
-<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">18</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LAC.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2018</td>
-<td class="gt_row gt_center gt_striped">WC</td>
-<td class="gt_row gt_center gt_striped">9.7</td>
+<td headers="rank" class="gt_row gt_center gt_striped">8</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/CIN.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center gt_striped">2021</td>
+<td headers="week" class="gt_row gt_center gt_striped">NA</td>
+<td headers="go" class="gt_row gt_center gt_striped">12.5</td>
+<td headers="rank1" class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">18</td>
+<td headers="posteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LAC.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center gt_striped">2018</td>
+<td headers="week1" class="gt_row gt_center gt_striped">WC</td>
+<td headers="go1" class="gt_row gt_center gt_striped">9.7</td>
 </tr>
 <tr>
-<td class="gt_row gt_center">9</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2017</td>
-<td class="gt_row gt_center">CONF</td>
-<td class="gt_row gt_center">12.5</td>
-<td class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">19</td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
-<td class="gt_row gt_center">2017</td>
-<td class="gt_row gt_center">WC</td>
-<td class="gt_row gt_center">9.1</td>
+<td headers="rank" class="gt_row gt_center">9</td>
+<td headers="posteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center">2017</td>
+<td headers="week" class="gt_row gt_center">CONF</td>
+<td headers="go" class="gt_row gt_center">12.5</td>
+<td headers="rank1" class="gt_row gt_center" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">19</td>
+<td headers="posteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center">2017</td>
+<td headers="week1" class="gt_row gt_center">WC</td>
+<td headers="go1" class="gt_row gt_center">9.1</td>
 </tr>
 <tr>
-<td class="gt_row gt_center gt_striped">10</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DET.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2014</td>
-<td class="gt_row gt_center gt_striped">WC</td>
-<td class="gt_row gt_center gt_striped">12.4</td>
-<td class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">20</td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
-<td class="gt_row gt_center gt_striped">2018</td>
-<td class="gt_row gt_center gt_striped">SB</td>
-<td class="gt_row gt_center gt_striped">8.8</td>
+<td headers="rank" class="gt_row gt_center gt_striped">10</td>
+<td headers="posteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DET.png" style="height:30px;"></td>
+<td headers="defteam" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png" style="height:30px;"></td>
+<td headers="season" class="gt_row gt_center gt_striped">2014</td>
+<td headers="week" class="gt_row gt_center gt_striped">WC</td>
+<td headers="go" class="gt_row gt_center gt_striped">12.4</td>
+<td headers="rank1" class="gt_row gt_center gt_striped" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: #BBBBBB;">20</td>
+<td headers="posteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/LA.png" style="height:30px;"></td>
+<td headers="defteam1" class="gt_row gt_center gt_striped"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/NE.png" style="height:30px;"></td>
+<td headers="season1" class="gt_row gt_center gt_striped">2018</td>
+<td headers="week1" class="gt_row gt_center gt_striped">SB</td>
+<td headers="go1" class="gt_row gt_center gt_striped">8.8</td>
 </tr>
 </tbody>
 </table>
@@ -1966,7 +1986,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
