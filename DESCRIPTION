@@ -1,6 +1,6 @@
 Package: nfl4th
 Title: Functions to Calculate Optimal Fourth Down Decisions in the National Football League
-Version: 1.0.2.9005
+Version: 1.0.2.9006
 Authors@R: 
     c(person(given = "Ben",
              family = "Baldwin",
@@ -43,7 +43,6 @@ Suggests:
     nflplotR,
     rmarkdown,
     tictoc,
-    tidyverse,
     testthat (>= 2.0.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
