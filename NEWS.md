@@ -5,6 +5,7 @@
 * Required data isn't loaded directly with the package. Instead the download is triggered when necessary and cached in a local package cache. The cache can be cleared with the new function `nfl4th_clear_cache()`. The package resets the cache partly when loaded. This can be prevented with `options(nfl4th.keep_games = TRUE)`.
 * Update win probability model. Instead of only using `nflfastR`, it stacks `nflfastR` with another model
 * Fixup cache paths.
+* Remove tidyverse from Suggests
 
 # nfl4th 1.0.2
 
