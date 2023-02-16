@@ -37,7 +37,7 @@ jobs:
         run: |
           options(install.packages.check.source = "no")
           remotes::install_deps(dependencies = TRUE, type = "binary")
-          install.packages(c("pkgdown", "ggtext", "DescTools", "ggthemes", "magick", "cowplot", "ggpmisc", "teamcolors", "patchwork"), type = "binary")
+          install.packages(c("pkgdown", "ggtext", "DescTools", "ggthemes", "magick", "cowplot", "ggpmisc", "teamcolors", "patchwork", "tidyverse"), type = "binary")
         shell: Rscript {0}
 
       - name: Install package
