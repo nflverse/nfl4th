@@ -63,7 +63,7 @@ add_gt_options <- function(gt_data) {
 We begin by demonstrating the use of `nfl4th` to load all seasons for which 4th down calculations are available in one line of code.
 
 ```{r data2020, message = FALSE}
-pbp <- nfl4th::load_4th_pbp(2014:2021, fast = T) %>%
+pbp <- nfl4th::load_4th_pbp(2014:2022, fast = T) %>%
   filter(down == 4)
 ```
 
@@ -597,7 +597,7 @@ pbp %>%
   theme_ben +
   labs(x = "Win probability prior to play",
        y = "Go-for-it percentage",
-       subtitle = glue::glue("Expected WP gain at least 2 percentage points | 2014 - 2021"),
+       subtitle = glue::glue("Expected WP gain at least 2 percentage points | 2014 - 2022"),
        title = my_title) +
   theme(
     plot.title = element_markdown(size = 22, hjust = 0.5),
@@ -944,7 +944,7 @@ d %>%
       align = "center"
     ) %>% 
     tab_header(
-      title = md(glue::glue("Win probability lost by kicking in playoff games, 2014-2020"))
+      title = md(glue::glue("Win probability lost by kicking in playoff games, 2014-2022"))
     ) %>%
     tab_style(
       style = cell_borders(
