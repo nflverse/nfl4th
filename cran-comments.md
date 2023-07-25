@@ -2,7 +2,8 @@
 
 This is a minor release that
 
-* Fixes HTML validation problem notes associated with switch to HTML5 for documentation
+* Uses cache to allow the package to function without internet.
+* Removes tidyverse from Suggests
 
 ## Test environments
 * Windows Server 2022, R-devel, 64 bit
