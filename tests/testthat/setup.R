@@ -3,7 +3,7 @@
 
 current_threads <- data.table::getDTthreads()
 data.table::setDTthreads(2)
-testthat::teardown_env(data.table::setDTthreads(current_threads))
+withr::defer(data.table::setDTthreads(current_threads), testthat::teardown_env())
 
 play <-
   tibble::tibble(
