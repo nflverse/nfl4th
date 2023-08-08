@@ -1,5 +1,3 @@
-source("helper.R")
-
 test_that("Calculate one play: GB", {
 
   probs <- nfl4th::add_4th_probs(play)
