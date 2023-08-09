@@ -38,12 +38,14 @@ Imports:
     tidyselect,
     xgboost
 Suggests: 
+    data.table,
     future,
     gt,
     nflplotR,
     rmarkdown,
     tictoc,
-    testthat (>= 2.0.0)
+    testthat (>= 2.0.0),
+    withr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
