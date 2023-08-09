@@ -16,6 +16,7 @@ A table showing the probabilities associated with each possible choice.
 Get a table with the probabilities associated with a 2-pt decision.
 }
 \examples{
+\donttest{
 play <-
   tibble::tibble(
     # things to help find the right game (use "reg" or "post")
@@ -37,5 +38,5 @@ play <-
 
 probs <- nfl4th::add_2pt_probs(play)
 nfl4th::make_2pt_table_data(probs)
-
+}
 }
