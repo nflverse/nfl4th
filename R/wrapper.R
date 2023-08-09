@@ -109,9 +109,10 @@ add_4th_probs <- function(df) {
 #' @export
 #' @examples
 #' \donttest{
+#' try({# Wrap in try to avoid CRAN test problems
 #' probs <- load_4th_pbp(2019:2020)
-#'
 #' dplyr::glimpse(probs)
+#' })
 #' \dontshow{
 #' # Close open connections for R CMD Check
 #' future::plan("sequential")
@@ -182,6 +183,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' }
 #' @export
 #' @examples
+#' \donttest{
 #' play <-
 #'   tibble::tibble(
 #'     # things to help find the right game (use "reg" or "post")
@@ -204,6 +206,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' probs <- nfl4th::add_2pt_probs(play)
 #'
 #' dplyr::glimpse(probs)
+#' }
 add_2pt_probs <- function(df) {
 
   original_df <- df %>% mutate(index = 1 : n())
