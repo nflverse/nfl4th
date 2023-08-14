@@ -82,6 +82,7 @@ make_table_data <- function(probs) {
 #' @return A table showing the probabilities associated with each possible choice.
 #' @export
 #' @examples
+#' \donttest{
 #' play <-
 #'   tibble::tibble(
 #'     # things to help find the right game (use "reg" or "post")
@@ -103,7 +104,7 @@ make_table_data <- function(probs) {
 #'
 #' probs <- nfl4th::add_2pt_probs(play)
 #' nfl4th::make_2pt_table_data(probs)
-#'
+#' }
 make_2pt_table_data <- function(probs) {
 
   go <- tibble::tibble(

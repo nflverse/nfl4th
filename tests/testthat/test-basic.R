@@ -1,6 +1,8 @@
-source("helper.R")
-
 test_that("Calculate one play: GB", {
+
+  # add_4th_probs relies on downloads. Better skip this on cran
+  # it is just pain to do on their machines
+  testthat::skip_on_cran()
 
   probs <- nfl4th::add_4th_probs(play)
 
@@ -10,6 +12,10 @@ test_that("Calculate one play: GB", {
 })
 
 test_that("Make the table: GB", {
+
+  # add_4th_probs relies on downloads. Better skip this on cran
+  # it is just pain to do on their machines
+  testthat::skip_on_cran()
 
   probs <- nfl4th::add_4th_probs(play)
   table <- nfl4th::make_table_data(probs)
