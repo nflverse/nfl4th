@@ -27,6 +27,7 @@ Get various probabilities associated with each option on PATs (go
 for it, kick PAT).
 }
 \examples{
+\donttest{
 play <-
   tibble::tibble(
     # things to help find the right game (use "reg" or "post")
@@ -49,4 +50,5 @@ play <-
 probs <- nfl4th::add_2pt_probs(play)
 
 dplyr::glimpse(probs)
+}
 }

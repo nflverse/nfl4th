@@ -1,4 +1,4 @@
-# nfl4th (development version)
+# nfl4th 1.0.3
 
 * Re-export xgboost models to get rid of annoying warning message
 * Tweak how close to end of game it will calculate probabilities
