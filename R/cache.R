@@ -1,9 +1,9 @@
 # paths are defined in zzz.R
 # these helpers read games or fd_model and save them to a package cache
 
-nfl4th_games_path <- function()   file.path(rappdirs::user_cache_dir("nfl4th", "nflverse"), "games_nfl4th.rds")
-nfl4th_fdmodel_path <- function() file.path(rappdirs::user_cache_dir("nfl4th", "nflverse"), "fd_model.rds")
-nfl4th_wpmodel_path <- function() file.path(rappdirs::user_cache_dir("nfl4th", "nflverse"), "wp_model.rds")
+nfl4th_games_path <- function()   file.path(R_user_dir("nfl4th", "cache"), "games_nfl4th.rds")
+nfl4th_fdmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "fd_model.rds")
+nfl4th_wpmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
 
 .games_nfl4th <- function(){
   if (!file.exists(nfl4th_games_path())){

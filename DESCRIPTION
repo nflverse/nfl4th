@@ -1,6 +1,6 @@
 Package: nfl4th
 Title: Functions to Calculate Optimal Fourth Down Decisions in the National Football League
-Version: 1.0.3
+Version: 1.0.4
 Authors@R: 
     c(person(given = "Ben",
              family = "Baldwin",
@@ -19,6 +19,7 @@ BugReports: https://github.com/nflverse/nfl4th/issues
 Depends: 
     R (>= 3.6)
 Imports: 
+    backports (>= 1.1.6),
     curl,
     dplyr,
     glue,
@@ -30,7 +31,6 @@ Imports:
     nflfastR (>= 4.0.0),
     nflreadr,
     purrr,
-    rappdirs,
     rlang,
     stringr,
     tibble,

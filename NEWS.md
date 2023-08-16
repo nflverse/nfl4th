@@ -1,3 +1,7 @@
+# nfl4th 1.0.4
+
+* Create package cache directory with `tools::R_user_dir()` because CRAN doesn't like `rappdirs::user_cache_dir()`
+
 # nfl4th 1.0.3
 
 * Re-export xgboost models to get rid of annoying warning message
