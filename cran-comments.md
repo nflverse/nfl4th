@@ -1,9 +1,6 @@
 ## Release summary
 
-This is a minor release that
-
-* Uses cache to allow the package to function without internet.
-* Removes tidyverse from Suggests
+Create user cache directory with tools instead of rappdirs
 
 ## Test environments
 * Windows Server 2022, R-devel, 64 bit
