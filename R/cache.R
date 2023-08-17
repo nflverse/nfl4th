@@ -6,7 +6,7 @@ nfl4th_fdmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "fd_m
 nfl4th_wpmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
 
 .games_nfl4th <- function(){
-  if (probably_cran()) return(get_games_file())
+  if (probably_cran() && !force_cache()) return(get_games_file())
   if (!file.exists(nfl4th_games_path())){
     saveRDS(get_games_file(), nfl4th_games_path())
   }
@@ -14,7 +14,7 @@ nfl4th_wpmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "wp_m
 }
 
 fd_model <- function(){
-  if (probably_cran()) return(load_fd_model())
+  if (probably_cran() && !force_cache()) return(load_fd_model())
   if (!file.exists(nfl4th_fdmodel_path())){
     saveRDS(load_fd_model(), nfl4th_fdmodel_path())
   }
@@ -22,7 +22,7 @@ fd_model <- function(){
 }
 
 wp_model <- function(){
-  if (probably_cran()) return(load_wp_model())
+  if (probably_cran() && !force_cache()) return(load_wp_model())
   if (!file.exists(nfl4th_wpmodel_path())){
     saveRDS(load_wp_model(), nfl4th_wpmodel_path())
   }
@@ -63,4 +63,9 @@ probably_cran <- function(){
     "_R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_", NA_character_
     )
   !is.na(cpu_threshold)
+}
+
+# allow user to force the cache even if probably_cran() is TRUE
+force_cache <- function() {
+  getOption("nfl4th.force_cache", "false") == "true"
 }
