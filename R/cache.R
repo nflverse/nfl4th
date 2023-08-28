@@ -1,11 +1,12 @@
 # paths are defined in zzz.R
 # these helpers read games or fd_model and save them to a package cache
 
-nfl4th_games_path <- function()   file.path(rappdirs::user_cache_dir("nfl4th", "nflverse"), "games_nfl4th.rds")
-nfl4th_fdmodel_path <- function() file.path(rappdirs::user_cache_dir("nfl4th", "nflverse"), "fd_model.rds")
-nfl4th_wpmodel_path <- function() file.path(rappdirs::user_cache_dir("nfl4th", "nflverse"), "wp_model.rds")
+nfl4th_games_path <- function()   file.path(R_user_dir("nfl4th", "cache"), "games_nfl4th.rds")
+nfl4th_fdmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "fd_model.rds")
+nfl4th_wpmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
 
 .games_nfl4th <- function(){
+  if (probably_cran() && !force_cache()) return(get_games_file())
   if (!file.exists(nfl4th_games_path())){
     saveRDS(get_games_file(), nfl4th_games_path())
   }
@@ -13,6 +14,7 @@ nfl4th_wpmodel_path <- function() file.path(rappdirs::user_cache_dir("nfl4th", "
 }
 
 fd_model <- function(){
+  if (probably_cran() && !force_cache()) return(load_fd_model())
   if (!file.exists(nfl4th_fdmodel_path())){
     saveRDS(load_fd_model(), nfl4th_fdmodel_path())
   }
@@ -20,6 +22,7 @@ fd_model <- function(){
 }
 
 wp_model <- function(){
+  if (probably_cran() && !force_cache()) return(load_wp_model())
   if (!file.exists(nfl4th_wpmodel_path())){
     saveRDS(load_wp_model(), nfl4th_wpmodel_path())
   }
@@ -51,4 +54,18 @@ nfl4th_clear_cache <- function(type = c("games", "fd_model", "wp_model", "all"))
   )
   file.remove(to_delete[file.exists(to_delete)])
   invisible(TRUE)
+}
+
+# The env var _R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_ is mostly
+# a CRAN env var. We use it to decide if the code likely is running on CRAN
+probably_cran <- function(){
+  cpu_threshold <- Sys.getenv(
+    "_R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_", NA_character_
+    )
+  !is.na(cpu_threshold)
+}
+
+# allow user to force the cache even if probably_cran() is TRUE
+force_cache <- function() {
+  getOption("nfl4th.force_cache", "false") == "true"
 }
