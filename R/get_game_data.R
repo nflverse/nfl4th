@@ -94,9 +94,10 @@ get_4th_plays <- function(gid) {
             play_min = if_else(is.na(play_min) & !is.na(play_time), as.integer(0), play_min),
             play_sec = substr(play_time, nchar(play_time) - 1, nchar(play_time)) %>% as.integer(),
             mins = if_else(nchar(time) == 5, substr(time, 1, 2), substr(time, 1, 1)) %>% as.integer(),
-            secs = if_else(nchar(time) == 5, substr(time, 4, 5), substr(time, 3, 4)) %>% as.integer(),
-            mins = if_else(is.na(play_min), mins, play_min),
-            secs = if_else(is.na(play_sec), secs, play_sec)
+            secs = if_else(nchar(time) == 5, substr(time, 4, 5), substr(time, 3, 4)) %>% as.integer()
+            # trying to fix wacky behavior 9/2023
+            # mins = if_else(is.na(play_min), mins, play_min),
+            # secs = if_else(is.na(play_sec), secs, play_sec)
           ) %>%
           arrange(qtr, desc(mins), desc(secs), id) %>%
           dplyr::mutate(
