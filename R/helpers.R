@@ -31,7 +31,12 @@ get_games_file <- function() {
     filter(season > 2013) %>%
     mutate(
       type = if_else(game_type == "REG", "reg", "post"),
-      model_roof = if_else(roof == "open" | roof == "closed" | is.na(roof), "retractable", roof),
+      model_roof = case_when(
+        roof == "open" | roof == "closed" | is.na(roof) ~ "retractable",
+        roof == "retractable" ~ "retractable",
+        roof == "dome" ~ "dome",
+        TRUE ~ "outdoors"
+        ),
       # for EP model: don't use this for games earlier than 2014
       era0 = 0, era1 = 0, era2 = 0,
       era3 = dplyr::if_else(season > 2013 & season <= 2017, 1, 0),
