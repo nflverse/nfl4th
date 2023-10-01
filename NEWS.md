@@ -1,5 +1,7 @@
 # nfl4th (development version)
 
+* Stop letting roof break things
+
 # nfl4th 1.0.4
 
 * Create package cache directory with `tools::R_user_dir()` because CRAN doesn't like `rappdirs::user_cache_dir()`
