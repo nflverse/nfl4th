@@ -1,6 +1,6 @@
 `%>%`<-magrittr::`%>%`
 
-s <- nflfastR:::most_recent_season()
+s <- nflreadr::most_recent_season()
 
 pbp <- nfl4th::load_4th_pbp(2014:s)
 
