@@ -48,7 +48,11 @@ get_games_file <- function() {
       retractable = dplyr::if_else(model_roof == 'retractable', 1, 0),
       dome = dplyr::if_else(model_roof == 'dome', 1, 0),
       outdoors = dplyr::if_else(model_roof == 'outdoors', 1, 0),
-      roof = model_roof
+      roof = model_roof,
+      espn = dplyr::case_when(
+        game_id == "2023_22_SF_KC" ~ "401547378",
+        TRUE ~ espn
+      )
     ) %>%
     dplyr::mutate_at(dplyr::vars("home_team", "away_team"), team_name_fn) %>%
     dplyr::select(
