@@ -23,7 +23,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
-            local:.,
+            local::.,
             callr
           extra-packages: nflverse/nflverse-data
 
