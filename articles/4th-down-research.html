@@ -12,21 +12,19 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="4th down research">
-<meta property="og:description" content="nfl4th">
-<meta property="og:image" content="https://www.nfl4th.com/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -63,13 +61,13 @@
 <li>
   <a href="http://twitter.com/ben_bot_baldwin" class="external-link">
     <span class="fab fa-twitter fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
   <a href="https://github.com/nflverse/nfl4th/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -80,7 +78,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -90,7 +88,7 @@
 Baldwin</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nflverse/nfl4th/blob/HEAD/vignettes/articles/4th-down-research.Rmd" class="external-link"><code>vignettes/articles/4th-down-research.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nflverse/nfl4th/blob/nfl4th_infrastructure/vignettes/articles/4th-down-research.Rmd" class="external-link"><code>vignettes/articles/4th-down-research.Rmd</code></a></small>
       <div class="hidden name"><code>4th-down-research.Rmd</code></div>
 
     </div>
@@ -155,8 +153,10 @@ in 2020 versus how large the predicted benefit would be.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
-<span><span class="co">#&gt; Warning: Removed 11 rows containing non-finite values (`stat_smooth()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 11 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 11 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_smooth()`).</span></span>
+<span><span class="co">#&gt; Warning: Removed 11 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/league-1.png" width="7200"></p>
 </div>
 <div class="section level3">
@@ -197,23 +197,23 @@ piece on The Athletic</a>:</p>
 <span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_header.html" class="external-link">tab_header</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NFL team decision-making by go recommendation, 2020"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/tab_source_note.html" class="external-link">tab_source_note</a></span><span class="op">(</span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/md.html" class="external-link">md</a></span><span class="op">(</span><span class="st">'**Notes**: "Definitely" recommendations are greater than 4 percentage point advantage,&lt;br&gt; "probably" 1-4 percentage points'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div id="rblzuoaktn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#rblzuoaktn table {
+<div id="lefoodfiee" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lefoodfiee table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#rblzuoaktn thead, #rblzuoaktn tbody, #rblzuoaktn tfoot, #rblzuoaktn tr, #rblzuoaktn td, #rblzuoaktn th {
+#lefoodfiee thead, #lefoodfiee tbody, #lefoodfiee tfoot, #lefoodfiee tr, #lefoodfiee td, #lefoodfiee th {
   border-style: none;
 }
 
-#rblzuoaktn p {
+#lefoodfiee p {
   margin: 0;
   padding: 0;
 }
 
-#rblzuoaktn .gt_table {
+#lefoodfiee .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -239,12 +239,12 @@ piece on The Athletic</a>:</p>
   border-left-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_caption {
+#lefoodfiee .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rblzuoaktn .gt_title {
+#lefoodfiee .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -256,7 +256,7 @@ piece on The Athletic</a>:</p>
   border-bottom-width: 0;
 }
 
-#rblzuoaktn .gt_subtitle {
+#lefoodfiee .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -268,7 +268,7 @@ piece on The Athletic</a>:</p>
   border-top-width: 0;
 }
 
-#rblzuoaktn .gt_heading {
+#lefoodfiee .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -280,13 +280,13 @@ piece on The Athletic</a>:</p>
   border-right-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_bottom_border {
+#lefoodfiee .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_col_headings {
+#lefoodfiee .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -301,7 +301,7 @@ piece on The Athletic</a>:</p>
   border-right-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_col_heading {
+#lefoodfiee .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -321,7 +321,7 @@ piece on The Athletic</a>:</p>
   overflow-x: hidden;
 }
 
-#rblzuoaktn .gt_column_spanner_outer {
+#lefoodfiee .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -333,15 +333,15 @@ piece on The Athletic</a>:</p>
   padding-right: 4px;
 }
 
-#rblzuoaktn .gt_column_spanner_outer:first-child {
+#lefoodfiee .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rblzuoaktn .gt_column_spanner_outer:last-child {
+#lefoodfiee .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rblzuoaktn .gt_column_spanner {
+#lefoodfiee .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -353,11 +353,11 @@ piece on The Athletic</a>:</p>
   width: 100%;
 }
 
-#rblzuoaktn .gt_spanner_row {
+#lefoodfiee .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#rblzuoaktn .gt_group_heading {
+#lefoodfiee .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -383,7 +383,7 @@ piece on The Athletic</a>:</p>
   text-align: left;
 }
 
-#rblzuoaktn .gt_empty_group_heading {
+#lefoodfiee .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -398,15 +398,15 @@ piece on The Athletic</a>:</p>
   vertical-align: middle;
 }
 
-#rblzuoaktn .gt_from_md > :first-child {
+#lefoodfiee .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rblzuoaktn .gt_from_md > :last-child {
+#lefoodfiee .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rblzuoaktn .gt_row {
+#lefoodfiee .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -425,7 +425,7 @@ piece on The Athletic</a>:</p>
   overflow-x: hidden;
 }
 
-#rblzuoaktn .gt_stub {
+#lefoodfiee .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -438,7 +438,7 @@ piece on The Athletic</a>:</p>
   padding-right: 5px;
 }
 
-#rblzuoaktn .gt_stub_row_group {
+#lefoodfiee .gt_stub_row_group {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -452,15 +452,15 @@ piece on The Athletic</a>:</p>
   vertical-align: top;
 }
 
-#rblzuoaktn .gt_row_group_first td {
+#lefoodfiee .gt_row_group_first td {
   border-top-width: 3px;
 }
 
-#rblzuoaktn .gt_row_group_first th {
+#lefoodfiee .gt_row_group_first th {
   border-top-width: 3px;
 }
 
-#rblzuoaktn .gt_summary_row {
+#lefoodfiee .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -470,16 +470,16 @@ piece on The Athletic</a>:</p>
   padding-right: 5px;
 }
 
-#rblzuoaktn .gt_first_summary_row {
+#lefoodfiee .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_first_summary_row.thick {
+#lefoodfiee .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rblzuoaktn .gt_last_summary_row {
+#lefoodfiee .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -489,7 +489,7 @@ piece on The Athletic</a>:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_grand_summary_row {
+#lefoodfiee .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -499,7 +499,7 @@ piece on The Athletic</a>:</p>
   padding-right: 5px;
 }
 
-#rblzuoaktn .gt_first_grand_summary_row {
+#lefoodfiee .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -509,7 +509,7 @@ piece on The Athletic</a>:</p>
   border-top-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_last_grand_summary_row_top {
+#lefoodfiee .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -519,11 +519,11 @@ piece on The Athletic</a>:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_striped {
+#lefoodfiee .gt_striped {
   background-color: #FFFFFF;
 }
 
-#rblzuoaktn .gt_table_body {
+#lefoodfiee .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -532,7 +532,7 @@ piece on The Athletic</a>:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_footnotes {
+#lefoodfiee .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -546,7 +546,7 @@ piece on The Athletic</a>:</p>
   border-right-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_footnote {
+#lefoodfiee .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -555,7 +555,7 @@ piece on The Athletic</a>:</p>
   padding-right: 5px;
 }
 
-#rblzuoaktn .gt_sourcenotes {
+#lefoodfiee .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -569,7 +569,7 @@ piece on The Athletic</a>:</p>
   border-right-color: #D3D3D3;
 }
 
-#rblzuoaktn .gt_sourcenote {
+#lefoodfiee .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -577,64 +577,73 @@ piece on The Athletic</a>:</p>
   padding-right: 5px;
 }
 
-#rblzuoaktn .gt_left {
+#lefoodfiee .gt_left {
   text-align: left;
 }
 
-#rblzuoaktn .gt_center {
+#lefoodfiee .gt_center {
   text-align: center;
 }
 
-#rblzuoaktn .gt_right {
+#lefoodfiee .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rblzuoaktn .gt_font_normal {
+#lefoodfiee .gt_font_normal {
   font-weight: normal;
 }
 
-#rblzuoaktn .gt_font_bold {
+#lefoodfiee .gt_font_bold {
   font-weight: bold;
 }
 
-#rblzuoaktn .gt_font_italic {
+#lefoodfiee .gt_font_italic {
   font-style: italic;
 }
 
-#rblzuoaktn .gt_super {
+#lefoodfiee .gt_super {
   font-size: 65%;
 }
 
-#rblzuoaktn .gt_footnote_marks {
+#lefoodfiee .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#rblzuoaktn .gt_asterisk {
+#lefoodfiee .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rblzuoaktn .gt_indent_1 {
+#lefoodfiee .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rblzuoaktn .gt_indent_2 {
+#lefoodfiee .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rblzuoaktn .gt_indent_3 {
+#lefoodfiee .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rblzuoaktn .gt_indent_4 {
+#lefoodfiee .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rblzuoaktn .gt_indent_5 {
+#lefoodfiee .gt_indent_5 {
   text-indent: 25px;
+}
+
+#lefoodfiee .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#lefoodfiee div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
 }
 </style>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -661,7 +670,7 @@ piece on The Athletic</a>:</p>
 </tr>
 <tr>
 <td headers="type" class="gt_row gt_left">Toss-up</td>
-<td headers="go" class="gt_row gt_center">17</td>
+<td headers="go" class="gt_row gt_center">18</td>
 <td headers="n" class="gt_row gt_center">1717</td>
 </tr>
 <tr>
@@ -676,8 +685,7 @@ piece on The Athletic</a>:</p>
 </tr>
 </tbody>
 <tfoot class="gt_sourcenotes"><tr>
-<td class="gt_sourcenote" colspan="3">
-<strong>Notes</strong>: “Definitely” recommendations are greater than 4 percentage point advantage,<br> “probably” 1-4 percentage points</td>
+<td class="gt_sourcenote" colspan="3"><span class="gt_from_md"><strong>Notes</strong>: “Definitely” recommendations are greater than 4 percentage point advantage,<br> “probably” 1-4 percentage points</span></td>
     </tr></tfoot>
 </table>
 </div>
@@ -725,23 +733,23 @@ lost.</p>
 <span>  <span class="fu">fmt_number</span><span class="op">(</span>columns <span class="op">=</span> <span class="fu">vars</span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span>, decimals <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">cols_align</span><span class="op">(</span>columns <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">tab_header</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Worst kick decisions of 2020"</span><span class="op">)</span></span></code></pre></div>
-<div id="bqajquudoo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bqajquudoo table {
+<div id="wkkeulbfdp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#wkkeulbfdp table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bqajquudoo thead, #bqajquudoo tbody, #bqajquudoo tfoot, #bqajquudoo tr, #bqajquudoo td, #bqajquudoo th {
+#wkkeulbfdp thead, #wkkeulbfdp tbody, #wkkeulbfdp tfoot, #wkkeulbfdp tr, #wkkeulbfdp td, #wkkeulbfdp th {
   border-style: none;
 }
 
-#bqajquudoo p {
+#wkkeulbfdp p {
   margin: 0;
   padding: 0;
 }
 
-#bqajquudoo .gt_table {
+#wkkeulbfdp .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -767,12 +775,12 @@ lost.</p>
   border-left-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_caption {
+#wkkeulbfdp .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bqajquudoo .gt_title {
+#wkkeulbfdp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -784,7 +792,7 @@ lost.</p>
   border-bottom-width: 0;
 }
 
-#bqajquudoo .gt_subtitle {
+#wkkeulbfdp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -796,7 +804,7 @@ lost.</p>
   border-top-width: 0;
 }
 
-#bqajquudoo .gt_heading {
+#wkkeulbfdp .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -808,13 +816,13 @@ lost.</p>
   border-right-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_bottom_border {
+#wkkeulbfdp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_col_headings {
+#wkkeulbfdp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -829,7 +837,7 @@ lost.</p>
   border-right-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_col_heading {
+#wkkeulbfdp .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -849,7 +857,7 @@ lost.</p>
   overflow-x: hidden;
 }
 
-#bqajquudoo .gt_column_spanner_outer {
+#wkkeulbfdp .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -861,15 +869,15 @@ lost.</p>
   padding-right: 4px;
 }
 
-#bqajquudoo .gt_column_spanner_outer:first-child {
+#wkkeulbfdp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bqajquudoo .gt_column_spanner_outer:last-child {
+#wkkeulbfdp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bqajquudoo .gt_column_spanner {
+#wkkeulbfdp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -881,11 +889,11 @@ lost.</p>
   width: 100%;
 }
 
-#bqajquudoo .gt_spanner_row {
+#wkkeulbfdp .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bqajquudoo .gt_group_heading {
+#wkkeulbfdp .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -911,7 +919,7 @@ lost.</p>
   text-align: left;
 }
 
-#bqajquudoo .gt_empty_group_heading {
+#wkkeulbfdp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -926,15 +934,15 @@ lost.</p>
   vertical-align: middle;
 }
 
-#bqajquudoo .gt_from_md > :first-child {
+#wkkeulbfdp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bqajquudoo .gt_from_md > :last-child {
+#wkkeulbfdp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bqajquudoo .gt_row {
+#wkkeulbfdp .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -953,7 +961,7 @@ lost.</p>
   overflow-x: hidden;
 }
 
-#bqajquudoo .gt_stub {
+#wkkeulbfdp .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -966,7 +974,7 @@ lost.</p>
   padding-right: 5px;
 }
 
-#bqajquudoo .gt_stub_row_group {
+#wkkeulbfdp .gt_stub_row_group {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -980,15 +988,15 @@ lost.</p>
   vertical-align: top;
 }
 
-#bqajquudoo .gt_row_group_first td {
+#wkkeulbfdp .gt_row_group_first td {
   border-top-width: 3px;
 }
 
-#bqajquudoo .gt_row_group_first th {
+#wkkeulbfdp .gt_row_group_first th {
   border-top-width: 3px;
 }
 
-#bqajquudoo .gt_summary_row {
+#wkkeulbfdp .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -998,16 +1006,16 @@ lost.</p>
   padding-right: 5px;
 }
 
-#bqajquudoo .gt_first_summary_row {
+#wkkeulbfdp .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_first_summary_row.thick {
+#wkkeulbfdp .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bqajquudoo .gt_last_summary_row {
+#wkkeulbfdp .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1017,7 +1025,7 @@ lost.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_grand_summary_row {
+#wkkeulbfdp .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1027,7 +1035,7 @@ lost.</p>
   padding-right: 5px;
 }
 
-#bqajquudoo .gt_first_grand_summary_row {
+#wkkeulbfdp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1037,7 +1045,7 @@ lost.</p>
   border-top-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_last_grand_summary_row_top {
+#wkkeulbfdp .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1047,11 +1055,11 @@ lost.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_striped {
+#wkkeulbfdp .gt_striped {
   background-color: #FFFFFF;
 }
 
-#bqajquudoo .gt_table_body {
+#wkkeulbfdp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1060,7 +1068,7 @@ lost.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_footnotes {
+#wkkeulbfdp .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1074,7 +1082,7 @@ lost.</p>
   border-right-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_footnote {
+#wkkeulbfdp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1083,7 +1091,7 @@ lost.</p>
   padding-right: 5px;
 }
 
-#bqajquudoo .gt_sourcenotes {
+#wkkeulbfdp .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1097,7 +1105,7 @@ lost.</p>
   border-right-color: #D3D3D3;
 }
 
-#bqajquudoo .gt_sourcenote {
+#wkkeulbfdp .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1105,64 +1113,73 @@ lost.</p>
   padding-right: 5px;
 }
 
-#bqajquudoo .gt_left {
+#wkkeulbfdp .gt_left {
   text-align: left;
 }
 
-#bqajquudoo .gt_center {
+#wkkeulbfdp .gt_center {
   text-align: center;
 }
 
-#bqajquudoo .gt_right {
+#wkkeulbfdp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bqajquudoo .gt_font_normal {
+#wkkeulbfdp .gt_font_normal {
   font-weight: normal;
 }
 
-#bqajquudoo .gt_font_bold {
+#wkkeulbfdp .gt_font_bold {
   font-weight: bold;
 }
 
-#bqajquudoo .gt_font_italic {
+#wkkeulbfdp .gt_font_italic {
   font-style: italic;
 }
 
-#bqajquudoo .gt_super {
+#wkkeulbfdp .gt_super {
   font-size: 65%;
 }
 
-#bqajquudoo .gt_footnote_marks {
+#wkkeulbfdp .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bqajquudoo .gt_asterisk {
+#wkkeulbfdp .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bqajquudoo .gt_indent_1 {
+#wkkeulbfdp .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bqajquudoo .gt_indent_2 {
+#wkkeulbfdp .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bqajquudoo .gt_indent_3 {
+#wkkeulbfdp .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bqajquudoo .gt_indent_4 {
+#wkkeulbfdp .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bqajquudoo .gt_indent_5 {
+#wkkeulbfdp .gt_indent_5 {
   text-indent: 25px;
+}
+
+#wkkeulbfdp .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#wkkeulbfdp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
 }
 </style>
 <table class="table gt_table" style="table-layout: fixed;; width: 0px" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -1359,7 +1376,14 @@ recommendations<a class="anchor" aria-label="anchor" href="#nfl-coaches-are-incr
 <span>    arrow <span class="op">=</span> <span class="fu">arrow</span><span class="op">(</span>length <span class="op">=</span> <span class="fu">unit</span><span class="op">(</span><span class="fl">0.05</span>, <span class="st">"npc"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 24 rows containing non-finite values (`stat_smooth()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning in geom_segment(aes(x = -0.1, y = 80, xend = -2, yend = 80), arrow = arrow(length = unit(0.05, : All aesthetics have length 1, but the data has 5599 rows.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please consider using `annotate()` or provide this layer with data containing</span></span>
+<span><span class="co">#&gt;   a single row.</span></span>
+<span><span class="co">#&gt; Warning in geom_segment(aes(x = 0.1, y = 80, xend = 2, yend = 80), arrow = arrow(length = unit(0.05, : All aesthetics have length 1, but the data has 5599 rows.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please consider using `annotate()` or provide this layer with data containing</span></span>
+<span><span class="co">#&gt;   a single row.</span></span>
+<span><span class="co">#&gt; Warning: Removed 24 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/time-1.png" width="7200"></p>
 <p>For the remainder of this page, the code that generates the tables
 and figures won’t be shown in order to make it more readable, but <a href="https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd" class="external-link">all
@@ -1415,7 +1439,8 @@ the difference isn’t as large as I might have thought.</p>
 go for it when ahead by a lot or trailing by a lot. This makes sense as
 their decision is less likely to make the difference between a win and a
 loss (and thus open the coach up to being blamed for a loss).</p>
-<pre><code><span><span class="co">#&gt; Warning: Removed 7 rows containing non-finite values (`stat_smooth()`).</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Warning: Removed 7 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre>
 <p><img src="4th-down-research_files/figure-html/wp-1.png" width="7200"></p>
 <p>When do teams start going for it?</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -1448,7 +1473,8 @@ loss (and thus open the coach up to being blamed for a loss).</p>
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">5</span>, y <span class="op">=</span> <span class="fl">45</span>, label <span class="op">=</span> <span class="st">"Q2/Q3"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">5</span>, y <span class="op">=</span> <span class="fl">90</span>, label <span class="op">=</span> <span class="st">"Q4"</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using method = 'gam'</span></span>
-<span><span class="co">#&gt; Warning: Removed 47 rows containing non-finite values (`stat_smooth()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 47 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre></div>
 <p><img src="4th-down-research_files/figure-html/unnamed-chunk-2-1.png" width="1152"></p>
 </div>
 <div class="section level2">
@@ -1492,23 +1518,23 @@ the source code here</a>.</p>
 <p>The worst playoff games since 2014 in terms of total win probability
 lost by conservative decisions on 4th downs. Five of these happened in
 2020!</p>
-<div id="wwjzrtsjam" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#wwjzrtsjam table {
+<div id="kadgwxbhis" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kadgwxbhis table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#wwjzrtsjam thead, #wwjzrtsjam tbody, #wwjzrtsjam tfoot, #wwjzrtsjam tr, #wwjzrtsjam td, #wwjzrtsjam th {
+#kadgwxbhis thead, #kadgwxbhis tbody, #kadgwxbhis tfoot, #kadgwxbhis tr, #kadgwxbhis td, #kadgwxbhis th {
   border-style: none;
 }
 
-#wwjzrtsjam p {
+#kadgwxbhis p {
   margin: 0;
   padding: 0;
 }
 
-#wwjzrtsjam .gt_table {
+#kadgwxbhis .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1534,12 +1560,12 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-left-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_caption {
+#kadgwxbhis .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#wwjzrtsjam .gt_title {
+#kadgwxbhis .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1551,7 +1577,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-bottom-width: 0;
 }
 
-#wwjzrtsjam .gt_subtitle {
+#kadgwxbhis .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1563,7 +1589,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-top-width: 0;
 }
 
-#wwjzrtsjam .gt_heading {
+#kadgwxbhis .gt_heading {
   background-color: #F2F2F2;
   text-align: center;
   border-bottom-color: #F2F2F2;
@@ -1575,13 +1601,13 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-right-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_bottom_border {
+#kadgwxbhis .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_col_headings {
+#kadgwxbhis .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1596,7 +1622,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-right-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_col_heading {
+#kadgwxbhis .gt_col_heading {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1616,7 +1642,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   overflow-x: hidden;
 }
 
-#wwjzrtsjam .gt_column_spanner_outer {
+#kadgwxbhis .gt_column_spanner_outer {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1628,15 +1654,15 @@ lost by conservative decisions on 4th downs. Five of these happened in
   padding-right: 4px;
 }
 
-#wwjzrtsjam .gt_column_spanner_outer:first-child {
+#kadgwxbhis .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wwjzrtsjam .gt_column_spanner_outer:last-child {
+#kadgwxbhis .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wwjzrtsjam .gt_column_spanner {
+#kadgwxbhis .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1648,11 +1674,11 @@ lost by conservative decisions on 4th downs. Five of these happened in
   width: 100%;
 }
 
-#wwjzrtsjam .gt_spanner_row {
+#kadgwxbhis .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#wwjzrtsjam .gt_group_heading {
+#kadgwxbhis .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1678,7 +1704,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   text-align: left;
 }
 
-#wwjzrtsjam .gt_empty_group_heading {
+#kadgwxbhis .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #F2F2F2;
@@ -1693,15 +1719,15 @@ lost by conservative decisions on 4th downs. Five of these happened in
   vertical-align: middle;
 }
 
-#wwjzrtsjam .gt_from_md > :first-child {
+#kadgwxbhis .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wwjzrtsjam .gt_from_md > :last-child {
+#kadgwxbhis .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wwjzrtsjam .gt_row {
+#kadgwxbhis .gt_row {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 5px;
@@ -1720,7 +1746,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   overflow-x: hidden;
 }
 
-#wwjzrtsjam .gt_stub {
+#kadgwxbhis .gt_stub {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1733,7 +1759,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   padding-right: 5px;
 }
 
-#wwjzrtsjam .gt_stub_row_group {
+#kadgwxbhis .gt_stub_row_group {
   color: #333333;
   background-color: #F2F2F2;
   font-size: 100%;
@@ -1747,15 +1773,15 @@ lost by conservative decisions on 4th downs. Five of these happened in
   vertical-align: top;
 }
 
-#wwjzrtsjam .gt_row_group_first td {
+#kadgwxbhis .gt_row_group_first td {
   border-top-width: 3px;
 }
 
-#wwjzrtsjam .gt_row_group_first th {
+#kadgwxbhis .gt_row_group_first th {
   border-top-width: 3px;
 }
 
-#wwjzrtsjam .gt_summary_row {
+#kadgwxbhis .gt_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1765,16 +1791,16 @@ lost by conservative decisions on 4th downs. Five of these happened in
   padding-right: 5px;
 }
 
-#wwjzrtsjam .gt_first_summary_row {
+#kadgwxbhis .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_first_summary_row.thick {
+#kadgwxbhis .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#wwjzrtsjam .gt_last_summary_row {
+#kadgwxbhis .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1784,7 +1810,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-bottom-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_grand_summary_row {
+#kadgwxbhis .gt_grand_summary_row {
   color: #333333;
   background-color: #F2F2F2;
   text-transform: inherit;
@@ -1794,7 +1820,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   padding-right: 5px;
 }
 
-#wwjzrtsjam .gt_first_grand_summary_row {
+#kadgwxbhis .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1804,7 +1830,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-top-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_last_grand_summary_row_top {
+#kadgwxbhis .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1814,11 +1840,11 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-bottom-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_striped {
+#kadgwxbhis .gt_striped {
   background-color: #FFFFFF;
 }
 
-#wwjzrtsjam .gt_table_body {
+#kadgwxbhis .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1827,7 +1853,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-bottom-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_footnotes {
+#kadgwxbhis .gt_footnotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1841,7 +1867,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-right-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_footnote {
+#kadgwxbhis .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1850,7 +1876,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   padding-right: 5px;
 }
 
-#wwjzrtsjam .gt_sourcenotes {
+#kadgwxbhis .gt_sourcenotes {
   color: #333333;
   background-color: #F2F2F2;
   border-bottom-style: none;
@@ -1864,7 +1890,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
   border-right-color: #D3D3D3;
 }
 
-#wwjzrtsjam .gt_sourcenote {
+#kadgwxbhis .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1872,64 +1898,73 @@ lost by conservative decisions on 4th downs. Five of these happened in
   padding-right: 5px;
 }
 
-#wwjzrtsjam .gt_left {
+#kadgwxbhis .gt_left {
   text-align: left;
 }
 
-#wwjzrtsjam .gt_center {
+#kadgwxbhis .gt_center {
   text-align: center;
 }
 
-#wwjzrtsjam .gt_right {
+#kadgwxbhis .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wwjzrtsjam .gt_font_normal {
+#kadgwxbhis .gt_font_normal {
   font-weight: normal;
 }
 
-#wwjzrtsjam .gt_font_bold {
+#kadgwxbhis .gt_font_bold {
   font-weight: bold;
 }
 
-#wwjzrtsjam .gt_font_italic {
+#kadgwxbhis .gt_font_italic {
   font-style: italic;
 }
 
-#wwjzrtsjam .gt_super {
+#kadgwxbhis .gt_super {
   font-size: 65%;
 }
 
-#wwjzrtsjam .gt_footnote_marks {
+#kadgwxbhis .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#wwjzrtsjam .gt_asterisk {
+#kadgwxbhis .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#wwjzrtsjam .gt_indent_1 {
+#kadgwxbhis .gt_indent_1 {
   text-indent: 5px;
 }
 
-#wwjzrtsjam .gt_indent_2 {
+#kadgwxbhis .gt_indent_2 {
   text-indent: 10px;
 }
 
-#wwjzrtsjam .gt_indent_3 {
+#kadgwxbhis .gt_indent_3 {
   text-indent: 15px;
 }
 
-#wwjzrtsjam .gt_indent_4 {
+#kadgwxbhis .gt_indent_4 {
   text-indent: 20px;
 }
 
-#wwjzrtsjam .gt_indent_5 {
+#kadgwxbhis .gt_indent_5 {
   text-indent: 25px;
+}
+
+#kadgwxbhis .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#kadgwxbhis div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
 }
 </style>
 <table class="table gt_table" style="table-layout: fixed;; width: 0px" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -1949,7 +1984,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
 </colgroup>
 <thead>
 <tr class="gt_heading">
-<td colspan="12" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Win probability lost by kicking in playoff games, 2014-2022</td>
+<td colspan="12" class="gt_heading gt_title gt_font_normal gt_bottom_border" style><span class="gt_from_md">Win probability lost by kicking in playoff games, 2014-2022</span></td>
     </tr>
 <tr class="gt_col_headings">
 <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #000000; font-weight: bold;" scope="col" id=" "> </th>
@@ -2117,9 +2152,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -2132,16 +2165,16 @@ lost by conservative decisions on 4th downs. Five of these happened in
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

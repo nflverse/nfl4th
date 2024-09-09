@@ -1,57 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://www.nfl4th.com/404.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/articles/4th-down-research.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/articles/nfl4th.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/index.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/add_2pt_probs.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/add_4th_probs.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/get_4th_plays.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/load_4th_pbp.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/make_2pt_table_data.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/make_table_data.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/nfl4th-package.html</loc>
-  </url>
-  <url>
-    <loc>https://www.nfl4th.com/reference/nfl4th_clear_cache.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://www.nfl4th.com/404.html</loc></url>
+<url><loc>https://www.nfl4th.com/LICENSE-text.html</loc></url>
+<url><loc>https://www.nfl4th.com/LICENSE.html</loc></url>
+<url><loc>https://www.nfl4th.com/articles/4th-down-research.html</loc></url>
+<url><loc>https://www.nfl4th.com/articles/index.html</loc></url>
+<url><loc>https://www.nfl4th.com/articles/nfl4th.html</loc></url>
+<url><loc>https://www.nfl4th.com/authors.html</loc></url>
+<url><loc>https://www.nfl4th.com/index.html</loc></url>
+<url><loc>https://www.nfl4th.com/news/index.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/add_2pt_probs.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/add_4th_probs.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/get_4th_plays.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/index.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/load_4th_pbp.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/make_2pt_table_data.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/make_table_data.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/nfl4th-package.html</loc></url>
+<url><loc>https://www.nfl4th.com/reference/nfl4th_clear_cache.html</loc></url>
 </urlset>
+
