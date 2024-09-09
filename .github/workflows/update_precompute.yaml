@@ -25,7 +25,9 @@ jobs:
           packages: |
             local::.,
             callr
-          extra-packages: nflverse/nflverse-data
+          extra-packages: |
+            nflverse/nflverse-data
+            nflverse/nflreadr
 
       - name: Run update script
         run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
