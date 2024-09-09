@@ -129,7 +129,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
     data <- purrr::map_df(seasons, ~{
       message(glue::glue("Loading season {.x}"))
       nflfastR::load_pbp(.x) %>%
-        left_join(readRDS(url("https://github.com/nflverse/nfl4th/blob/master/data-raw/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id")) %>%
+        left_join(readRDS(url("https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id")) %>%
         return()
     })
   } else {
