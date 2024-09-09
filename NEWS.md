@@ -1,7 +1,7 @@
 # nfl4th (development version)
 
 * Stop letting roof break things
-* Hard code ESPN ID for super bowl
+* New location for pre-computed numbers
 
 # nfl4th 1.0.4
 
