@@ -44,7 +44,7 @@ jobs:
           then
             seasons=$( Rscript -e 'nflverse.workflows::get_current_season()' )
           else
-            seasons=$( printf $SEASON_REBUILD )
+            seasons="[$SEASON_REBUILD]"
           fi
           echo "seasons=$seasons" >> "$GITHUB_OUTPUT"
 
