@@ -63,8 +63,8 @@ get_fg_wp <- function(pbp) {
     fg_prob
   ) %>%
     mutate(
-      # don't recommend kicking when fg is over 62 yards (this is very scientific)
-      fg_make_prob = ifelse(yardline_100 > 44, 0, fg_make_prob),
+      # don't recommend kicking when fg is over 63 yards (this is very scientific)
+      fg_make_prob = ifelse(yardline_100 > 45, 0, fg_make_prob),
       # hacky way to not have crazy high probs for long kicks
       # because the bot should be conservative about recommending kicks in this region
       # for 56 through 60 yards
