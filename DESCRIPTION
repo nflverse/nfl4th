@@ -1,6 +1,6 @@
 Package: nfl4th
 Title: Functions to Calculate Optimal Fourth Down Decisions in the National Football League
-Version: 1.0.4.9003
+Version: 1.0.4.9004
 Authors@R: 
     c(person(given = "Ben",
              family = "Baldwin",
