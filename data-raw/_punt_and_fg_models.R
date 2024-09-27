@@ -167,25 +167,20 @@ bind_rows(
 
 # **************************************************************************************
 # field goals
-seasons <- 2014:2019
 
-pbp <- purrr::map_df(seasons, function(x) {
-  readRDS(
-    url(
-      glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds")
-    )
-  ) %>%
+pbp <- nflreadr::load_pbp(2014 : nflreadr::get_current_season()) %>%
     filter(
       play_type_nfl == "FIELD_GOAL"
-    )
-}) %>%
+    ) %>%
   mutate(
-    roof = if_else(roof %in% c("open", "closed"), "retractable", roof),
-    model_roof = as.factor(roof)
+    fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
+    fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
+    fg_model_roof = paste0(fg_roof, fg_era) |> as.factor()
+
   )
 
 #estimate model
-fg_model <- mgcv::bam(sp ~ s(yardline_100, by = interaction(model_roof)) + model_roof,
+fg_model <- mgcv::bam(sp ~ s(yardline_100, by = interaction(fg_model_roof)) + fg_model_roof,
                       data = pbp, family = "binomial")
 
 save(fg_model, file = 'data-raw/fg_model.Rdata')
