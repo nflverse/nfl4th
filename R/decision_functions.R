@@ -71,7 +71,7 @@ get_fg_wp <- function(pbp) {
   ) %>%
     mutate(
       # linear drop from prob at 58 yards (40 yard line) to 0 at 71 (53 yard line)
-      # example: kick at 44 yard line (62 yard FG) has 69% chance of what a 58 yard FG has (42 yard line)
+      # example: kick at 44 yard line (62 yard FG) has 69% chance of what a 58 yard FG has (40 yard line)
       # this is very hacky but selection bias in kicks makes long FG hard
       scalar = (53 - yardline_100) / 13,
       fg_make_prob = ifelse(yardline_100 > 40, scalar * fg_make_prob_58, fg_make_prob),
