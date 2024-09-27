@@ -2,7 +2,7 @@
 
 * Stop letting roof break things
 * New location for pre-computed numbers
-* Re-work field goal model. Takes into account improvements in accuracy (especially on long kicks) and gives probability > 0 on kicks of up to 70 yards
+* Re-work field goal model. Takes into account improvements in accuracy (especially on long kicks) and gives probability > 0 on kicks of over 70 yards
 
 # nfl4th 1.0.4
 
