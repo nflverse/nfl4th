@@ -60,7 +60,7 @@ get_fg_wp <- function(pbp) {
 
   # probability 58 yard field goal is made in environment (indoor/ourdoor) / era (2014-2019 or 2020+)
   # used to decay prob for longer kicks
-  fg_prob_58 <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp |> mutate(yardline_100 = 42), type="response")) %>%
+  fg_prob_58 <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp |> mutate(yardline_100 = 40), type="response")) %>%
     as_tibble() %>%
     dplyr::rename(fg_make_prob_58 = value)
 
