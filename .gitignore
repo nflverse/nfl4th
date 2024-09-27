@@ -46,3 +46,7 @@ docs/
 
 # translation temp files
 po/*~
+
+# model debris
+*.ubj
+
