@@ -20,7 +20,7 @@ team_name_fn <- function(var) {
 
 # helper column to avoid join errors
 drop.cols <- c(
-  "game_id", "week",  "model_roof", "roof", "era3", "era4", "era", "home_total", "away_total", "total_line", "spread_line",
+  "game_id", "week",  "model_roof", "roof", "era3", "era4", "home_total", "away_total", "total_line", "spread_line",
   "retractable", "dome", "outdoors"
 )
 
@@ -41,8 +41,12 @@ get_games_file <- function() {
       era0 = 0, era1 = 0, era2 = 0,
       era3 = dplyr::if_else(season > 2013 & season <= 2017, 1, 0),
       era4 = dplyr::if_else(season > 2017, 1, 0),
+
       # for field goal model
-      era = 3,
+      fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
+      fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
+      fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
+
       home_total = (total_line + spread_line) / 2,
       away_total = (total_line - spread_line) / 2,
       retractable = dplyr::if_else(model_roof == 'retractable', 1, 0),
@@ -57,7 +61,7 @@ get_games_file <- function() {
     dplyr::mutate_at(dplyr::vars("home_team", "away_team"), team_name_fn) %>%
     dplyr::select(
       game_id, season, type, week, away_team, home_team, espn,
-      model_roof, roof, era0, era1, era2, era3, era4, era, home_total, away_total, total_line, spread_line,
+      fg_model_roof, model_roof, roof, era0, era1, era2, era3, era4, home_total, away_total, total_line, spread_line,
       retractable, dome, outdoors
     ) %>%
     return()
