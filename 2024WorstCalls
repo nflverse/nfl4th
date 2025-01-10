@@ -1,0 +1,33 @@
+pbp %>%
+  filter(
+    season == 2024,
+    go == 0,
+    # they tried to go for it so throw this play out
+    !(posteam == "ARI" & week == 3 & play_id == 2364)
+  ) %>%
+  arrange(-go_boost) %>%
+  mutate(rank = 1 : n()) %>%
+  head(10) %>%
+  select(rank, posteam, defteam, week, qtr, ydstogo, score_differential, go_boost, desc) %>%
+  gt() %>%
+  cols_label(
+    rank = "", posteam = "Team", defteam = "Opp", week = "Week", qtr = "Qtr",
+    ydstogo = "YTG", score_differential = "Diff", desc = "Play", go_boost = "WP loss"
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold"),
+    locations = list(cells_column_labels(everything()))
+  ) %>% 
+  text_transform(
+    locations = cells_body(vars(posteam, defteam)),
+    fn = function(x) web_image(url = paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
+  ) %>% 
+  cols_width(everything() ~ px(400)) %>% 
+  cols_width(
+    vars(rank) ~ px(30), vars(go_boost) ~ px(80),
+    vars(posteam, defteam, week, score_differential, qtr, ydstogo) ~ px(50)
+  ) %>% 
+  add_gt_options() %>%
+  fmt_number(columns = vars(go_boost), decimals = 1) %>%
+  cols_align(columns = 1:8, align = "center") %>% 
+  tab_header(title = "Worst kick decisions of 2024")
