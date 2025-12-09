@@ -45,6 +45,7 @@ jobs:
             any::patchwork
             any::tidyverse
             nflverse/fastrmodels
+            cran/xgboost@1.7.11.1
           needs: website
 
       - name: Build site
