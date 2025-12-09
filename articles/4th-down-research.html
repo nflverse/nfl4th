@@ -156,7 +156,7 @@ in 2020 versus how large the predicted benefit would be.</p>
 <span><span class="co">#&gt; (`stat_smooth()`).</span></span>
 <span><span class="co">#&gt; Warning: Removed 11 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
-<p><img src="4th-down-research_files/figure-html/league-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/league-1.png" class="r-plt" width="7200"></p>
 </div>
 <div class="section level3">
 <h3 id="check-coaches-alignment-with-the-model">Check coaches’ alignment with the model<a class="anchor" aria-label="anchor" href="#check-coaches-alignment-with-the-model"></a>
@@ -1383,7 +1383,7 @@ recommendations<a class="anchor" aria-label="anchor" href="#nfl-coaches-are-incr
 <span><span class="co">#&gt;   a single row.</span></span>
 <span><span class="co">#&gt; Warning: Removed 24 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre></div>
-<p><img src="4th-down-research_files/figure-html/time-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/time-1.png" class="r-plt" width="7200"></p>
 <p>For the remainder of this page, the code that generates the tables
 and figures won’t be shown in order to make it more readable, but <a href="https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd" class="external-link">all
 of the code can be viewed here</a>.</p>
@@ -1400,7 +1400,7 @@ necessary yards to go and nothing more, resulting in an under-estimate
 of the benefit of going for 4th down. Let’s compare the recommendations
 using the numbers in <a href="https://www.nytimes.com/2014/09/05/upshot/4th-down-when-to-go-for-it-and-why.html" class="external-link">this
 NYT article</a>.</p>
-<p><img src="4th-down-research_files/figure-html/combined-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/combined-1.png" class="r-plt" width="7200"></p>
 <p>While <code>nfl4th</code> and NYT agree that teams should always go
 for 4th &amp; 1, <code>nfl4th</code> also thinks this is the case for
 4th-and-2 and even most 4th-and-3s. However, note that this is an
@@ -1416,7 +1416,7 @@ below.</p>
 <p>The model makes very different recommendations based on game
 situations. Teams that are underdogs or are trailing are told to act
 more aggressively to get back in the game:</p>
-<p><img src="4th-down-research_files/figure-html/combined2-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/combined2-1.png" class="r-plt" width="7200"></p>
 </div>
 <div class="section level3">
 <h3 id="nfl4th-recommendations-given-vegas-line">
@@ -1428,7 +1428,7 @@ teams favored or not favored by a similar number of points. Here is what
 the recommendations look like for teams that are 4-10 point underdogs.
 As expected, these teams are encouraged to be more aggressive, although
 the difference isn’t as large as I might have thought.</p>
-<p><img src="4th-down-research_files/figure-html/nfl4th-spread-1.png" width="1152"></p>
+<p><img src="4th-down-research_files/figure-html/nfl4th-spread-1.png" class="r-plt" width="1152"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1440,7 +1440,7 @@ their decision is less likely to make the difference between a win and a
 loss (and thus open the coach up to being blamed for a loss).</p>
 <pre><code><span><span class="co">#&gt; Warning: Removed 7 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre>
-<p><img src="4th-down-research_files/figure-html/wp-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/wp-1.png" class="r-plt" width="7200"></p>
 <p>When do teams start going for it?</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pbp</span> <span class="op">%&gt;%</span></span>
@@ -1474,7 +1474,7 @@ loss (and thus open the coach up to being blamed for a loss).</p>
 <span><span class="co">#&gt; `geom_smooth()` using method = 'gam'</span></span>
 <span><span class="co">#&gt; Warning: Removed 47 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre></div>
-<p><img src="4th-down-research_files/figure-html/unnamed-chunk-2-1.png" width="1152"></p>
+<p><img src="4th-down-research_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="1152"></p>
 </div>
 <div class="section level2">
 <h2 id="some-team-specific-numbers">Some team-specific numbers<a class="anchor" aria-label="anchor" href="#some-team-specific-numbers"></a>
@@ -1483,18 +1483,18 @@ loss (and thus open the coach up to being blamed for a loss).</p>
 <h3 id="every-decision-for-every-team-in-2020">Every decision for every team in 2020<a class="anchor" aria-label="anchor" href="#every-decision-for-every-team-in-2020"></a>
 </h3>
 <p>Here is each decision made by every team in 2020.</p>
-<p><img src="4th-down-research_files/figure-html/afc-1.png" width="7200"></p>
-<p><img src="4th-down-research_files/figure-html/nfc-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/afc-1.png" class="r-plt" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/nfc-1.png" class="r-plt" width="7200"></p>
 </div>
 <div class="section level3">
 <h3 id="which-teams-were-most-closely-aligned-with-the-bot-in-2020">Which teams were most closely aligned with the bot in 2020?<a class="anchor" aria-label="anchor" href="#which-teams-were-most-closely-aligned-with-the-bot-in-2020"></a>
 </h3>
 <p>Seeing teams like the Ravens, Colts, and Browns high up here should
 not be surprising.</p>
-<p><img src="4th-down-research_files/figure-html/goshould-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/goshould-1.png" class="r-plt" width="7200"></p>
 <p>The teams that lost the most win probability in 2020 by conservative
 decision-making.</p>
-<p><img src="4th-down-research_files/figure-html/golost-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/golost-1.png" class="r-plt" width="7200"></p>
 </div>
 <div class="section level3">
 <h3 id="timelines-of-teams-over-time">Timelines of teams over time<a class="anchor" aria-label="anchor" href="#timelines-of-teams-over-time"></a>
@@ -1503,9 +1503,9 @@ decision-making.</p>
 if you’re interested in seeing another team, <a href="https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd" class="external-link">see
 the source code here</a>.</p>
 <p>Our Ravens: very good at this.</p>
-<p><img src="4th-down-research_files/figure-html/tlbal-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/tlbal-1.png" class="r-plt" width="7200"></p>
 <p>The Seahawks: less so!</p>
-<p><img src="4th-down-research_files/figure-html/tlsea-1.png" width="7200"></p>
+<p><img src="4th-down-research_files/figure-html/tlsea-1.png" class="r-plt" width="7200"></p>
 </div>
 </div>
 <div class="section level2">
@@ -2164,7 +2164,7 @@ lost by conservative decisions on 4th downs. Five of these happened in
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
