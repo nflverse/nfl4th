@@ -19,3 +19,5 @@
     file.remove(nfl4th_games_path())
   }
 }
+
+utils::globalVariables("id")
