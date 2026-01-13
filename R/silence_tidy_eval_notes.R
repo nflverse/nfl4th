@@ -32,6 +32,7 @@ aborted_play <-
   home_team <-
   home_timeouts_remaining <-
   home_total <-
+  id <-
   index <-
   index_2pt <-
   make_fg_wp <-
