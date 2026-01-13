@@ -54,10 +54,10 @@ get_games_file <- function() {
       outdoors = dplyr::if_else(model_roof == 'outdoors', 1, 0),
       roof = model_roof,
       espn = dplyr::case_when(
-        game_id == "2025_19_BUF_JAX" ~ "401772977",
-        game_id == "2025_19_SF_PHI" ~ "401772980",
-        game_id == "2025_19_LAC_NE" ~ "401772978",
-        game_id == "2025_19_HOU_PIT" ~ "401772976",
+        game_id == "2025_20_BUF_DEN" ~ "401772982",
+        game_id == "2025_20_SF_SEA" ~ "401772984",
+        game_id == "2025_20_HOU_NE" ~ "401772983",
+        game_id == "2025_20_LA_CHI" ~ "401772985",
         TRUE ~ espn
       )
     ) %>%
