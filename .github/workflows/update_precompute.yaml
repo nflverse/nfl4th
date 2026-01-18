@@ -78,6 +78,7 @@ jobs:
             nflverse/nflverse-data
             nflverse/nflreadr
             cran/xgboost@1.7.11.1
+            qsbase/qs
 
       - name: Run update script
         run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
@@ -104,6 +105,7 @@ jobs:
           packages: |
             nflverse/nflverse-data
             nflverse/nflreadr
+            qsbase/qs
 
       - name: Run update script
         run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
