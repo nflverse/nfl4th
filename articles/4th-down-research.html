@@ -87,7 +87,7 @@
 Baldwin</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nflverse/nfl4th/blob/master/vignettes/articles/4th-down-research.Rmd" class="external-link"><code>vignettes/articles/4th-down-research.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nflverse/nfl4th/blob/model_archive/vignettes/articles/4th-down-research.Rmd" class="external-link"><code>vignettes/articles/4th-down-research.Rmd</code></a></small>
       <div class="hidden name"><code>4th-down-research.Rmd</code></div>
 
     </div>
@@ -127,7 +127,7 @@ in 2020 versus how large the predicted benefit would be.</p>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">between</span><span class="op">(</span><span class="va">go_boost</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    should_go <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    should_go <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>      <span class="va">go_boost</span> <span class="op">&gt;</span> <span class="fl">.5</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>      <span class="va">go_boost</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">.5</span> <span class="op">~</span> <span class="fl">0</span>,</span>
 <span>      <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -166,7 +166,7 @@ piece on The Athletic</a>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pbp</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op">==</span> <span class="fl">2020</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">go_boost</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">go</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="va">go_boost</span> <span class="op">&gt;=</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"Definitely go for it"</span>,</span>
 <span>    <span class="va">go_boost</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">go_boost</span> <span class="op">&lt;</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"Probably go for it"</span>,</span>
 <span>    <span class="va">go_boost</span> <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">1</span> <span class="op">&amp;</span> <span class="va">go_boost</span> <span class="op">&lt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Toss-up"</span>,</span>
