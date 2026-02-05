@@ -17,6 +17,7 @@ Depends:
     R (>= 3.6)
 Imports: 
     backports (>= 1.1.6),
+    cli,
     curl,
     dplyr,
     glue,
