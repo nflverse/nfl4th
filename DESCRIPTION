@@ -1,7 +1,7 @@
 Package: nfl4th
 Title: Functions to Calculate Optimal Fourth Down Decisions in the
     National Football League
-Version: 1.0.4.9007
+Version: 1.0.4.9008
 Authors@R: c(
     person("Ben", "Baldwin", , "bbaldwin206@gmail.com", role = c("aut", "cre", "cph")),
     person("Sebastian", "Carl", , "mrcaseb@gmail.com", role = "ctb")
