@@ -11,3 +11,5 @@
 ^data-raw$
 ^CRAN-RELEASE$
 ^CRAN-SUBMISSION$
+^[.]?air[.]toml$
+^\.vscode$
