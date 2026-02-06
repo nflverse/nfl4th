@@ -45,7 +45,7 @@ get_games_file <- function() {
       # for field goal model
       fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
       fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
-      fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
+      fg_model_roof = paste0(fg_roof, fg_era) %>% as.factor(),
 
       home_total = (total_line + spread_line) / 2,
       away_total = (total_line - spread_line) / 2,
@@ -216,27 +216,29 @@ add_probs <- function(df) {
 
 }
 
-rds_from_url <- function(.url){
-  con <- url(.url)
-  dat <- readRDS(con)
-  close(con)
-  dat
+raw_rds_from_url <- function(url){
+  con <- url(url)
+  on.exit(close(con))
+  load <- try(readRDS(con), silent = TRUE)
+  if (inherits(load, "try-error")) {
+    cli::cli_warn("Failed to readRDS from {.url {url}}")
+    return(NULL)
+  }
+  load
 }
 
 load_fd_model <- function() {
-  fd_model <- NULL
-  con <- url("https://github.com/guga31bb/fourth_calculator/blob/main/data/fd_model_v2.Rdata?raw=true")
-  try(load(con), silent = TRUE)
-  close(con)
-  fd_model
+  # this rds file is a raw vector that xgboost::xgb.load.raw() can read
+  raw_rds_from_url(
+    "https://github.com/nflverse/nfl4th/releases/download/model_archive/fd_model.rds"
+  )
 }
 
 load_wp_model <- function() {
-  wp_model <- NULL
-  con <- url("https://github.com/guga31bb/fourth_calculator/blob/main/data/home_wp_model.Rdata?raw=true")
-  try(load(con), silent = TRUE)
-  close(con)
-  wp_model
+  # this rds file is a raw vector that xgboost::xgb.load.raw() can read
+  raw_rds_from_url(
+    "https://github.com/nflverse/nfl4th/releases/download/model_archive/wp_model.rds"
+  )
 }
 
 

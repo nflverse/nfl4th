@@ -1,134 +1,140 @@
-aborted_play <-
-  away_team <-
-  away_timeouts_remaining <-
-  away_total <-
-  conv_1pt <-
-  conv_2pt <-
-  defteam_timeouts_remaining <-
-  dome <-
-  down <-
-  end_of_half <-
-  home_receive_2h_ko <-
-  ep <-
-  era <-
-  era0 <-
-  era1 <-
-  era2 <-
-  era3 <-
-  era4 <-
-  fd_pct <-
-  fg_index <-
-  fg_make_prob <-
-  fg_wp <-
-  first_down_prob <-
-  gain <-
-  game_id <-
-  game_seconds_remaining <-
-  game_type <-
-  go <-
-  go_index <-
-  go_wp <-
-  half_seconds_remaining <-
-  home_team <-
-  home_timeouts_remaining <-
-  home_total <-
-  id <-
-  index <-
-  index_2pt <-
-  make_fg_wp <-
-  miss_fg_wp <-
-  model_roof <-
-  muff <-
-  new_prob <-
-  original_posteam <-
-  outdoors <-
-  pass <-
-  pct <-
-  pct_0 <-
-  play_type_nfl <-
-  posteam <-
-  posteam_spread <-
-  posteam_timeouts_remaining <-
-  posteam_total <-
-  prior_posteam <-
-  prob <-
-  prob_1pt <-
-  pts <-
-  punt_index <-
-  punt_wp <-
-  qtr <-
-  quarter_seconds_remaining <-
-  receive_2h_ko <-
-  retractable <-
-  roof <-
-  runoff <-
-  rush <-
-  score_differential <-
-  season <-
-  series <-
-  spread_line <-
-  total_line <-
-  turnover <-
-  type <-
-  value <-
-  vegas_wp <-
-  vegas_home_wp <-
-  week <-
-  wp_0 <-
-  wp_1 <-
-  wp_2 <-
-  wp_fail <-
-  wp_go1 <-
-  wp_go2 <-
-  wp_succeed <-
-  wp_td <-
-  wt_wp <-
-  yardline_100 <-
-  yardline_after <-
-  ydstogo <-
-  choice <-
-  choice_prob <-
-  extra_point_result <-
-  fail_wp <-
-  go_boost <-
-  max_non_go <-
-  play_no <-
-  punt_prob <-
-  success_prob <-
-  success_wp <-
-  two_point_conv_result <-
-  away_score <-
-  away_timeout_used <-
-  challenge_team <-
-  clock_display_value <-
-  defteam <-
-  espn <-
-  espn_id <-
-  half <-
-  home_opening_kickoff <-
-  home_score <-
-  home_timeout_used <-
-  mins <-
-  period_number <-
-  play_min <-
-  play_sec <-
-  play_time <-
-  season_type <-
-  secs <-
-  start_distance <-
-  start_down <-
-  start_possession_text <-
-  start_yards_to_endzone <-
-  team.abbreviation <-
-  team_abbreviation <-
-  temp_yardline <-
-  text <-
-  time <-
-  timeout_team <-
-  total_away_timeouts_used <-
-  total_home_timeouts_used <-
-  type_text <-
-  yardline <-
-  yardline_number <-
-  yardline_side <-
-  aborted_play <- NULL
+# Create with data-raw/silence_tidy_eval_notes_creator.R
+utils::globalVariables(
+  package = "nfl4th",
+  names = c(
+    "aborted_play",
+    "away_score",
+    "away_team",
+    "away_timeout_used",
+    "away_timeouts_remaining",
+    "away_total",
+    "challenge_team",
+    "choice",
+    "choice_prob",
+    "clock_display_value",
+    "conv_1pt",
+    "conv_2pt",
+    "defteam",
+    "defteam_timeouts_remaining",
+    "dome",
+    "down",
+    "end_of_half",
+    "ep",
+    "era0",
+    "era1",
+    "era2",
+    "era3",
+    "era4",
+    "espn",
+    "espn_id",
+    "extra_point_result",
+    "fail_wp",
+    "fd_pct",
+    "fg_era",
+    "fg_index",
+    "fg_make_prob",
+    "fg_make_prob_58",
+    "fg_model_roof",
+    "fg_roof",
+    "fg_wp",
+    "first_down_prob",
+    "gain",
+    "game_id",
+    "game_seconds_remaining",
+    "game_type",
+    "go",
+    "go_boost",
+    "go_index",
+    "go_wp",
+    "half",
+    "half_seconds_remaining",
+    "home_opening_kickoff",
+    "home_receive_2h_ko",
+    "home_score",
+    "home_team",
+    "home_timeout_used",
+    "home_timeouts_remaining",
+    "home_total",
+    "id",
+    "index",
+    "index_2pt",
+    "make_fg_wp",
+    "max_non_go",
+    "mins",
+    "miss_fg_wp",
+    "model_roof",
+    "muff",
+    "new_prob",
+    "original_posteam",
+    "outdoors",
+    "pass",
+    "pct",
+    "pct_0",
+    "period_number",
+    "play_min",
+    "play_no",
+    "play_time",
+    "play_type_nfl",
+    "posteam",
+    "posteam_spread",
+    "posteam_timeouts_remaining",
+    "posteam_total",
+    "prior_posteam",
+    "prob",
+    "prob_1pt",
+    "pts",
+    "punt_index",
+    "punt_prob",
+    "punt_wp",
+    "qtr",
+    "quarter_seconds_remaining",
+    "retractable",
+    "roof",
+    "runoff",
+    "rush",
+    "scalar",
+    "score_differential",
+    "season",
+    "season_type",
+    "secs",
+    "spread_line",
+    "start_distance",
+    "start_down",
+    "start_possession_text",
+    "start_yards_to_endzone",
+    "success_prob",
+    "success_wp",
+    "team_abbreviation",
+    "team.abbreviation",
+    "temp_yardline",
+    "text",
+    "time",
+    "timeout_team",
+    "total_away_timeouts_used",
+    "total_home_timeouts_used",
+    "total_line",
+    "turnover",
+    "two_point_conv_result",
+    "type",
+    "type_text",
+    "value",
+    "vegas_home_wp",
+    "vegas_wp",
+    "week",
+    "wp_0",
+    "wp_1",
+    "wp_2",
+    "wp_fail",
+    "wp_go1",
+    "wp_go2",
+    "wp_succeed",
+    "wp_td",
+    "wt_wp",
+    "yardline",
+    "yardline_100",
+    "yardline_after",
+    "yardline_number",
+    "yardline_side",
+    "ydstogo"
+  )
+)

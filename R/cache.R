@@ -14,19 +14,21 @@ nfl4th_wpmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "wp_m
 }
 
 fd_model <- function(){
-  if (probably_cran() && !force_cache()) return(load_fd_model())
+  if (probably_cran() && !force_cache()) return(xgboost::xgb.load.raw(load_fd_model()))
   if (!file.exists(nfl4th_fdmodel_path())){
     saveRDS(load_fd_model(), nfl4th_fdmodel_path())
   }
-  readRDS(nfl4th_fdmodel_path())
+  readRDS(nfl4th_fdmodel_path()) %>%
+    xgboost::xgb.load.raw()
 }
 
 wp_model <- function(){
-  if (probably_cran() && !force_cache()) return(load_wp_model())
+  if (probably_cran() && !force_cache()) return(xgboost::xgb.load.raw(load_wp_model()))
   if (!file.exists(nfl4th_wpmodel_path())){
     saveRDS(load_wp_model(), nfl4th_wpmodel_path())
   }
-  readRDS(nfl4th_wpmodel_path())
+  readRDS(nfl4th_wpmodel_path()) %>%
+    xgboost::xgb.load.raw()
 }
 
 #' Reset nfl4th Package Cache
