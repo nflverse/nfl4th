@@ -53,8 +53,7 @@ add_gt_options <- function(gt_data) {
     table.background.color = '#F2F2F2',
     data_row.padding = gt::px(2),
     table.font.size = gt::px(16L)
-  ) |>
-  return()
+  )
 }
 ```
 
@@ -297,10 +296,8 @@ plot_prepare <- function(df) {
       has_punted = cumsum(decision == "Punt"),
       decision = ifelse(has_punted > 0, "Punt", decision)
     ) |>
-    ungroup() |>
-    return()
+    ungroup()
 }
-
 ```
 
 ```{r nfl4th, echo = FALSE, message = FALSE}
