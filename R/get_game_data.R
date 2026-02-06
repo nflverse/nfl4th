@@ -38,9 +38,11 @@ get_4th_plays <- function(gid) {
   tryCatch(
     expr = {
 
-
-      pbp <- httr::GET(url = glue::glue("http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event={df$espn}")) |>
-        httr::content(as = "text", encoding = "UTF-8") |>
+      game_url <- paste0(
+        "http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=",
+        df$espn
+      )
+      pbp <- game_url |>
         jsonlite::fromJSON(flatten = TRUE)
 
       if ("code" %in% names(pbp)) {
@@ -294,7 +296,9 @@ get_4th_plays <- function(gid) {
     },
     warning = function(w) {
       if (warn == 1) {
-        message(glue::glue("Warning: The requested GameID {df$espn} ({df$game_id}) is invalid!"))
+        cli::cli_alert_warning(
+          "Warning: The requested GameID {df$espn} ({df$game_id}) is invalid!"
+        )
       }
     },
     finally = {
