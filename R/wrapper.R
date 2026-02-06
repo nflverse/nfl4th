@@ -53,18 +53,18 @@
 #' }
 add_4th_probs <- function(df) {
 
-  original_df <- df %>% mutate(index = 1 : n())
+  original_df <- df |> mutate(index = 1 : n())
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
     # message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
-    modified_df <- original_df %>%
-      prepare_nflfastr_data() %>%
+    modified_df <- original_df |>
+      prepare_nflfastr_data() |>
       filter(down == 4)
   }
 
   # message("Performing final preparation . . .")
-  df <- modified_df %>%
+  df <- modified_df |>
     prepare_df()
 
   if (!"runoff" %in% names(df)) {
@@ -72,16 +72,16 @@ add_4th_probs <- function(df) {
   }
 
   message(glue::glue("Computing probabilities for {nrow(df)} plays. . ."))
-  df <- df %>%
-    add_probs() %>%
-    mutate(play_no = 1 : n()) %>%
-    group_by(play_no) %>%
+  df <- df |>
+    add_probs() |>
+    mutate(play_no = 1 : n()) |>
+    group_by(play_no) |>
     mutate(
       punt_prob = if_else(is.na(punt_wp), 0, punt_wp),
       max_non_go = max(fg_wp, punt_prob, na.rm = T),
       go_boost = 100 * (go_wp - max_non_go)
-    ) %>%
-    ungroup() %>%
+    ) |>
+    ungroup() |>
     select(
       index, go_boost,
       first_down_prob, wp_fail, wp_succeed, go_wp,
@@ -89,11 +89,9 @@ add_4th_probs <- function(df) {
       punt_wp
     )
 
-  original_df %>%
-    left_join(df, by = c("index")) %>%
-    select(-index) %>%
-    return()
-
+  original_df |>
+    left_join(df, by = c("index")) |>
+    select(-index)
 }
 
 #' Load calculated 4th down probabilities from `nflfastR` data
@@ -128,20 +126,18 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
   if (fast) {
     data <- purrr::map_df(seasons, ~{
       message(glue::glue("Loading season {.x}"))
-      nflfastR::load_pbp(.x) %>%
-        left_join(readRDS(url("https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id")) %>%
-        return()
+      nflfastR::load_pbp(.x) |>
+        left_join(readRDS(url("https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id"))
     })
   } else {
     data <- purrr::map_df(seasons, ~{
       message(glue::glue("Loading season {.x}"))
-      nflreadr::load_pbp(.x) %>%
-        nfl4th::add_4th_probs() %>%
-        return()
+      nflreadr::load_pbp(.x) |>
+        nfl4th::add_4th_probs()
     })
   }
 
-  data %>%
+  data |>
     dplyr::mutate(
       go = ifelse(
         (rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
@@ -158,9 +154,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
         stringr::str_detect(desc, "(Run formation)|(Pass formation)|(Shotgun)") & stringr::str_detect(desc, "(False Start)|(Neutral Zone Infraction)") ~ NA_real_,
         TRUE ~ go
       )
-    ) %>%
-    return()
-
+    )
 }
 
 
@@ -209,25 +203,25 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' }
 add_2pt_probs <- function(df) {
 
-  original_df <- df %>% mutate(index = 1 : n())
+  original_df <- df |> mutate(index = 1 : n())
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
     message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
-    modified_df <- original_df %>%
-      prepare_nflfastr_data() %>%
+    modified_df <- original_df |>
+      prepare_nflfastr_data() |>
       filter(
         !is.na(two_point_conv_result) | !is.na(extra_point_result)
       )
   }
 
   # message("Performing final preparation . . .")
-  df <- modified_df %>%
+  df <- modified_df |>
     prepare_df()
 
   message(glue::glue("Computing probabilities for  {nrow(df)} plays. . ."))
-  df <- df %>%
-    get_2pt_wp() %>%
+  df <- df |>
+    get_2pt_wp() |>
     select(
       index,
       wp_0, wp_1, wp_2,
@@ -235,9 +229,7 @@ add_2pt_probs <- function(df) {
       wp_go1, wp_go2
     )
 
-  original_df %>%
-    left_join(df, by = c("index")) %>%
-    select(-index) %>%
-    return()
-
+  original_df |>
+    left_join(df, by = c("index")) |>
+    select(-index)
 }

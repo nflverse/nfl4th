@@ -23,21 +23,21 @@ one_play <- tibble::tibble(
 
 # load all
 
-pbp <- one_play %>%
-  prepare_df() %>%
+pbp <- one_play |>
+  prepare_df() |>
   filter(down == 4)
 
-get_punt_wp(pbp) %>%
+get_punt_wp(pbp) |>
   select(punt_wp)
 
-get_fg_wp(pbp) %>%
+get_fg_wp(pbp) |>
   select(fg_make_prob, make_fg_wp, miss_fg_wp, fg_wp)
 
-get_go_wp(pbp) %>%
+get_go_wp(pbp) |>
   select(go_index, first_down_prob, wp_fail, wp_succeed, go_wp)
 
-one_play %>%
-  add_4th_probs() %>%
+one_play |>
+  add_4th_probs() |>
   nfl4th::make_table_data()
 
 ###############################################
@@ -46,18 +46,18 @@ one_play %>%
 library(tidyverse)
 yr <- 2020
 
-new <- load_4th_pbp(yr) %>%
+new <- load_4th_pbp(yr) |>
   select(game_id, play_id, new_go_boost = go_boost)
 
 old <- load_4th_pbp(yr, fast = TRUE)
 
-df <- old %>%
-  left_join(new, by = c("game_id", "play_id")) %>%
+df <- old |>
+  left_join(new, by = c("game_id", "play_id")) |>
   filter(!is.na(go_boost))
 
-df %>%
-  filter(ydstogo <= 3) %>%
-  filter(between(go_boost, -10, 10)) %>%
+df |>
+  filter(ydstogo <= 3) |>
+  filter(between(go_boost, -10, 10)) |>
   ggplot(aes(go_boost, new_go_boost)) +
   geom_abline(slope = 1) +
   geom_hline(yintercept = 0) +
@@ -74,8 +74,8 @@ df %>%
   ) +
   facet_wrap(~ydstogo)
 
-df %>%
-  filter(go_boost > 5, new_go_boost < 1) %>%
+df |>
+  filter(go_boost > 5, new_go_boost < 1) |>
   select(game_id, play_id, score_differential, qtr, quarter_seconds_remaining, yardline_100, ydstogo, go_boost, new_go_boost)
 
 # 0.9754796
@@ -84,11 +84,11 @@ cor(df$go_boost, df$new_go_boost)
 
 # # # # vignette
 
-pbp <- nfl4th::load_4th_pbp(2020:2021, fast = FALSE) %>%
+pbp <- nfl4th::load_4th_pbp(2020:2021, fast = FALSE) |>
   filter(down == 4)
 
-plot <- pbp %>%
-  filter(!is.na(go_wp)) %>%
+plot <- pbp |>
+  filter(!is.na(go_wp)) |>
   mutate(
     punt_prob = if_else(is.na(punt_wp), 0, punt_wp),
     ydstogo = ifelse(ydstogo > 10, 10, ydstogo),
@@ -100,28 +100,28 @@ plot <- pbp %>%
     ),
     # round to nearest 5
     binned_yardline = 5 * round(yardline_100 / 5)
-    ) %>%
+    ) |>
   select(binned_yardline, yardline_100, ydstogo, go_boost, decision, vegas_wp, score_differential, qtr, posteam, home_team, spread_line)
 
 plot_prepare <- function(df) {
 
-  df %>%
+  df |>
     # for getting percent of decisions for alpha in some plots
-    group_by(binned_yardline, ydstogo) %>%
-    mutate(tot_n = n()) %>%
-    ungroup() %>%
-    group_by(binned_yardline, ydstogo, decision) %>%
-    summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) %>%
-    group_by(binned_yardline, ydstogo) %>%
-    arrange(binned_yardline, ydstogo, -n) %>%
-    dplyr::slice(1) %>%
+    group_by(binned_yardline, ydstogo) |>
+    mutate(tot_n = n()) |>
+    ungroup() |>
+    group_by(binned_yardline, ydstogo, decision) |>
+    summarize(n = n(), tot_n = dplyr::first(tot_n), pct = n / tot_n) |>
+    group_by(binned_yardline, ydstogo) |>
+    arrange(binned_yardline, ydstogo, -n) |>
+    dplyr::slice(1) |>
     # for the charts: if you've been told to punt at 4th & X
     # you should also be told to punt from that yardline at 4th & X and longer
     # a better alternative would be some sort of smoother or picking a given game
     # but ain't nobody got time for that
 
     # and same with FGs
-    group_by(binned_yardline) %>%
+    group_by(binned_yardline) |>
     mutate(
       has_punted = cumsum(decision == "Punt"),
       has_kicked = cumsum(decision == "Field goal"),
@@ -130,20 +130,20 @@ plot_prepare <- function(df) {
         has_kicked > 0 ~ "Field goal",
         TRUE ~ decision
       )
-    ) %>%
+    ) |>
     # if you've been told to punt on 4th & X from a given yardline
     # you should also be told to punt on 4th & X at a longer yardline
-    group_by(ydstogo) %>%
+    group_by(ydstogo) |>
     mutate(
       has_punted = cumsum(decision == "Punt"),
       decision = ifelse(has_punted > 0, "Punt", decision)
-    ) %>%
-    ungroup() %>%
+    ) |>
+    ungroup() |>
     return()
 }
 
-plot %>%
-  plot_prepare() %>%
+plot |>
+  plot_prepare() |>
   ggplot(aes(binned_yardline, ydstogo, fill = decision)) +
   geom_tile(aes(binned_yardline, ydstogo, width = 4.5, height = .95), alpha = 0.75) +
   scale_y_reverse(breaks = scales::pretty_breaks(n = 10), expand = c(0,0)) +
@@ -167,16 +167,16 @@ plot %>%
   annotate("text",x=80, y= 7, label = "Punt", size = 6) +
   annotate("text",x=20, y= 7, label = "Field goal", size = 6)
 
-current <- pbp %>%
-  filter(season == 2020) %>%
-  filter(go_boost > 1.5, !is.na(go_boost), !is.na(go)) %>%
-  filter(vegas_wp > .2) %>%
-  group_by(posteam) %>%
-  summarize(go = mean(go), n = n()) %>%
-  ungroup() %>%
-  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
-  arrange(-go) %>%
-  mutate(rank = 1:n()) %>%
+current <- pbp |>
+  filter(season == 2020) |>
+  filter(go_boost > 1.5, !is.na(go_boost), !is.na(go)) |>
+  filter(vegas_wp > .2) |>
+  group_by(posteam) |>
+  summarize(go = mean(go), n = n()) |>
+  ungroup() |>
+  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) |>
+  arrange(-go) |>
+  mutate(rank = 1:n()) |>
   arrange(posteam)
 
 my_title <- glue::glue("Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> 2020")
@@ -209,24 +209,24 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
 
 library(tidyverse)
 
-pbp <- load_4th_pbp(nflreadr:::most_recent_season(), fast = FALSE) %>%
-  filter(!is.na(go), down == 4) %>%
+pbp <- load_4th_pbp(nflreadr:::most_recent_season(), fast = FALSE) |>
+  filter(!is.na(go), down == 4) |>
   mutate(
     go_boost = ifelse(go_boost > 30 & posteam == "DEN", 27, go_boost)
 
   )
 
-old <- load_4th_pbp(nflreadr:::most_recent_season(), fast = TRUE) %>%
-  filter(!is.na(go), down == 4) %>%
+old <- load_4th_pbp(nflreadr:::most_recent_season(), fast = TRUE) |>
+  filter(!is.na(go), down == 4) |>
   select(game_id, play_id, old_go_boost = go_boost)
 
-df <- pbp %>%
-  left_join(old, by = c("game_id", "play_id")) %>%
+df <- pbp |>
+  left_join(old, by = c("game_id", "play_id")) |>
   filter(!is.na(go_boost))
 
-df %>%
-  filter(ydstogo <= 3) %>%
-  filter(between(go_boost, -10, 10)) %>%
+df |>
+  filter(ydstogo <= 3) |>
+  filter(between(go_boost, -10, 10)) |>
   ggplot(aes(old_go_boost, go_boost)) +
   geom_abline(slope = 1) +
   geom_hline(yintercept = 0) +
@@ -249,33 +249,33 @@ df %>%
 
 # worst 10 of the season
 library(gt)
-pbp %>%
-  filter(go == 0) %>%
-  arrange(-go_boost) %>%
-  mutate(rank = 1 : n()) %>%
-  head(10) %>%
-  select(rank, posteam, defteam, week, qtr, ydstogo, score_differential, go_boost, desc) %>%
-  gt() %>%
+pbp |>
+  filter(go == 0) |>
+  arrange(-go_boost) |>
+  mutate(rank = 1 : n()) |>
+  head(10) |>
+  select(rank, posteam, defteam, week, qtr, ydstogo, score_differential, go_boost, desc) |>
+  gt() |>
   cols_label(
     rank = "", posteam = "Team", defteam = "Opp", week = "Week", qtr = "Qtr",
     ydstogo = "YTG", score_differential = "Diff", desc = "Play", go_boost = "WP loss"
-  ) %>%
+  ) |>
   tab_style(
     style = cell_text(color = "black", weight = "bold"),
     locations = list(cells_column_labels(everything()))
-  ) %>%
+  ) |>
   text_transform(
     locations = cells_body(c(posteam, defteam)),
     fn = function(x) web_image(url = paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
-  ) %>%
-  cols_width(everything() ~ px(400)) %>%
+  ) |>
+  cols_width(everything() ~ px(400)) |>
   cols_width(
     c(rank) ~ px(30), c(go_boost) ~ px(80),
     c(posteam, defteam, week, score_differential, qtr, ydstogo) ~ px(50)
-  ) %>%
-  gtExtras::gt_theme_538() %>%
-  fmt_number(columns = c(go_boost), decimals = 1) %>%
-  cols_align(columns = 1:8, align = "center") %>%
+  ) |>
+  gtExtras::gt_theme_538() |>
+  fmt_number(columns = c(go_boost), decimals = 1) |>
+  cols_align(columns = 1:8, align = "center") |>
   tab_header(title = paste("Worst kick decisions of", nflreadr:::most_recent_season()))
 
 
@@ -287,16 +287,16 @@ library(ggtext)
 cutoff <- 1
 num <- 3
 
-current <- pbp %>%
-  filter(go_boost >= cutoff, !is.na(go), !is.na(go_boost)) %>%
-  filter(wp > .1 | (qtr == 1)) %>%
-  group_by(posteam) %>%
-  summarize(go = mean(go), n = n()) %>%
-  ungroup() %>%
-  filter(n >= num) %>%
-  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
-  arrange(-go) %>%
-  mutate(rank = 1:n()) %>%
+current <- pbp |>
+  filter(go_boost >= cutoff, !is.na(go), !is.na(go_boost)) |>
+  filter(wp > .1 | (qtr == 1)) |>
+  group_by(posteam) |>
+  summarize(go = mean(go), n = n()) |>
+  ungroup() |>
+  filter(n >= num) |>
+  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) |>
+  arrange(-go) |>
+  mutate(rank = 1:n()) |>
   arrange(posteam)
 
 my_title <- glue::glue("Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> 2022")
@@ -328,18 +328,18 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
 
 
 
-current <- pbp %>%
-  filter(go_boost >= -1.5, !is.na(go), !is.na(go_boost)) %>%
-  filter(wp > .1 | (qtr == 1)) %>%
-  mutate(range = ifelse(go_boost < 1.5, 0, 1)) %>%
-  group_by(range, posteam) %>%
-  summarize(go = mean(go), n = n()) %>%
-  ungroup() %>%
-  pivot_wider(names_from = range, values_from = c(go, n)) %>%
-  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) %>%
+current <- pbp |>
+  filter(go_boost >= -1.5, !is.na(go), !is.na(go_boost)) |>
+  filter(wp > .1 | (qtr == 1)) |>
+  mutate(range = ifelse(go_boost < 1.5, 0, 1)) |>
+  group_by(range, posteam) |>
+  summarize(go = mean(go), n = n()) |>
+  ungroup() |>
+  pivot_wider(names_from = range, values_from = c(go, n)) |>
+  left_join(nflfastR::teams_colors_logos, by=c('posteam' = 'team_abbr')) |>
   arrange(posteam)
 
-current %>%
+current |>
   ggplot(aes(go_0, go_1, label = posteam)) +
   geom_vline(xintercept = 0) +
   geom_hline(yintercept = c(0, 100)) +
@@ -372,28 +372,28 @@ current %>%
 
 # forfeited WP
 
-current <- pbp %>%
-  group_by(posteam) %>%
+current <- pbp |>
+  group_by(posteam) |>
   mutate(
     games = n_distinct(game_id),
     # hard code the DEN disaster
     go_boost = ifelse(go_boost > 30 & posteam == "DEN", 27, go_boost)
-  ) %>%
-  ungroup() %>%
-  filter(go_boost > 0, go == 0) %>%
-  group_by(posteam) %>%
+  ) |>
+  ungroup() |>
+  filter(go_boost > 0, go == 0) |>
+  group_by(posteam) |>
   summarize(
     go = sum(go_boost),
     n = n(),
     games = dplyr::first(games),
     go = go/games
-  ) %>%
-  ungroup() %>%
-  full_join(nflfastR::teams_colors_logos %>% filter(!team_abbr %in% c("LAR", "OAK", "STL", "SD")), by=c('posteam' = 'team_abbr')) %>%
+  ) |>
+  ungroup() |>
+  full_join(nflfastR::teams_colors_logos |> filter(!team_abbr %in% c("LAR", "OAK", "STL", "SD")), by=c('posteam' = 'team_abbr')) |>
   # for teams without any wrong decisions
-  mutate(go = ifelse(is.na(go), 0, go)) %>%
-  arrange(-go) %>%
-  mutate(rank = 1:n()) %>%
+  mutate(go = ifelse(is.na(go), 0, go)) |>
+  arrange(-go) |>
+  mutate(rank = 1:n()) |>
   arrange(posteam)
 
 my_title <- glue::glue("WP per game <span style='color:red'>lost by kicking in go situations</span>, 2022")
@@ -427,13 +427,13 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
 
 
 
-plays <- get_4th_plays("2020_20_TB_GB") %>%
+plays <- get_4th_plays("2020_20_TB_GB") |>
   tail(1)
 
-plays %>%
+plays |>
   select(desc, quarter_seconds_remaining)
 
-plays %>%
-  nfl4th::add_4th_probs() %>%
-  nfl4th::make_table_data() %>%
+plays |>
+  nfl4th::add_4th_probs() |>
+  nfl4th::make_table_data() |>
   knitr::kable(digits = 1)

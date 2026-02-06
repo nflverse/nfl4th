@@ -27,8 +27,8 @@ drop.cols <- c(
 # loading and cleaning games file
 get_games_file <- function() {
 
-  nflreadr::load_schedules() %>%
-    filter(season > 2013) %>%
+  nflreadr::load_schedules() |>
+    filter(season > 2013) |>
     mutate(
       type = if_else(game_type == "REG", "reg", "post"),
       model_roof = case_when(
@@ -45,7 +45,7 @@ get_games_file <- function() {
       # for field goal model
       fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
       fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
-      fg_model_roof = paste0(fg_roof, fg_era) %>% as.factor(),
+      fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
 
       home_total = (total_line + spread_line) / 2,
       away_total = (total_line - spread_line) / 2,
@@ -60,23 +60,22 @@ get_games_file <- function() {
         game_id == "2025_20_LA_CHI" ~ "401772985",
         TRUE ~ espn
       )
-    ) %>%
-    dplyr::mutate_at(dplyr::vars("home_team", "away_team"), team_name_fn) %>%
+    ) |>
+    dplyr::mutate_at(dplyr::vars("home_team", "away_team"), team_name_fn) |>
     dplyr::select(
       game_id, season, type, week, away_team, home_team, espn,
       fg_model_roof, model_roof, roof, era0, era1, era2, era3, era4, home_total, away_total, total_line, spread_line,
       retractable, dome, outdoors
-    ) %>%
-    return()
+    )
 }
 
 # data prep function
 prepare_df <- function(df) {
 
-  df %>%
+  df |>
     # if an nflfastR df is passed, need to drop all this so we don't get redundant cols
-    dplyr::select(-tidyselect::any_of(drop.cols)) %>%
-    left_join(.games_nfl4th(), by = c("home_team", "away_team", "type", "season")) %>%
+    dplyr::select(-tidyselect::any_of(drop.cols)) |>
+    left_join(.games_nfl4th(), by = c("home_team", "away_team", "type", "season")) |>
     mutate(
       home_receive_2h_ko = dplyr::case_when(
         # home got it first
@@ -104,15 +103,13 @@ prepare_df <- function(df) {
       away_timeouts_remaining = if_else(posteam == away_team, posteam_timeouts_remaining, defteam_timeouts_remaining),
       original_posteam = posteam
 
-    ) %>%
-    return()
-
+    )
 }
 
 # helper function for switching possession and running off 6 seconds
 flip_team <- function(df) {
 
-  df %>%
+  df |>
     mutate(
       # switch posteam
       posteam = if_else(home_team == posteam, away_team, home_team),
@@ -127,16 +124,14 @@ flip_team <- function(df) {
       # don't let seconds go negative
       half_seconds_remaining = if_else(half_seconds_remaining < 0, 0, half_seconds_remaining),
       game_seconds_remaining = if_else(game_seconds_remaining < 0, 0, game_seconds_remaining)
-    ) %>%
-    return()
-
+    )
 }
 
 # helper function to move the game to start of 3rd Q on an end-of-half play
 # on the plays where we find that the half has ended
 flip_half <- function(df) {
 
-  df %>%
+  df |>
     mutate(
       prior_posteam = posteam,
       end_of_half = ifelse(
@@ -157,17 +152,15 @@ flip_half <- function(df) {
         posteam != prior_posteam & end_of_half == 1, -score_differential, score_differential
       ),
       home_receive_2h_ko = ifelse(end_of_half == 1, 0, home_receive_2h_ko)
-    ) %>%
-    select(-prior_posteam, -end_of_half) %>%
-    return()
-
+    ) |>
+    select(-prior_posteam, -end_of_half)
 }
 
 # fill in end of game situation when team can kneel out clock
 # discourages punting or fg when the other team can end the game
 end_game_fn <- function(pbp) {
 
-  pbp %>%
+  pbp |>
     mutate(
       defteam_timeouts_remaining = ifelse(posteam == home_team, away_timeouts_remaining, home_timeouts_remaining),
       vegas_wp = case_when(
@@ -176,8 +169,7 @@ end_game_fn <- function(pbp) {
         score_differential > 0 & game_seconds_remaining < 40 & defteam_timeouts_remaining == 2 ~ 0,
         TRUE ~ vegas_wp
       )
-    ) %>%
-    return()
+    )
 }
 
 
@@ -189,10 +181,10 @@ end_game_fn <- function(pbp) {
 prepare_nflfastr_data <- function(pbp) {
 
   # some prep
-  data <- pbp %>%
+  data <- pbp |>
     dplyr::mutate(
       type = ifelse(tolower(season_type) == "reg", "reg", "post")
-    ) %>%
+    ) |>
     filter(
       game_seconds_remaining > 15,
       !is.na(half_seconds_remaining),
@@ -208,12 +200,10 @@ prepare_nflfastr_data <- function(pbp) {
 # convenience function to add the probs from each model
 add_probs <- function(df) {
 
-  df %>%
-    get_go_wp() %>%
-    get_fg_wp() %>%
-    get_punt_wp() %>%
-    return()
-
+  df |>
+    get_go_wp() |>
+    get_fg_wp() |>
+    get_punt_wp()
 }
 
 raw_rds_from_url <- function(url){

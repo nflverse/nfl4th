@@ -6,12 +6,12 @@
 get_punt_wp <- function(pbp) {
 
   # to join later
-  pbp <- pbp %>% mutate(punt_index = 1 : n ())
+  pbp <- pbp |> mutate(punt_index = 1 : n ())
 
   # get wp associated with punt
-  probs <- pbp %>%
-    left_join(punt_df, by = "yardline_100") %>%
-    flip_team() %>%
+  probs <- pbp |>
+    left_join(punt_df, by = "yardline_100") |>
+    flip_team() |>
     mutate(
       yardline_100 = 100 - yardline_after,
 
@@ -33,19 +33,19 @@ get_punt_wp <- function(pbp) {
 
       ydstogo = ifelse(yardline_100 < 10, yardline_100, as.integer(ydstogo))
 
-    ) %>%
-    flip_half() %>%
-    calculate_win_probability() %>%
-    end_game_fn() %>%
+    ) |>
+    flip_half() |>
+    calculate_win_probability() |>
+    end_game_fn() |>
     mutate(
       wt_wp = pct * vegas_wp
-    ) %>%
-    group_by(punt_index) %>%
-    summarize(punt_wp = sum(wt_wp)) %>%
+    ) |>
+    group_by(punt_index) |>
+    summarize(punt_wp = sum(wt_wp)) |>
     ungroup()
 
-  pbp %>%
-    left_join(probs, by = "punt_index") %>%
+  pbp |>
+    left_join(probs, by = "punt_index") |>
     select(-punt_index)
 
 }
@@ -54,21 +54,21 @@ get_punt_wp <- function(pbp) {
 get_fg_wp <- function(pbp) {
 
   # probability field goal is made
-  fg_prob <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp, type="response")) %>%
-    as_tibble() %>%
+  fg_prob <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp, type="response")) |>
+    as_tibble() |>
     dplyr::rename(fg_make_prob = value)
 
   # probability 58 yard field goal is made in environment (indoor/ourdoor) / era (2014-2019 or 2020+)
   # used to decay prob for longer kicks
-  fg_prob_58 <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp %>% mutate(yardline_100 = 40), type="response")) %>%
-    as_tibble() %>%
+  fg_prob_58 <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp |> mutate(yardline_100 = 40), type="response")) |>
+    as_tibble() |>
     dplyr::rename(fg_make_prob_58 = value)
 
   dat <- bind_cols(
     pbp,
     fg_prob,
     fg_prob_58
-  ) %>%
+  ) |>
     mutate(
       # linear drop from prob at 58 yards (40 yard line) to 0 at 71 (53 yard line)
       # example: kick at 44 yard line (62 yard FG) has 69% chance of what a 58 yard FG has (40 yard line)
@@ -83,53 +83,52 @@ get_fg_wp <- function(pbp) {
     )
 
   # win prob after receiving kickoff for touchback and other team has 3 more points
-  make_df <- dat %>%
+  make_df <- dat |>
 
     # win prob after receiving kickoff for touchback and other team has 3 more points
-    flip_team() %>%
+    flip_team() |>
     mutate(
       yardline_100 = 75,
       score_differential = score_differential - 3
-    ) %>%
+    ) |>
 
     # for end of 1st half stuff
-    flip_half() %>%
-    calculate_win_probability() %>%
-    end_game_fn() %>%
+    flip_half() |>
+    calculate_win_probability() |>
+    end_game_fn() |>
     select(fg_index, make_fg_wp = vegas_wp)
 
   # win prob after missed FG
-  miss_df <- dat %>%
-    flip_team() %>%
+  miss_df <- dat |>
+    flip_team() |>
     mutate(
       yardline_100 = (100 - yardline_100) - 8,
       # yardline_100 can't be bigger than 80 due to some weird nfl rule
       yardline_100 = if_else(yardline_100 > 80, 80, yardline_100),
       yardline_100 = ifelse(yardline_100 < 1, 1, yardline_100)
-    ) %>%
+    ) |>
     # for end of 1st half stuff
-    flip_half() %>%
-    calculate_win_probability() %>%
-    end_game_fn() %>%
+    flip_half() |>
+    calculate_win_probability() |>
+    end_game_fn() |>
     select(fg_index, miss_fg_wp = vegas_wp)
 
-  dat %>%
-    left_join(make_df, by = "fg_index") %>%
-    left_join(miss_df, by = "fg_index") %>%
-    mutate(fg_wp = fg_make_prob * make_fg_wp + (1 - fg_make_prob) * miss_fg_wp) %>%
-    select(-fg_index) %>%
-    return()
+  dat |>
+    left_join(make_df, by = "fg_index") |>
+    left_join(miss_df, by = "fg_index") |>
+    mutate(fg_wp = fg_make_prob * make_fg_wp + (1 - fg_make_prob) * miss_fg_wp) |>
+    select(-fg_index)
 }
 
 # function to get WPs for go for 1 or go for 2
 # this is here because it's needed for the going for 4th down model
 get_2pt_wp <- function(pbp) {
 
-  pbp <- pbp %>% mutate(index_2pt = 1 : n())
+  pbp <- pbp |> mutate(index_2pt = 1 : n())
 
   # stuff in the 2pt model
-  data <- pbp %>%
-    mutate(era2 = 0) %>%
+  data <- pbp |>
+    mutate(era2 = 0) |>
     select(
       era2,  era3,     era4,     outdoors,
       retractable,  dome,    posteam_spread, total_line,  posteam_total
@@ -139,15 +138,15 @@ get_2pt_wp <- function(pbp) {
   prob_2pt <- stats::predict(
     xgboost::xgb.load.raw(two_pt_model),
     as.matrix(data)
-  )  %>%
-    tibble::as_tibble() %>%
-    dplyr::rename(prob_2pt = "value") %>%
+  )  |>
+    tibble::as_tibble() |>
+    dplyr::rename(prob_2pt = "value") |>
     select(prob_2pt)
 
   # probability of making PAT
-  xp_prob <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp %>% mutate(yardline_100 = 15), type="response")) %>%
-    as_tibble() %>%
-    dplyr::rename(prob_1pt = "value") %>%
+  xp_prob <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp |> mutate(yardline_100 = 15), type="response")) |>
+    as_tibble() |>
+    dplyr::rename(prob_1pt = "value") |>
     select(prob_1pt)
 
   pbp <- bind_cols(
@@ -155,10 +154,10 @@ get_2pt_wp <- function(pbp) {
   )
 
   probs <- bind_rows(
-    pbp %>% mutate(pts = 0, score_differential = -score_differential),
-    pbp %>% mutate(pts = 1, score_differential = -score_differential - 1),
-    pbp %>% mutate(pts = 2, score_differential = -score_differential - 2)
-  ) %>%
+    pbp |> mutate(pts = 0, score_differential = -score_differential),
+    pbp |> mutate(pts = 1, score_differential = -score_differential - 1),
+    pbp |> mutate(pts = 2, score_differential = -score_differential - 2)
+  ) |>
     mutate(
       # switch posteam
       posteam = case_when(
@@ -171,32 +170,31 @@ get_2pt_wp <- function(pbp) {
       down = 1,
       ydstogo = 10
 
-    ) %>%
-    flip_half() %>%
-    calculate_win_probability() %>%
-    arrange(index_2pt, pts) %>%
-    select(index_2pt, pts, vegas_wp, prob_2pt, prob_1pt) %>%
-    group_by(index_2pt) %>%
+    ) |>
+    flip_half() |>
+    calculate_win_probability() |>
+    arrange(index_2pt, pts) |>
+    select(index_2pt, pts, vegas_wp, prob_2pt, prob_1pt) |>
+    group_by(index_2pt) |>
     summarize(
       wp_0 = dplyr::first(vegas_wp),
       wp_1 = dplyr::nth(vegas_wp, 2),
       wp_2 = dplyr::last(vegas_wp),
       conv_2pt = dplyr::first(prob_2pt),
       conv_1pt = dplyr::first(prob_1pt)
-    ) %>%
+    ) |>
     mutate(
       wp_go2 = conv_2pt * wp_2 + (1 - conv_2pt) * wp_0,
       wp_go1 = conv_1pt * wp_1 + (1 - conv_1pt) * wp_0,
 
       # convenience column useful for other things
       wp_td = ifelse(wp_go1 > wp_go2, wp_go1, wp_go2)
-    ) %>%
+    ) |>
     ungroup()
 
-  pbp %>%
-    left_join(probs, by = "index_2pt") %>%
-    select(-index_2pt) %>%
-    return()
+  pbp |>
+    left_join(probs, by = "index_2pt") |>
+    select(-index_2pt)
 
 }
 
@@ -204,10 +202,10 @@ get_2pt_wp <- function(pbp) {
 get_go_wp <- function(pbp) {
 
   n_plays <- nrow(pbp)
-  pbp <- pbp %>% mutate(go_index = 1 : n())
+  pbp <- pbp |> mutate(go_index = 1 : n())
 
   # stuff in the go for it model
-  data <- pbp %>%
+  data <- pbp |>
     select(
       down,    ydstogo,     yardline_100,  era3,     era4,     outdoors,
       retractable,  dome,    posteam_spread, total_line,  posteam_total
@@ -224,32 +222,32 @@ get_go_wp <- function(pbp) {
   # We switch back to the vector (transposing might be expensive) in order
   # to keep the rest of the code (for now).
   if (is.matrix(preds)) {
-    preds <- preds %>%
-      t() %>%
+    preds <- preds |>
+      t() |>
       as.vector("numeric")
   }
-  preds_df <- preds %>%
-    tibble::as_tibble() %>%
-    dplyr::rename(prob = "value") %>%
+  preds_df <- preds |>
+    tibble::as_tibble() |>
+    dplyr::rename(prob = "value") |>
     dplyr::bind_cols(
       tibble::tibble(
         "gain" = rep_len(-10:65, length.out = n_plays * 76),
         "go_index" = rep(pbp$go_index, times = rep_len(76, length.out = n_plays))
-      ) %>%
+      ) |>
         dplyr::left_join(pbp, by = "go_index")
-    ) %>%
+    ) |>
     dplyr::mutate(
       # if predicted gain is more than possible, call it a TD
       gain = ifelse(gain > yardline_100, as.integer(yardline_100), as.integer(gain))
-    ) %>%
+    ) |>
 
     # this step is to combine all the TD probs into one (for gains longer than possible)
-    group_by(go_index, gain) %>%
-    mutate(prob = sum(prob)) %>%
-    dplyr::slice(1) %>%
+    group_by(go_index, gain) |>
+    mutate(prob = sum(prob)) |>
+    dplyr::slice(1) |>
 
     # needed for the max() step later
-    group_by(go_index) %>%
+    group_by(go_index) |>
 
     # update situation based on play result
     mutate(
@@ -291,15 +289,15 @@ get_go_wp <- function(pbp) {
       # if now goal to go for either team, use yardline for yards to go, otherwise it's 1st and 10
       ydstogo = ifelse(yardline_100 < 10, yardline_100, 10)
 
-    ) %>%
+    ) |>
     ungroup()
 
   # separate df of just the TDs to calculate WP after TD
   # this step is needed to deal with the option of 1pt or 2pt choice
-  if (nrow(preds_df %>% filter(yardline_100 == 0)) > 0) {
-    tds_df <- preds_df %>%
-      filter(yardline_100 == 0) %>%
-      get_2pt_wp() %>%
+  if (nrow(preds_df |> filter(yardline_100 == 0)) > 0) {
+    tds_df <- preds_df |>
+      filter(yardline_100 == 0) |>
+      get_2pt_wp() |>
       select(go_index, yardline_100, wp_td)
   } else {
     # avoids errors when one play is fed that doesn't have TD in range
@@ -311,10 +309,10 @@ get_go_wp <- function(pbp) {
 
 
   # join TD WPs back to original df and use those WPs
-  preds <- preds_df %>%
-    left_join(tds_df, by = c("go_index", "yardline_100")) %>%
-    flip_half() %>%
-    calculate_win_probability() %>%
+  preds <- preds_df |>
+    left_join(tds_df, by = c("go_index", "yardline_100")) |>
+    flip_half() |>
+    calculate_win_probability() |>
     mutate(
       # get the TD probs computed separately
       vegas_wp = ifelse(yardline_100 == 0, wp_td, vegas_wp),
@@ -338,37 +336,36 @@ get_go_wp <- function(pbp) {
       wt_wp = prob * vegas_wp
     )
 
-  report <- preds %>%
-    group_by(go_index, turnover) %>%
+  report <- preds |>
+    group_by(go_index, turnover) |>
     mutate(
       fd_pct = sum(prob),
       new_prob = prob / fd_pct,
       wt_wp = new_prob * vegas_wp
-    ) %>%
+    ) |>
     summarize(
       pct = sum(prob),
       wp = sum(wt_wp)
-    ) %>%
+    ) |>
     pivot_wider(
       names_from = turnover, values_from = c("pct", "wp")
-    ) %>%
+    ) |>
     dplyr::rename(
       first_down_prob = pct_0,
       wp_fail = wp_1,
       wp_succeed = wp_0
-    ) %>%
-    ungroup() %>%
+    ) |>
+    ungroup() |>
     dplyr::select(go_index, first_down_prob, wp_fail, wp_succeed)
 
-  wp_go_df <- preds %>%
-    group_by(go_index) %>%
-    summarize(go_wp = sum(wt_wp)) %>%
+  wp_go_df <- preds |>
+    group_by(go_index) |>
+    summarize(go_wp = sum(wt_wp)) |>
     ungroup()
 
-  pbp %>%
-    left_join(report, by = "go_index") %>%
-    left_join(wp_go_df, by = "go_index") %>%
-    select(-go_index) %>%
-    return()
+  pbp |>
+    left_join(report, by = "go_index") |>
+    left_join(wp_go_df, by = "go_index") |>
+    select(-go_index)
 
 }
