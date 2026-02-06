@@ -19,8 +19,6 @@ Imports:
     cli,
     curl,
     dplyr,
-    glue,
-    httr,
     janitor,
     jsonlite,
     mgcv,
@@ -31,7 +29,6 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    tidyselect,
     xgboost
 Suggests: 
     data.table,
