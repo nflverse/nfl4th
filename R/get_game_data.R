@@ -29,7 +29,6 @@
 #' dplyr::glimpse(plays)
 #' }
 get_4th_plays <- function(gid) {
-
   df <- .games_nfl4th() |>
     filter(game_id == gid)
 
@@ -37,7 +36,6 @@ get_4th_plays <- function(gid) {
 
   tryCatch(
     expr = {
-
       game_url <- paste0(
         "http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=",
         df$espn
@@ -51,26 +49,37 @@ get_4th_plays <- function(gid) {
 
       # get plays out of the drives lists
       # i think current drive duplicates a drive in previous drive so might be ok to cut this
-      if ("current" %in% names(pbp$drives) & "previous" %in% names(pbp$drives)) {
+      if (
+        "current" %in% names(pbp$drives) & "previous" %in% names(pbp$drives)
+      ) {
         current_drive <- pbp$drives$current
-        current_drive <- current_drive[['plays']] |> bind_rows() |> as_tibble() |> mutate(team.abbreviation = current_drive$team$abbreviation)
+        current_drive <- current_drive[['plays']] |>
+          bind_rows() |>
+          as_tibble() |>
+          mutate(team.abbreviation = current_drive$team$abbreviation)
 
         previous_drives <- pbp$drives$previous
 
         drives <- bind_rows(
-          previous_drives |> dplyr::select(team.abbreviation, plays) |> tidyr::unnest(plays),
+          previous_drives |>
+            dplyr::select(team.abbreviation, plays) |>
+            tidyr::unnest(plays),
           current_drive
         )
       } else if ("current" %in% names(pbp$drives)) {
         current_drive <- pbp$drives$current
-        drives <- current_drive[['plays']] |> bind_rows() |> as_tibble() |> mutate(team.abbreviation = current_drive$team$abbreviation)
+        drives <- current_drive[['plays']] |>
+          bind_rows() |>
+          as_tibble() |>
+          mutate(team.abbreviation = current_drive$team$abbreviation)
       } else {
         previous_drives <- pbp$drives$previous
-        drives <- previous_drives |> dplyr::select(team.abbreviation, plays) |> tidyr::unnest(plays)
+        drives <- previous_drives |>
+          dplyr::select(team.abbreviation, plays) |>
+          tidyr::unnest(plays)
       }
 
       suppressWarnings(
-
         plays <- drives |>
           as_tibble() |>
           group_by(id) |>
@@ -92,11 +101,31 @@ get_4th_plays <- function(gid) {
             # time column is wacky so extract it from play description when possible
             play_time = stringr::str_extract(desc, "\\([^()]+(?=\\)\\s)"),
             play_time = substr(play_time, 2, nchar(play_time)),
-            play_min = stringr::str_extract(play_time, "[^()]+(?=\\:)") |> as.integer(),
-            play_min = if_else(is.na(play_min) & !is.na(play_time), as.integer(0), play_min),
-            play_sec = substr(play_time, nchar(play_time) - 1, nchar(play_time)) |> as.integer(),
-            mins = if_else(nchar(time) == 5, substr(time, 1, 2), substr(time, 1, 1)) |> as.integer(),
-            secs = if_else(nchar(time) == 5, substr(time, 4, 5), substr(time, 3, 4)) |> as.integer()
+            play_min = stringr::str_extract(play_time, "[^()]+(?=\\:)") |>
+              as.integer(),
+            play_min = if_else(
+              is.na(play_min) & !is.na(play_time),
+              as.integer(0),
+              play_min
+            ),
+            play_sec = substr(
+              play_time,
+              nchar(play_time) - 1,
+              nchar(play_time)
+            ) |>
+              as.integer(),
+            mins = if_else(
+              nchar(time) == 5,
+              substr(time, 1, 2),
+              substr(time, 1, 1)
+            ) |>
+              as.integer(),
+            secs = if_else(
+              nchar(time) == 5,
+              substr(time, 4, 5),
+              substr(time, 3, 4)
+            ) |>
+              as.integer()
             # trying to fix wacky behavior 9/2023
             # mins = if_else(is.na(play_min), mins, play_min),
             # secs = if_else(is.na(play_sec), secs, play_sec)
@@ -111,15 +140,35 @@ get_4th_plays <- function(gid) {
               TRUE ~ posteam
             )
           ) |>
-          dplyr::mutate_at(dplyr::vars("home_team", "away_team", "posteam"), team_name_fn) |>
+          dplyr::mutate_at(
+            dplyr::vars("home_team", "away_team", "posteam"),
+            team_name_fn
+          ) |>
           mutate(
             defteam = if_else(posteam == home_team, away_team, home_team),
             half = if_else(qtr <= 2, 1, 2),
-            challenge_team = stringr::str_extract(desc, "[:alpha:]*\\s*[:alpha:]*\\s*[:alpha:]*[:alpha:]+(?=\\schallenged)"),
-            challenge_team = stringr::str_replace_all(challenge_team, "[\r\n]" , ""),
-            challenge_team = stringr::str_trim(challenge_team, side = c("both")),
-            desc_timeout = if_else(stringr::str_detect(desc, "Timeout #[:digit:]"), 1, 0),
-            timeout_team = stringr::str_extract(desc, "(?<=Timeout #[:digit:] by )[:upper:]{2,3}"),
+            challenge_team = stringr::str_extract(
+              desc,
+              "[:alpha:]*\\s*[:alpha:]*\\s*[:alpha:]*[:alpha:]+(?=\\schallenged)"
+            ),
+            challenge_team = stringr::str_replace_all(
+              challenge_team,
+              "[\r\n]",
+              ""
+            ),
+            challenge_team = stringr::str_trim(
+              challenge_team,
+              side = c("both")
+            ),
+            desc_timeout = if_else(
+              stringr::str_detect(desc, "Timeout #[:digit:]"),
+              1,
+              0
+            ),
+            timeout_team = stringr::str_extract(
+              desc,
+              "(?<=Timeout #[:digit:] by )[:upper:]{2,3}"
+            ),
             timeout_team = case_when(
               # fix team abbrevs
               timeout_team == "WSH" ~ "WAS",
@@ -148,7 +197,8 @@ get_4th_plays <- function(gid) {
               challenge_team == "Jacksonville" & desc_timeout == 1 ~ "JAX",
               challenge_team == "Kansas City" & desc_timeout == 1 ~ "KC",
               challenge_team == "Los Angeles Rams" & desc_timeout == 1 ~ "LA",
-              challenge_team == "Los Angeles Chargers" & desc_timeout == 1 ~ "LAC",
+              challenge_team == "Los Angeles Chargers" &
+                desc_timeout == 1 ~ "LAC",
               challenge_team == "Las Vegas" & desc_timeout == 1 ~ "LV",
               challenge_team == "Miami" & desc_timeout == 1 ~ "MIA",
               challenge_team == "Minnesota" & desc_timeout == 1 ~ "MIN",
@@ -182,13 +232,23 @@ get_4th_plays <- function(gid) {
           dplyr::group_by(half) |>
           arrange(qtr, desc(mins), desc(secs), id) |>
           dplyr::mutate(
-            total_home_timeouts_used = dplyr::if_else(cumsum(home_timeout_used) > 3, 3, cumsum(home_timeout_used)),
-            total_away_timeouts_used = dplyr::if_else(cumsum(away_timeout_used) > 3, 3, cumsum(away_timeout_used))
+            total_home_timeouts_used = dplyr::if_else(
+              cumsum(home_timeout_used) > 3,
+              3,
+              cumsum(home_timeout_used)
+            ),
+            total_away_timeouts_used = dplyr::if_else(
+              cumsum(away_timeout_used) > 3,
+              3,
+              cumsum(away_timeout_used)
+            )
           ) |>
           dplyr::ungroup() |>
           dplyr::mutate(
-            home_timeouts_remaining = home_timeouts_remaining - total_home_timeouts_used,
-            away_timeouts_remaining = away_timeouts_remaining - total_away_timeouts_used,
+            home_timeouts_remaining = home_timeouts_remaining -
+              total_home_timeouts_used,
+            away_timeouts_remaining = away_timeouts_remaining -
+              total_away_timeouts_used,
             posteam_timeouts_remaining = dplyr::if_else(
               posteam == home_team,
               home_timeouts_remaining,
@@ -202,10 +262,18 @@ get_4th_plays <- function(gid) {
             time = 60 * as.integer(mins) + as.integer(secs),
             home_score = dplyr::lag(home_score),
             away_score = dplyr::lag(away_score),
-            score_differential = if_else(posteam == home_team, home_score - away_score, away_score - home_score),
+            score_differential = if_else(
+              posteam == home_team,
+              home_score - away_score,
+              away_score - home_score
+            ),
             runoff = 0,
             season = df$season,
-            home_opening_kickoff = if_else(dplyr::first(stats::na.omit(posteam)) == home_team, 1, 0),
+            home_opening_kickoff = if_else(
+              dplyr::first(stats::na.omit(posteam)) == home_team,
+              1,
+              0
+            ),
             type = df$type
           ) |>
           filter(
@@ -241,7 +309,9 @@ get_4th_plays <- function(gid) {
               yardline_number
             ),
             yardline_100 = if_else(
-              !is.na(temp_yardline), as.integer(temp_yardline), yardline_100
+              !is.na(temp_yardline),
+              as.integer(temp_yardline),
+              yardline_100
             )
           ) |>
           select(
@@ -272,23 +342,40 @@ get_4th_plays <- function(gid) {
           # put in end of game conditions
           dplyr::mutate(
             # if there's a conversion with fewer than 5 minutes left and a lead, run off 40 seconds
-            runoff = if_else(between(quarter_seconds_remaining, 167, 300) & score_differential > 0 & qtr == 4, 40, runoff),
+            runoff = if_else(
+              between(quarter_seconds_remaining, 167, 300) &
+                score_differential > 0 &
+                qtr == 4,
+              40,
+              runoff
+            ),
             # if there's a conversion right before 2 minute warning, run down to 2 minute warning
-            runoff = if_else(between(quarter_seconds_remaining, 127, 166) & score_differential > 0 & qtr == 4, quarter_seconds_remaining - 120 - 6, runoff),
+            runoff = if_else(
+              between(quarter_seconds_remaining, 127, 166) &
+                score_differential > 0 &
+                qtr == 4,
+              quarter_seconds_remaining - 120 - 6,
+              runoff
+            ),
             # if conversion after 2 minute warning, run down 40 seconds
-            runoff = if_else(quarter_seconds_remaining <= 120 & score_differential > 0 & qtr == 4, 40, runoff)
+            runoff = if_else(
+              quarter_seconds_remaining <= 120 &
+                score_differential > 0 &
+                qtr == 4,
+              40,
+              runoff
+            )
           )
       )
 
       if (nrow(plays) > 0) {
         plays <- plays |>
           mutate(
-            index = 1 : n()
+            index = 1:n()
           )
       } else {
         plays$index <- NA_real_
       }
-
     },
     error = function(e) {
       message("The following error has occured:")
@@ -301,9 +388,7 @@ get_4th_plays <- function(gid) {
         )
       }
     },
-    finally = {
-    }
-
+    finally = {}
   )
 
   return(plays)
