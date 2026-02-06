@@ -52,8 +52,7 @@
 #' dplyr::glimpse(probs)
 #' }
 add_4th_probs <- function(df) {
-
-  original_df <- df |> mutate(index = 1 : n())
+  original_df <- df |> mutate(index = 1:n())
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
@@ -74,7 +73,7 @@ add_4th_probs <- function(df) {
   cli::cli_alert_info("Computing probabilities for {nrow(df)} plays. . .")
   df <- df |>
     add_probs() |>
-    mutate(play_no = 1 : n()) |>
+    mutate(play_no = 1:n()) |>
     group_by(play_no) |>
     mutate(
       punt_prob = if_else(is.na(punt_wp), 0, punt_wp),
@@ -83,9 +82,16 @@ add_4th_probs <- function(df) {
     ) |>
     ungroup() |>
     select(
-      index, go_boost,
-      first_down_prob, wp_fail, wp_succeed, go_wp,
-      fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp,
+      index,
+      go_boost,
+      first_down_prob,
+      wp_fail,
+      wp_succeed,
+      go_wp,
+      fg_make_prob,
+      miss_fg_wp,
+      make_fg_wp,
+      fg_wp,
       punt_wp
     )
 
@@ -117,41 +123,62 @@ add_4th_probs <- function(df) {
 #' }
 #' }
 load_4th_pbp <- function(seasons, fast = FALSE) {
-
   if (min(seasons) < 2014) {
-    stop("Season before 2014 supplied. Please try again with nothing before 2014.")
+    stop(
+      "Season before 2014 supplied. Please try again with nothing before 2014."
+    )
   }
 
   # season-by-season = less likely to result in crashes due to memory
   if (fast) {
-    data <- purrr::map_df(seasons, ~{
-      cli::cli_alert_info("Loading season {.x}")
-      nflfastR::load_pbp(.x) |>
-        left_join(readRDS(url("https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id"))
-    })
+    data <- purrr::map_df(
+      seasons,
+      ~ {
+        cli::cli_alert_info("Loading season {.x}")
+        nflfastR::load_pbp(.x) |>
+          left_join(
+            readRDS(url(
+              "https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
+            )),
+            by = c("game_id", "play_id")
+          )
+      }
+    )
   } else {
-    data <- purrr::map_df(seasons, ~{
-      cli::cli_alert_info("Loading season {.x}")
-      nflreadr::load_pbp(.x) |>
-        nfl4th::add_4th_probs()
-    })
+    data <- purrr::map_df(
+      seasons,
+      ~ {
+        cli::cli_alert_info("Loading season {.x}")
+        nflreadr::load_pbp(.x) |>
+          nfl4th::add_4th_probs()
+      }
+    )
   }
 
   data |>
     dplyr::mutate(
       go = ifelse(
         (rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
-        100, 0
+        100,
+        0
       ),
       # if it's an aborted snap in punt formation, call it a punt
       go = ifelse(
         aborted_play == 1 & stringr::str_detect(desc, "Punt formation"),
-        0, go
+        0,
+        go
       ),
       # if it's a run formation or pass formation and there's a dead ball penalty, set go to NA
       # since we can't know the intention of the play
       go = case_when(
-        stringr::str_detect(desc, "(Run formation)|(Pass formation)|(Shotgun)") & stringr::str_detect(desc, "(False Start)|(Neutral Zone Infraction)") ~ NA_real_,
+        stringr::str_detect(
+          desc,
+          "(Run formation)|(Pass formation)|(Shotgun)"
+        ) &
+          stringr::str_detect(
+            desc,
+            "(False Start)|(Neutral Zone Infraction)"
+          ) ~ NA_real_,
         TRUE ~ go
       )
     )
@@ -202,12 +229,13 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' dplyr::glimpse(probs)
 #' }
 add_2pt_probs <- function(df) {
-
-  original_df <- df |> mutate(index = 1 : n())
+  original_df <- df |> mutate(index = 1:n())
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
-    message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
+    message(
+      "type not found. Assuming an nflfastR df and doing necessary cleaning . . ."
+    )
     modified_df <- original_df |>
       prepare_nflfastr_data() |>
       filter(
@@ -224,9 +252,13 @@ add_2pt_probs <- function(df) {
     get_2pt_wp() |>
     select(
       index,
-      wp_0, wp_1, wp_2,
-      conv_1pt, conv_2pt,
-      wp_go1, wp_go2
+      wp_0,
+      wp_1,
+      wp_2,
+      conv_1pt,
+      conv_2pt,
+      wp_go1,
+      wp_go2
     )
 
   original_df |>

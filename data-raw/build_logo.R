@@ -3,7 +3,7 @@ library(showtext)
 
 ## Loading Google fonts (http://www.google.com/fonts)
 # font_add_google("Bowlby One SC", "seb")
-font_add_google("Syncopate", "seb")##
+font_add_google("Syncopate", "seb") ##
 # font_add_google("Michroma", "seb")
 # font_add_google("Allerta Stencil", "seb")
 ## Automatically use showtext to render text for future devices

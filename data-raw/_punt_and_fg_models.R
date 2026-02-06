@@ -7,9 +7,12 @@ seasons <- 2010:2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
-      glue::glue("https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds")
+      glue::glue(
+        "https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds"
+      )
     )
-  ) |> filter(play_type_nfl == "PUNT")
+  ) |>
+    filter(play_type_nfl == "PUNT")
 })
 
 # thank you to Thomas Mock for the function
@@ -29,12 +32,17 @@ points <- pbp |>
   mutate(
     # give return yards too
     yardline_after = yardline_100 - kick_distance + return_yards,
-    yardline_after =
-      if_else(
-        stringr::str_detect(desc, "end zone") & is.na(kick_distance), 20, yardline_after
-      ),
+    yardline_after = if_else(
+      stringr::str_detect(desc, "end zone") & is.na(kick_distance),
+      20,
+      yardline_after
+    ),
     # for blocked punts, just give them the ball there
-    yardline_after = if_else(stringr::str_detect(desc, "BLOCKED") & is.na(yardline_after), yardline_100, yardline_after),
+    yardline_after = if_else(
+      stringr::str_detect(desc, "BLOCKED") & is.na(yardline_after),
+      yardline_100,
+      yardline_after
+    ),
     # make it in the actual field of play
     yardline_after = if_else(yardline_after > 100, 100, yardline_after),
     # there's 2 safeties that are too annoying to deal with
@@ -126,15 +134,21 @@ df <- density_map_normal |>
   arrange(yardline_100, yardline_after) |>
   group_by(yardline_100) |>
   mutate(
-    outlier_pct = sum(density * (yardline_after == 100)) + sum(density * (yardline_after == 999)),
+    outlier_pct = sum(density * (yardline_after == 100)) +
+      sum(density * (yardline_after == 999)),
     non_outlier_pct = 1 - outlier_pct,
     pct = pct * non_outlier_pct,
     pct = if_else(is.na(pct), density, pct),
-    yardline_after = if_else(yardline_after == 999, yardline_100, yardline_after)
+    yardline_after = if_else(
+      yardline_after == 999,
+      yardline_100,
+      yardline_after
+    )
   ) |>
   ungroup() |>
   left_join(
-    outliers |> select(yardline_100, bin_muffed_pct), by = "yardline_100"
+    outliers |> select(yardline_100, bin_muffed_pct),
+    by = "yardline_100"
   ) |>
   arrange(yardline_100, yardline_after) |>
   select(yardline_100, yardline_after, pct, bin_muffed_pct) |>
@@ -149,10 +163,12 @@ bind_rows(
   arrange(yardline_100, yardline_after) |>
   group_by(yardline_100, yardline_after) |>
   mutate(
-    muff = 1 : n() - 1,
+    muff = 1:n() - 1,
     pct = if_else(muff == 1, bin_muffed_pct * pct, pct),
     pct = if_else(
-      muff == 0 & yardline_after != 100 & yardline_100 != yardline_after, (1 - bin_muffed_pct) * pct, pct
+      muff == 0 & yardline_after != 100 & yardline_100 != yardline_after,
+      (1 - bin_muffed_pct) * pct,
+      pct
     )
   ) |>
   # one last making sure all the pct add up to 1
@@ -160,7 +176,10 @@ bind_rows(
   mutate(tot_pct = sum(pct), pct = pct / tot_pct) |>
   ungroup() |>
   select(
-    yardline_100, yardline_after, pct, muff
+    yardline_100,
+    yardline_after,
+    pct,
+    muff
   ) |>
   saveRDS('data-raw/punt_data.rds')
 
@@ -168,20 +187,21 @@ bind_rows(
 # **************************************************************************************
 # field goals
 
-pbp <- nflreadr::load_pbp(2014 : nflreadr::get_current_season()) |>
-    filter(
-      play_type_nfl == "FIELD_GOAL"
-    ) |>
+pbp <- nflreadr::load_pbp(2014:nflreadr::get_current_season()) |>
+  filter(
+    play_type_nfl == "FIELD_GOAL"
+  ) |>
   mutate(
     fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
     fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
     fg_model_roof = paste0(fg_roof, fg_era) |> as.factor()
-
   )
 
 #estimate model
-fg_model <- mgcv::bam(sp ~ s(yardline_100, by = interaction(fg_model_roof)) + fg_model_roof,
-                      data = pbp, family = "binomial")
+fg_model <- mgcv::bam(
+  sp ~ s(yardline_100, by = interaction(fg_model_roof)) + fg_model_roof,
+  data = pbp,
+  family = "binomial"
+)
 
 save(fg_model, file = 'data-raw/fg_model.Rdata')
-

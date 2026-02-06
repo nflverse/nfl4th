@@ -32,7 +32,6 @@
 #' nfl4th::make_table_data(probs)
 #'}
 make_table_data <- function(probs) {
-
   go <- tibble::tibble(
     "choice_prob" = probs$go_wp,
     "choice" = "Go for it",
@@ -61,7 +60,9 @@ make_table_data <- function(probs) {
     select(choice, choice_prob, success_prob, fail_wp, success_wp)
 
   for_return <- bind_rows(
-    go, fg, punt
+    go,
+    fg,
+    punt
   ) |>
     mutate(
       choice_prob = 100 * choice_prob,
@@ -106,7 +107,6 @@ make_table_data <- function(probs) {
 #' nfl4th::make_2pt_table_data(probs)
 #' }
 make_2pt_table_data <- function(probs) {
-
   go <- tibble::tibble(
     "choice_prob" = probs$wp_go2,
     "choice" = "Go for 2",
@@ -126,7 +126,8 @@ make_2pt_table_data <- function(probs) {
     select(choice, choice_prob, success_prob, fail_wp, success_wp)
 
   for_return <- bind_rows(
-    go, pat
+    go,
+    pat
   ) |>
     mutate(
       choice_prob = 100 * choice_prob,

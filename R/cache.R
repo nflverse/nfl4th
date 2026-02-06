@@ -1,30 +1,42 @@
 # paths are defined in zzz.R
 # these helpers read games or fd_model and save them to a package cache
 
-nfl4th_games_path <- function()   file.path(R_user_dir("nfl4th", "cache"), "games_nfl4th.rds")
-nfl4th_fdmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "fd_model.rds")
-nfl4th_wpmodel_path <- function() file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
+nfl4th_games_path <- function() {
+  file.path(R_user_dir("nfl4th", "cache"), "games_nfl4th.rds")
+}
+nfl4th_fdmodel_path <- function() {
+  file.path(R_user_dir("nfl4th", "cache"), "fd_model.rds")
+}
+nfl4th_wpmodel_path <- function() {
+  file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
+}
 
-.games_nfl4th <- function(){
-  if (probably_cran() && !force_cache()) return(get_games_file())
-  if (!file.exists(nfl4th_games_path())){
+.games_nfl4th <- function() {
+  if (probably_cran() && !force_cache()) {
+    return(get_games_file())
+  }
+  if (!file.exists(nfl4th_games_path())) {
     saveRDS(get_games_file(), nfl4th_games_path())
   }
   readRDS(nfl4th_games_path())
 }
 
-fd_model <- function(){
-  if (probably_cran() && !force_cache()) return(xgboost::xgb.load.raw(load_fd_model()))
-  if (!file.exists(nfl4th_fdmodel_path())){
+fd_model <- function() {
+  if (probably_cran() && !force_cache()) {
+    return(xgboost::xgb.load.raw(load_fd_model()))
+  }
+  if (!file.exists(nfl4th_fdmodel_path())) {
     saveRDS(load_fd_model(), nfl4th_fdmodel_path())
   }
   readRDS(nfl4th_fdmodel_path()) |>
     xgboost::xgb.load.raw()
 }
 
-wp_model <- function(){
-  if (probably_cran() && !force_cache()) return(xgboost::xgb.load.raw(load_wp_model()))
-  if (!file.exists(nfl4th_wpmodel_path())){
+wp_model <- function() {
+  if (probably_cran() && !force_cache()) {
+    return(xgboost::xgb.load.raw(load_wp_model()))
+  }
+  if (!file.exists(nfl4th_wpmodel_path())) {
     saveRDS(load_wp_model(), nfl4th_wpmodel_path())
   }
   readRDS(nfl4th_wpmodel_path()) |>
@@ -46,9 +58,12 @@ wp_model <- function(){
 #'
 #' @examples
 #' nfl4th_clear_cache()
-nfl4th_clear_cache <- function(type = c("games", "fd_model", "wp_model", "all")){
+nfl4th_clear_cache <- function(
+  type = c("games", "fd_model", "wp_model", "all")
+) {
   type <- rlang::arg_match(type)
-  to_delete <- switch (type,
+  to_delete <- switch(
+    type,
     "games" = nfl4th_games_path(),
     "fd_model" = nfl4th_fdmodel_path(),
     "wp_model" = nfl4th_wpmodel_path(),
@@ -60,10 +75,11 @@ nfl4th_clear_cache <- function(type = c("games", "fd_model", "wp_model", "all"))
 
 # The env var _R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_ is mostly
 # a CRAN env var. We use it to decide if the code likely is running on CRAN
-probably_cran <- function(){
+probably_cran <- function() {
   cpu_threshold <- Sys.getenv(
-    "_R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_", NA_character_
-    )
+    "_R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_",
+    NA_character_
+  )
   !is.na(cpu_threshold)
 }
 
