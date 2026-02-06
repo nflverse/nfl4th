@@ -1,11 +1,9 @@
 url: https://www.nfl4th.com/
 
 template:
-  params:
-    bootswatch: sandstone
-  # opengraph:
-  #   image:
-  #     src: https://raw.githubusercontent.com/leesharpe/nflseedR/master/man/figures/gh_preview.png
+  bootstrap: 5
+  light-switch: true
+  bootswatch: sandstone
 
 toc:
   depth: 3
@@ -19,7 +17,7 @@ authors:
 navbar:
   structure:
     left:  [home, intro, reference, research, news, tutorials]
-    right: [twitter, github]
+    right: [search, lightswitch, discord, twitter, github]
   components:
     reference:
       text: "Functions"
@@ -29,4 +27,9 @@ navbar:
       href: articles/articles/4th-down-research.html
     twitter:
       icon: "fab fa-twitter fa-lg"
+      aria-label: Twitter
       href: http://twitter.com/ben_bot_baldwin
+    discord:
+      icon: "fab fa-discord fa-lg"
+      href: https://discord.com/invite/5Er2FBnnQa
+      aria-label: Discord
