@@ -39,7 +39,7 @@ drop.me <- c("vegas_wp", "vegas_home_wp", "ep")
 calculate_win_probability <- function(pbp_data) {
 
   # drop existing values of ep and the probs before making new ones
-  pbp_data <- pbp_data |> dplyr::select(-tidyselect::any_of(drop.me))
+  pbp_data <- pbp_data |> dplyr::select(-dplyr::any_of(drop.me))
   pbp_data <- pbp_data |> dplyr::select(-ends_with("_prob"))
 
   # model 1: estimate home win probability
