@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/nflverse/nfl4th/workflows/R-CMD-check/badge.svg)](https://github.com/nflverse/nfl4th/actions)
+[![R-CMD-check](https://github.com/nflverse/nfl4th/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nflverse/nfl4th/actions/workflows/R-CMD-check.yaml)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/nfl4th)](https://CRAN.R-project.org/package=nfl4th)
 [![Lifecycle:
@@ -44,8 +44,8 @@ install.packages("nfl4th", repos = c("https://nflverse.r-universe.dev", getOptio
 or by using remotes:
 
 ``` r
-if (!require("remotes")) install.packages("remotes")
-remotes::install_github("nflverse/nfl4th")
+if (!require("pak")) install.packages("pak")
+pak::pak("nflverse/nfl4th")
 ```
 
 ## Features
