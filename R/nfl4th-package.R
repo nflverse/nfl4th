@@ -5,7 +5,6 @@
 # roxygen namespace tags. Modify with care!
 ## usethis namespace: start
 #' @import dplyr
-#' @importFrom glue glue
 #' @importFrom nflfastR calculate_win_probability
 #' @importFrom rlang arg_match
 #' @importFrom stringr str_replace_all
