@@ -10,7 +10,6 @@
 #' @importFrom rlang arg_match
 #' @importFrom stringr str_replace_all
 #' @importFrom tidyr pivot_wider
-#' @importFrom tidyselect any_of
 #' @importFrom tools R_user_dir
 #' @importFrom xgboost getinfo
 ## usethis namespace: end
