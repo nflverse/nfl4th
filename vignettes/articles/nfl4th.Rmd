@@ -27,27 +27,27 @@ data <- nfl4th::load_4th_pbp(2020)
 Here's what the data obtained using `load_4th_pbp()` looks like: 
 
 ```{r ex1}
-data %>%
-  dplyr::filter(!is.na(go_boost)) %>%
-  utils::head(10) %>%
+data |>
+  dplyr::filter(!is.na(go_boost)) |>
+  utils::head(10) |>
   dplyr::select(
     posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
     wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
     fg_wp, punt_wp
-  ) %>%
+  ) |>
   knitr::kable(digits = 2)
 ```
 
 Or we can add some filters to look up a certain game:
 
 ```{r ex2}
-data %>%
-  dplyr::filter(week == 20, posteam == "GB", down == 4) %>%
+data |>
+  dplyr::filter(week == 20, posteam == "GB", down == 4) |>
   dplyr::select(
     posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
     wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
     fg_wp, punt_wp
-  ) %>%
+  ) |>
   knitr::kable(digits = 2)
 ```
 
@@ -81,13 +81,13 @@ one_play <- tibble::tibble(
   defteam_timeouts_remaining = 3
 )
 
-one_play %>%
-  nfl4th::add_4th_probs() %>%
+one_play |>
+  nfl4th::add_4th_probs() |>
   dplyr::select(
     posteam, ydstogo, yardline_100, posteam, go_boost, first_down_prob, 
     wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, 
     fg_wp, punt_wp
-  ) %>%
+  ) |>
   knitr::kable(digits = 2)
 ```
 
@@ -98,9 +98,9 @@ Comparing this and the table above, we see the exact same numbers as expected.
 Let's put the play above into a table using the provided function `make_table_data()`, which makes it easier to interpret the recommendations for a play. This function only works with one play at a time since it makes a table using the results from the play.
 
 ```{r table1}
-one_play %>%
-  nfl4th::add_4th_probs() %>%
-  nfl4th::make_table_data() %>%
+one_play |>
+  nfl4th::add_4th_probs() |>
+  nfl4th::make_table_data() |>
   knitr::kable(digits = 1)
 ```
 
@@ -130,9 +130,9 @@ another_play <- tibble::tibble(
   defteam_timeouts_remaining = 3
 )
 
-another_play %>%
-  nfl4th::add_2pt_probs() %>%
-  nfl4th::make_2pt_table_data() %>%
+another_play |>
+  nfl4th::add_2pt_probs() |>
+  nfl4th::make_2pt_table_data() |>
   knitr::kable(digits = 1)
 ```
 
@@ -143,15 +143,15 @@ Note that the go for 2 probability here is identical to the win probability asso
 `nflfastR` isn't available for live games and typing all the plays in by hand is annoying. So how does the 4th down bot work? With thanks to the ESPN API, which can be accessed using `get_4th_plays()`.
 
 ```{r espn}
-plays <- get_4th_plays("2020_20_TB_GB") %>%
+plays <- get_4th_plays("2020_20_TB_GB") |>
   tail(1)
 
-plays %>% 
+plays |> 
   select(desc, quarter_seconds_remaining)
 
-plays %>% 
-  nfl4th::add_4th_probs() %>%
-  nfl4th::make_table_data() %>%
+plays |> 
+  nfl4th::add_4th_probs() |>
+  nfl4th::make_table_data() |>
   knitr::kable(digits = 1)
 ```
 

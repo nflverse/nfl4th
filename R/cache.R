@@ -18,7 +18,7 @@ fd_model <- function(){
   if (!file.exists(nfl4th_fdmodel_path())){
     saveRDS(load_fd_model(), nfl4th_fdmodel_path())
   }
-  readRDS(nfl4th_fdmodel_path()) %>%
+  readRDS(nfl4th_fdmodel_path()) |>
     xgboost::xgb.load.raw()
 }
 
@@ -27,7 +27,7 @@ wp_model <- function(){
   if (!file.exists(nfl4th_wpmodel_path())){
     saveRDS(load_wp_model(), nfl4th_wpmodel_path())
   }
-  readRDS(nfl4th_wpmodel_path()) %>%
+  readRDS(nfl4th_wpmodel_path()) |>
     xgboost::xgb.load.raw()
 }
 
