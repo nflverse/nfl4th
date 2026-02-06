@@ -1,7 +1,5 @@
 .onLoad <- function(libname,pkgname){
 
-  backports::import(pkgname, "R_user_dir")
-
   is_online <- !is.null(curl::nslookup("github.com", error = FALSE))
   keep_games <- isTRUE(getOption("nfl4th.keep_games", FALSE))
 

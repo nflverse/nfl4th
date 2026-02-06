@@ -4,7 +4,7 @@
 #making sure they're in the right order
 wp_model_select <- function(pbp) {
 
-  pbp <- pbp %>%
+  pbp <- pbp |>
     dplyr::select(
       "home_receive_2h_ko",
       "spread_time",
@@ -28,7 +28,7 @@ wp_model_select <- function(pbp) {
 # apply the predictions
 get_preds_wp <- function(pbp) {
 
-  preds <- stats::predict(wp_model(), as.matrix(pbp %>% wp_model_select()))
+  preds <- stats::predict(wp_model(), as.matrix(pbp |> wp_model_select()))
 
   return(preds)
 }
@@ -39,12 +39,12 @@ drop.me <- c("vegas_wp", "vegas_home_wp", "ep")
 calculate_win_probability <- function(pbp_data) {
 
   # drop existing values of ep and the probs before making new ones
-  pbp_data <- pbp_data %>% dplyr::select(-tidyselect::any_of(drop.me))
-  pbp_data <- pbp_data %>% dplyr::select(-ends_with("_prob"))
+  pbp_data <- pbp_data |> dplyr::select(-tidyselect::any_of(drop.me))
+  pbp_data <- pbp_data |> dplyr::select(-ends_with("_prob"))
 
   # model 1: estimate home win probability
-    model_data <- pbp_data %>%
-      nflfastR::calculate_expected_points() %>%
+    model_data <- pbp_data |>
+      nflfastR::calculate_expected_points() |>
       dplyr::mutate(
         home_score_differential = ifelse(posteam == home_team, score_differential, -score_differential),
         home_posteam = ifelse(home_team == posteam, 1, 0),
@@ -53,12 +53,12 @@ calculate_win_probability <- function(pbp_data) {
         Diff_Time_Ratio = .data$home_score_differential / (exp(-4 * .data$elapsed_share))
       )
 
-    wp <- get_preds_wp(model_data) %>%
-      tibble::as_tibble() %>%
+    wp <- get_preds_wp(model_data) |>
+      tibble::as_tibble() |>
       dplyr::rename(vegas_home_wp = "value")
 
   # model 2: nflfastR possession team WP
-    model_data <- pbp_data %>%
+    model_data <- pbp_data |>
       dplyr::mutate(
         receive_2h_ko = case_when(
           # 1st half, home team opened game with kickoff, away team has ball
@@ -71,15 +71,15 @@ calculate_win_probability <- function(pbp_data) {
         defteam_timeouts_remaining = if_else(posteam == home_team, away_timeouts_remaining, home_timeouts_remaining)
       )
 
-    wp2 <- nflfastR::calculate_win_probability(model_data) %>%
-      tibble::as_tibble() %>%
+    wp2 <- nflfastR::calculate_win_probability(model_data) |>
+      tibble::as_tibble() |>
       select(vegas_wp)
 
   preds <- dplyr::bind_cols(
     pbp_data,
     wp,
     wp2
-  ) %>%
+  ) |>
     mutate(
       # wp model estimates home wp. flip back for away teams. WP is from perspective of team with 4th down decision (original posteam)
       vegas_home_wp = ifelse(original_posteam == away_team, 1 - vegas_home_wp, vegas_home_wp),
@@ -87,7 +87,7 @@ calculate_win_probability <- function(pbp_data) {
       vegas_wp = ifelse(posteam != original_posteam, 1 - vegas_wp, vegas_wp),
       # take the average
       vegas_wp = (vegas_home_wp + vegas_wp) / 2
-      ) %>%
+      ) |>
     select(-vegas_home_wp)
 
   return(preds)
