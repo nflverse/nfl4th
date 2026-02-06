@@ -60,7 +60,7 @@ get_fg_wp <- function(pbp) {
 
   # probability 58 yard field goal is made in environment (indoor/ourdoor) / era (2014-2019 or 2020+)
   # used to decay prob for longer kicks
-  fg_prob_58 <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp |> mutate(yardline_100 = 40), type="response")) %>%
+  fg_prob_58 <- as.numeric(mgcv::predict.bam(fg_model, newdata = pbp %>% mutate(yardline_100 = 40), type="response")) %>%
     as_tibble() %>%
     dplyr::rename(fg_make_prob_58 = value)
 
@@ -137,7 +137,7 @@ get_2pt_wp <- function(pbp) {
 
   # get probability of converting 2pt attempt from model
   prob_2pt <- stats::predict(
-    two_pt_model,
+    xgboost::xgb.load.raw(two_pt_model),
     as.matrix(data)
   )  %>%
     tibble::as_tibble() %>%
@@ -214,10 +214,21 @@ get_go_wp <- function(pbp) {
     )
 
   # get model output from situation
-  preds_df <- stats::predict(
+  preds <- stats::predict(
     fd_model(),
     as.matrix(data)
-  ) %>%
+  )
+
+  # xgboost v3 returns a matrix of predictions but the below code is designed
+  # to work with a vector as returned by xgboost v1.
+  # We switch back to the vector (transposing might be expensive) in order
+  # to keep the rest of the code (for now).
+  if (is.matrix(preds)) {
+    preds <- preds %>%
+      t() %>%
+      as.vector("numeric")
+  }
+  preds_df <- preds %>%
     tibble::as_tibble() %>%
     dplyr::rename(prob = "value") %>%
     dplyr::bind_cols(
