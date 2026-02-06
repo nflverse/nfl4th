@@ -71,7 +71,7 @@ add_4th_probs <- function(df) {
     df$runoff <- 0L
   }
 
-  message(glue::glue("Computing probabilities for {nrow(df)} plays. . ."))
+  cli::cli_alert_info("Computing probabilities for {nrow(df)} plays. . .")
   df <- df |>
     add_probs() |>
     mutate(play_no = 1 : n()) |>
@@ -125,13 +125,13 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
   # season-by-season = less likely to result in crashes due to memory
   if (fast) {
     data <- purrr::map_df(seasons, ~{
-      message(glue::glue("Loading season {.x}"))
+      cli::cli_alert_info("Loading season {.x}")
       nflfastR::load_pbp(.x) |>
         left_join(readRDS(url("https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true")), by = c("game_id", "play_id"))
     })
   } else {
     data <- purrr::map_df(seasons, ~{
-      message(glue::glue("Loading season {.x}"))
+      cli::cli_alert_info("Loading season {.x}")
       nflreadr::load_pbp(.x) |>
         nfl4th::add_4th_probs()
     })
@@ -219,7 +219,7 @@ add_2pt_probs <- function(df) {
   df <- modified_df |>
     prepare_df()
 
-  message(glue::glue("Computing probabilities for  {nrow(df)} plays. . ."))
+  cli::cli_alert_info("Computing probabilities for  {nrow(df)} plays. . .")
   df <- df |>
     get_2pt_wp() |>
     select(
