@@ -4,6 +4,7 @@
 * New location for pre-computed numbers
 * Re-work field goal model. Takes into account improvements in accuracy (especially on long kicks) and gives probability > 0 on kicks of over 70 yards
 * Update models and internals to  be compatible with newer xgboost (>= v3) versions. (#41)
+* nfl4th now requires R 4.1 to allow the package to use R's native pipe `|>` operator. This follows the [Tidyverse R version support rules](https://www.tidyverse.org/blog/2019/04/r-version-support/). (#43)
 
 # nfl4th 1.0.4
 

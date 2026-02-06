@@ -30,7 +30,7 @@
 #' }
 get_4th_plays <- function(gid) {
 
-  df <- .games_nfl4th() %>%
+  df <- .games_nfl4th() |>
     filter(game_id == gid)
 
   plays <- data.frame()
@@ -39,8 +39,8 @@ get_4th_plays <- function(gid) {
     expr = {
 
 
-      pbp <- httr::GET(url = glue::glue("http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event={df$espn}")) %>%
-        httr::content(as = "text", encoding = "UTF-8") %>%
+      pbp <- httr::GET(url = glue::glue("http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event={df$espn}")) |>
+        httr::content(as = "text", encoding = "UTF-8") |>
         jsonlite::fromJSON(flatten = TRUE)
 
       if ("code" %in% names(pbp)) {
@@ -51,30 +51,30 @@ get_4th_plays <- function(gid) {
       # i think current drive duplicates a drive in previous drive so might be ok to cut this
       if ("current" %in% names(pbp$drives) & "previous" %in% names(pbp$drives)) {
         current_drive <- pbp$drives$current
-        current_drive <- current_drive[['plays']] %>% bind_rows() %>% as_tibble() %>% mutate(team.abbreviation = current_drive$team$abbreviation)
+        current_drive <- current_drive[['plays']] |> bind_rows() |> as_tibble() |> mutate(team.abbreviation = current_drive$team$abbreviation)
 
         previous_drives <- pbp$drives$previous
 
         drives <- bind_rows(
-          previous_drives %>% dplyr::select(team.abbreviation, plays) %>% tidyr::unnest(plays),
+          previous_drives |> dplyr::select(team.abbreviation, plays) |> tidyr::unnest(plays),
           current_drive
         )
       } else if ("current" %in% names(pbp$drives)) {
         current_drive <- pbp$drives$current
-        drives <- current_drive[['plays']] %>% bind_rows() %>% as_tibble() %>% mutate(team.abbreviation = current_drive$team$abbreviation)
+        drives <- current_drive[['plays']] |> bind_rows() |> as_tibble() |> mutate(team.abbreviation = current_drive$team$abbreviation)
       } else {
         previous_drives <- pbp$drives$previous
-        drives <- previous_drives %>% dplyr::select(team.abbreviation, plays) %>% tidyr::unnest(plays)
+        drives <- previous_drives |> dplyr::select(team.abbreviation, plays) |> tidyr::unnest(plays)
       }
 
       suppressWarnings(
 
-        plays <- drives %>%
-          as_tibble() %>%
-          group_by(id) %>%
-          dplyr::slice(1) %>%
-          ungroup() %>%
-          janitor::clean_names() %>%
+        plays <- drives |>
+          as_tibble() |>
+          group_by(id) |>
+          dplyr::slice(1) |>
+          ungroup() |>
+          janitor::clean_names() |>
           dplyr::rename(
             posteam = team_abbreviation,
             qtr = period_number,
@@ -84,22 +84,22 @@ get_4th_plays <- function(gid) {
             ydstogo = start_distance,
             desc = text,
             time = clock_display_value
-          ) %>%
-          dplyr::filter(qtr <= 4) %>%
+          ) |>
+          dplyr::filter(qtr <= 4) |>
           dplyr::mutate(
             # time column is wacky so extract it from play description when possible
             play_time = stringr::str_extract(desc, "\\([^()]+(?=\\)\\s)"),
             play_time = substr(play_time, 2, nchar(play_time)),
-            play_min = stringr::str_extract(play_time, "[^()]+(?=\\:)") %>% as.integer(),
+            play_min = stringr::str_extract(play_time, "[^()]+(?=\\:)") |> as.integer(),
             play_min = if_else(is.na(play_min) & !is.na(play_time), as.integer(0), play_min),
-            play_sec = substr(play_time, nchar(play_time) - 1, nchar(play_time)) %>% as.integer(),
-            mins = if_else(nchar(time) == 5, substr(time, 1, 2), substr(time, 1, 1)) %>% as.integer(),
-            secs = if_else(nchar(time) == 5, substr(time, 4, 5), substr(time, 3, 4)) %>% as.integer()
+            play_sec = substr(play_time, nchar(play_time) - 1, nchar(play_time)) |> as.integer(),
+            mins = if_else(nchar(time) == 5, substr(time, 1, 2), substr(time, 1, 1)) |> as.integer(),
+            secs = if_else(nchar(time) == 5, substr(time, 4, 5), substr(time, 3, 4)) |> as.integer()
             # trying to fix wacky behavior 9/2023
             # mins = if_else(is.na(play_min), mins, play_min),
             # secs = if_else(is.na(play_sec), secs, play_sec)
-          ) %>%
-          arrange(qtr, desc(mins), desc(secs), id) %>%
+          ) |>
+          arrange(qtr, desc(mins), desc(secs), id) |>
           dplyr::mutate(
             home_team = df$home_team,
             away_team = df$away_team,
@@ -108,8 +108,8 @@ get_4th_plays <- function(gid) {
               posteam == "LAR" ~ "LA",
               TRUE ~ posteam
             )
-          ) %>%
-          dplyr::mutate_at(dplyr::vars("home_team", "away_team", "posteam"), team_name_fn) %>%
+          ) |>
+          dplyr::mutate_at(dplyr::vars("home_team", "away_team", "posteam"), team_name_fn) |>
           mutate(
             defteam = if_else(posteam == home_team, away_team, home_team),
             half = if_else(qtr <= 2, 1, 2),
@@ -176,14 +176,14 @@ get_4th_plays <- function(gid) {
             ),
             home_timeouts_remaining = 3,
             away_timeouts_remaining = 3
-          ) %>%
-          dplyr::group_by(half) %>%
-          arrange(qtr, desc(mins), desc(secs), id) %>%
+          ) |>
+          dplyr::group_by(half) |>
+          arrange(qtr, desc(mins), desc(secs), id) |>
           dplyr::mutate(
             total_home_timeouts_used = dplyr::if_else(cumsum(home_timeout_used) > 3, 3, cumsum(home_timeout_used)),
             total_away_timeouts_used = dplyr::if_else(cumsum(away_timeout_used) > 3, 3, cumsum(away_timeout_used))
-          ) %>%
-          dplyr::ungroup() %>%
+          ) |>
+          dplyr::ungroup() |>
           dplyr::mutate(
             home_timeouts_remaining = home_timeouts_remaining - total_home_timeouts_used,
             away_timeouts_remaining = away_timeouts_remaining - total_away_timeouts_used,
@@ -205,18 +205,18 @@ get_4th_plays <- function(gid) {
             season = df$season,
             home_opening_kickoff = if_else(dplyr::first(stats::na.omit(posteam)) == home_team, 1, 0),
             type = df$type
-          ) %>%
+          ) |>
           filter(
             down == 4,
             !(time < 15 & qtr %in% c(4)),
             is.na(timeout_team),
             type_text != "Two-minute warning",
             type_text != "End Period"
-          ) %>%
-          group_by(qtr, time, ydstogo) %>%
-          dplyr::slice(1) %>%
-          ungroup() %>%
-          arrange(qtr, desc(time), ydstogo) %>%
+          ) |>
+          group_by(qtr, time, ydstogo) |>
+          dplyr::slice(1) |>
+          ungroup() |>
+          arrange(qtr, desc(time), ydstogo) |>
           mutate(
             game_id = df$game_id,
             espn_id = df$espn,
@@ -241,7 +241,7 @@ get_4th_plays <- function(gid) {
             yardline_100 = if_else(
               !is.na(temp_yardline), as.integer(temp_yardline), yardline_100
             )
-          ) %>%
+          ) |>
           select(
             game_id,
             espn_id,
@@ -266,7 +266,7 @@ get_4th_plays <- function(gid) {
             away_score,
             type_text,
             season
-          ) %>%
+          ) |>
           # put in end of game conditions
           dplyr::mutate(
             # if there's a conversion with fewer than 5 minutes left and a lead, run off 40 seconds
@@ -279,7 +279,7 @@ get_4th_plays <- function(gid) {
       )
 
       if (nrow(plays) > 0) {
-        plays <- plays %>%
+        plays <- plays |>
           mutate(
             index = 1 : n()
           )
