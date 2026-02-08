@@ -305,3 +305,14 @@ load_wp_model <- function() {
     "https://github.com/nflverse/nfl4th/releases/download/model_archive/wp_model.rds"
   )
 }
+
+# additional release issue bullets for usethis::use_release_issue()
+release_bullets <- function() {
+  c(
+    '`devtools::check_mac_release()`',
+    '`nflreadr:::my_rhub_check()`',
+    '`pkgdown::check_pkgdown()`',
+    '`nflreadr:::nflverse_thanks()`',
+    NULL
+  )
+}
