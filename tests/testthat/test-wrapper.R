@@ -53,10 +53,13 @@ test_that("add_2pt_probs works", {
     defteam_timeouts_remaining = 3
   )
 
-  expect_snapshot({
-    another_play |>
-      nfl4th::add_2pt_probs() |>
-      nfl4th::make_2pt_table_data() |>
-      knitr::kable(digits = 2)
-  })
+  expect_snapshot(
+    {
+      another_play |>
+        nfl4th::add_2pt_probs() |>
+        nfl4th::make_2pt_table_data() |>
+        knitr::kable(digits = 2)
+    },
+    cran = TRUE
+  )
 })
