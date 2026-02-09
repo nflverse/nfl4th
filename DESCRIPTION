@@ -18,6 +18,7 @@ Depends:
 Imports: 
     cli,
     curl,
+    data.table,
     dplyr,
     janitor,
     jsonlite,
@@ -31,7 +32,6 @@ Imports:
     tidyr,
     xgboost
 Suggests: 
-    data.table,
     future,
     gt,
     knitr,
