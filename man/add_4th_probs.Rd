@@ -29,6 +29,7 @@ Get various probabilities associated with each option on 4th downs (go
 for it, kick field goal, punt).
 }
 \examples{
+\dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 \donttest{
 play <-
   tibble::tibble(
@@ -55,4 +56,5 @@ probs <- nfl4th::add_4th_probs(play)
 
 dplyr::glimpse(probs)
 }
+\dontshow{\}) # examplesIf}
 }

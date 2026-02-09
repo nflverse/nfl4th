@@ -5,7 +5,7 @@
 #' @param probs A data frame consisting of one play that has had `add_4th_probs()` already run on it.
 #' @return A table showing the probabilities associated with each possible choice.
 #' @export
-#' @examples
+#' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #' \donttest{
 #' play <-
 #'   tibble::tibble(
@@ -82,7 +82,7 @@ make_table_data <- function(probs) {
 #' @param probs A data frame consisting of one play that has had `add_2pt_probs()` already run on it.
 #' @return A table showing the probabilities associated with each possible choice.
 #' @export
-#' @examples
+#' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #' \donttest{
 #' play <-
 #'   tibble::tibble(
