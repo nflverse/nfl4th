@@ -16,6 +16,7 @@ A table showing the probabilities associated with each possible choice.
 Get a table with the probabilities associated with a 2-pt decision.
 }
 \examples{
+\dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 \donttest{
 play <-
   tibble::tibble(
@@ -39,4 +40,5 @@ play <-
 probs <- nfl4th::add_2pt_probs(play)
 nfl4th::make_2pt_table_data(probs)
 }
+\dontshow{\}) # examplesIf}
 }

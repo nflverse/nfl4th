@@ -21,6 +21,7 @@ load_4th_pbp(seasons, fast = FALSE)
 Load calculated 4th down probabilities from \code{nflfastR} data.
 }
 \examples{
+\dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 \donttest{
 try({# Wrap in try to avoid CRAN test problems
 probs <- load_4th_pbp(2019:2020)
@@ -31,4 +32,5 @@ dplyr::glimpse(probs)
 future::plan("sequential")
 }
 }
+\dontshow{\}) # examplesIf}
 }

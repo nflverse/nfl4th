@@ -24,7 +24,7 @@
 #' \item{punt_wp}{Average win probability when punting.}
 #' }
 #' @export
-#' @examples
+#' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #' \donttest{
 #' play <-
 #'   tibble::tibble(
@@ -111,7 +111,7 @@ add_4th_probs <- function(df) {
 #' \item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times going for it.}
 #' }
 #' @export
-#' @examples
+#' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #' \donttest{
 #' try({# Wrap in try to avoid CRAN test problems
 #' probs <- load_4th_pbp(2019:2020)
@@ -203,7 +203,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' \item{wp_go2}{Win probability associated with going for 2.}
 #' }
 #' @export
-#' @examples
+#' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #' \donttest{
 #' play <-
 #'   tibble::tibble(

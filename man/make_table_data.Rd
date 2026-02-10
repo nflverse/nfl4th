@@ -16,6 +16,7 @@ A table showing the probabilities associated with each possible choice.
 Get a table with the probabilities on 4th down.
 }
 \examples{
+\dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 \donttest{
 play <-
   tibble::tibble(
@@ -41,4 +42,5 @@ play <-
 probs <- nfl4th::add_4th_probs(play)
 nfl4th::make_table_data(probs)
 }
+\dontshow{\}) # examplesIf}
 }

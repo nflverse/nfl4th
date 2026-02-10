@@ -27,6 +27,7 @@ Get various probabilities associated with each option on PATs (go
 for it, kick PAT).
 }
 \examples{
+\dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 \donttest{
 play <-
   tibble::tibble(
@@ -51,4 +52,5 @@ probs <- nfl4th::add_2pt_probs(play)
 
 dplyr::glimpse(probs)
 }
+\dontshow{\}) # examplesIf}
 }
