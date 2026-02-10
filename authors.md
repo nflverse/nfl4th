@@ -13,13 +13,13 @@ Source:
 [`DESCRIPTION`](https://github.com/nflverse/nfl4th/blob/master/DESCRIPTION)
 
 Baldwin B (2026). *nfl4th: Functions to Calculate Optimal Fourth Down
-Decisions in the National Football League*. R package version
-1.0.4.9009, <https://www.nfl4th.com/>.
+Decisions in the National Football League*. R package version 1.0.5,
+<https://www.nfl4th.com/>.
 
     @Manual{,
       title = {nfl4th: Functions to Calculate Optimal Fourth Down Decisions in the National Football League},
       author = {Ben Baldwin},
       year = {2026},
-      note = {R package version 1.0.4.9009},
+      note = {R package version 1.0.5},
       url = {https://www.nfl4th.com/},
     }

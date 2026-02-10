@@ -1,6 +1,6 @@
 # Changelog
 
-## nfl4th (development version)
+## nfl4th 1.0.5
 
 - Stop letting roof break things
 - New location for pre-computed numbers
@@ -11,7 +11,7 @@
   v3) versions. ([\#41](https://github.com/nflverse/nfl4th/issues/41))
 - nfl4th now requires R 4.1 to allow the package to use R’s native pipe
   `|>` operator. This follows the [Tidyverse R version support
-  rules](https://www.tidyverse.org/blog/2019/04/r-version-support/).
+  rules](https://tidyverse.org/blog/2019/04/r-version-support/).
   ([\#43](https://github.com/nflverse/nfl4th/issues/43))
 
 ## nfl4th 1.0.4
