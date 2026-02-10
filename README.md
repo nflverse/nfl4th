@@ -17,7 +17,7 @@ Server](https://img.shields.io/discord/789805604076126219.svg?color=7289da&label
 This is the package that powers the [fourth down
 calculator](https://rbsdm.com/stats/fourth_calculator/) introduced in
 [this piece on The
-Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
+Athletic](https://www.nytimes.com/athletic/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
 
 The code that powers the Twitter fourth down bot [is in this folder
 here](https://github.com/guga31bb/fourth_calculator/tree/main/bot) and
