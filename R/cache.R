@@ -1,5 +1,4 @@
-# paths are defined in zzz.R
-# these helpers read games or fd_model and save them to a package cache
+# these helpers read games or models and save them to a package cache
 
 nfl4th_games_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "games_nfl4th.rds")
@@ -22,25 +21,65 @@ nfl4th_wpmodel_path <- function() {
 }
 
 fd_model <- function() {
-  if (probably_cran() && !force_cache()) {
-    return(xgboost::xgb.load.raw(load_fd_model()))
-  }
-  if (!file.exists(nfl4th_fdmodel_path())) {
-    saveRDS(load_fd_model(), nfl4th_fdmodel_path())
-  }
-  readRDS(nfl4th_fdmodel_path()) |>
-    xgboost::xgb.load.raw()
+  cached_model("fd")
 }
 
 wp_model <- function() {
+  cached_model("wp")
+}
+
+cached_model <- function(type = c("wp", "fd")) {
+  type <- arg_match(type)
+  model_load <- switch(
+    type,
+    "wp" = load_wp_model,
+    "fd" = load_fd_model
+  )
+  # a.) we don't want to handle any sort of cache
+  # just return the model
   if (probably_cran() && !force_cache()) {
-    return(xgboost::xgb.load.raw(load_wp_model()))
+    model <- model_load()
+    return(
+      xgboost::xgb.load.raw(model)
+    )
   }
-  if (!file.exists(nfl4th_wpmodel_path())) {
-    saveRDS(load_wp_model(), nfl4th_wpmodel_path())
+
+  # b.) we want a cache
+  # if the model is cached, it is saved under this file path
+  model_path <- switch(
+    type,
+    "wp" = nfl4th_wpmodel_path(),
+    "fd" = nfl4th_fdmodel_path()
+  )
+
+  if (!file.exists(model_path)) {
+    # the file doesn't exist -> file isn't cached yet
+    # load and save it and return the parsed model
+    model <- model_load()
+    saveRDS(model, model_path)
+    return(
+      xgboost::xgb.load.raw(model)
+    )
+  } else {
+    # the file exists. read it.
+    model <- readRDS(model_path)
+    # nfl4th v 1.0.5 introduced new raw model formats that are incompatible
+    # with previous formats. We need to check the format of the cached file
+    # and clear it in case it's outdated.
+    if (is.raw(model)) {
+      return(
+        xgboost::xgb.load.raw(model)
+      )
+    } else {
+      # file in cache has old format -> remove it and call the whole thing
+      # recursively
+      file.remove(model_path)
+      # this time the cache will be empty and cached_model() will load it fresh
+      return(
+        cached_model(type = type)
+      )
+    }
   }
-  readRDS(nfl4th_wpmodel_path()) |>
-    xgboost::xgb.load.raw()
 }
 
 #' Reset nfl4th Package Cache
