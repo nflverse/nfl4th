@@ -1,6 +1,6 @@
 ## Release summary
 
-update internals to work with xgboost v3
+update internals to identify outdated models in package cache
 
 ## R CMD check results
 
