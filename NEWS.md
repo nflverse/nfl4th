@@ -2,6 +2,8 @@
 
 * The internal cache is now aware of changed model formats and forces a model update for compatibility with xgboost (>= v3). (#53)
 
+Thank you to &#x0040;isaactpetersen, and &#x0040;mrcaseb for their questions, feedback, and contributions towards this release.
+
 # nfl4th 1.0.5
 
 * Stop letting roof break things
