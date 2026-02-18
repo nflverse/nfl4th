@@ -1,9 +1,16 @@
 # Changelog
 
-## nfl4th (development version)
+## nfl4th 1.0.6
+
+CRAN release: 2026-02-17
 
 - The internal cache is now aware of changed model formats and forces a
   model update for compatibility with xgboost (\>= v3).
+  ([\#53](https://github.com/nflverse/nfl4th/issues/53))
+
+Thank you to [@isaactpetersen](https://github.com/isaactpetersen), and
+[@mrcaseb](https://github.com/mrcaseb) for their questions, feedback,
+and contributions towards this release.
 
 ## nfl4th 1.0.5
 
