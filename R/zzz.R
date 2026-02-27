@@ -2,13 +2,13 @@
   is_online <- !is.null(curl::nslookup("github.com", error = FALSE))
   keep_games <- isTRUE(getOption("nfl4th.keep_games", FALSE))
 
-  if (!is_online && !keep_games) {
+  if (!is_online && !keep_games && !probably_cran()) {
     rlang::warn(
       "GitHub.com seems offline, and `options(nfl4th.keep_games)` is not set to TRUE. Deleting the games cache, and predictions may not be available without an internet connection."
     )
   }
 
-  if (!is_online && keep_games) {
+  if (!is_online && keep_games && !probably_cran()) {
     rlang::warn(
       "GitHub.com seems offline, and `options(nfl4th.keep_games)` is set to TRUE. To get updates, clear the games cache with `nfl4th::nfl4th_clear_cache()`"
     )
