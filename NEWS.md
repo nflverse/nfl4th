@@ -1,3 +1,7 @@
+# nfl4th (development version)
+
+* Further improvements to internal cache handling by CRAN request. (#56)
+
 # nfl4th 1.0.6
 
 * The internal cache is now aware of changed model formats and forces a model update for compatibility with xgboost (>= v3). (#53)
