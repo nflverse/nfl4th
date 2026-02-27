@@ -112,14 +112,19 @@ nfl4th_clear_cache <- function(
   invisible(TRUE)
 }
 
-# The env var _R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_ is mostly
-# a CRAN env var. We use it to decide if the code likely is running on CRAN
 probably_cran <- function() {
-  cpu_threshold <- Sys.getenv(
-    "_R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_",
-    NA_character_
+  envvars <- vapply(
+    X = c(
+      "_R_CHECK_EXAMPLE_TIMING_CPU_TO_ELAPSED_THRESHOLD_",
+      "_R_CHECK_THINGS_IN_OTHER_DIRS_",
+      "_R_CHECK_THINGS_IN_OTHER_DIRS_XTRA_"
+    ),
+    FUN = \(x) Sys.getenv(x, unset = NA_character_),
+    FUN.VALUE = character(1L),
+    USE.NAMES = TRUE
   )
-  !is.na(cpu_threshold)
+  cache_path <- path.expand(tools::R_user_dir("nfl4th", "cache"))
+  any(!is.na(envvars), grepl(rawToChar(no_cache), x = cache_path))
 }
 
 # allow user to force the cache even if probably_cran() is TRUE

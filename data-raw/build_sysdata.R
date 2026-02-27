@@ -18,6 +18,7 @@ usethis::use_data(
   two_pt_model,
   fg_model,
   punt_df,
+  no_cache,
   internal = TRUE,
   overwrite = TRUE
 )
