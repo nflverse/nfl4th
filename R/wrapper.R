@@ -46,10 +46,11 @@
 #'     posteam_timeouts_remaining = 3,
 #'     defteam_timeouts_remaining = 3
 #'   )
-#'
+#' try({# to avoid cran issues
 #' probs <- nfl4th::add_4th_probs(play)
 #'
 #' dplyr::glimpse(probs)
+#' })
 #' }
 add_4th_probs <- function(df) {
   original_df <- df |> mutate(index = 1:n())
@@ -223,10 +224,11 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #'     posteam_timeouts_remaining = 3,
 #'     defteam_timeouts_remaining = 3
 #'   )
-#'
+#' try({# to avoid cran issues
 #' probs <- nfl4th::add_2pt_probs(play)
 #'
 #' dplyr::glimpse(probs)
+#' })
 #' }
 add_2pt_probs <- function(df) {
   original_df <- df |> mutate(index = 1:n())

@@ -30,8 +30,10 @@ must be present:
 }
 \examples{
 \donttest{
+try({# to avoid cran issues
 plays <- nfl4th::get_4th_plays('2020_20_TB_GB')
 
 dplyr::glimpse(plays)
+})
 }
 }
