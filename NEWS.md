@@ -1,4 +1,4 @@
-# nfl4th (development version)
+# nfl4th 1.0.7
 
 * Further improvements to internal cache handling by CRAN request. (#56)
 
