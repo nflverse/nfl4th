@@ -38,9 +38,10 @@ play <-
     posteam_timeouts_remaining = 3,
     defteam_timeouts_remaining = 3
   )
-
+try({# to avoid cran issues
 probs <- nfl4th::add_4th_probs(play)
 nfl4th::make_table_data(probs)
+})
 }
 \dontshow{\}) # examplesIf}
 }

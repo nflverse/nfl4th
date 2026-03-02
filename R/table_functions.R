@@ -27,9 +27,10 @@
 #'     posteam_timeouts_remaining = 3,
 #'     defteam_timeouts_remaining = 3
 #'   )
-#'
+#' try({# to avoid cran issues
 #' probs <- nfl4th::add_4th_probs(play)
 #' nfl4th::make_table_data(probs)
+#' })
 #'}
 make_table_data <- function(probs) {
   go <- tibble::tibble(
@@ -102,9 +103,10 @@ make_table_data <- function(probs) {
 #'     posteam_timeouts_remaining = 3,
 #'     defteam_timeouts_remaining = 3
 #'   )
-#'
+#' try({# to avoid cran issues
 #' probs <- nfl4th::add_2pt_probs(play)
 #' nfl4th::make_2pt_table_data(probs)
+#' })
 #' }
 make_2pt_table_data <- function(probs) {
   go <- tibble::tibble(
