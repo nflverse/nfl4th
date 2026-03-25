@@ -1,6 +1,6 @@
 ## Release summary
 
-update internals to identify outdated models in package cache
+Further improvements to internal cache handling by CRAN request
 
 ## R CMD check results
 
