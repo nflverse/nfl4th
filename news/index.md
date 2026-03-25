@@ -1,6 +1,8 @@
 # Changelog
 
-## nfl4th (development version)
+## nfl4th 1.0.7
+
+CRAN release: 2026-03-04
 
 - Further improvements to internal cache handling by CRAN request.
   ([\#56](https://github.com/nflverse/nfl4th/issues/56))

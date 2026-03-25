@@ -44,10 +44,11 @@ play <-
     posteam_timeouts_remaining = 3,
     defteam_timeouts_remaining = 3
   )
-
+try({# to avoid cran issues
 probs <- nfl4th::add_4th_probs(play)
-#> ℹ Computing probabilities for 1 plays. . .
 nfl4th::make_table_data(probs)
+})
+#> ℹ Computing probabilities for 1 plays. . .
 #> # A tibble: 3 × 5
 #>   choice             choice_prob success_prob fail_wp success_wp
 #>   <chr>                    <dbl>        <dbl>   <dbl>      <dbl>

@@ -84,11 +84,12 @@ play <-
     posteam_timeouts_remaining = 3,
     defteam_timeouts_remaining = 3
   )
-
+try({# to avoid cran issues
 probs <- nfl4th::add_4th_probs(play)
-#> ℹ Computing probabilities for 1 plays. . .
 
 dplyr::glimpse(probs)
+})
+#> ℹ Computing probabilities for 1 plays. . .
 #> Rows: 1
 #> Columns: 23
 #> $ home_team                  <chr> "GB"

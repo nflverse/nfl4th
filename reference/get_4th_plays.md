@@ -47,9 +47,11 @@ The following columns must be present:
 
 ``` r
 # \donttest{
+try({# to avoid cran issues
 plays <- nfl4th::get_4th_plays('2020_20_TB_GB')
 
 dplyr::glimpse(plays)
+})
 #> Rows: 9
 #> Columns: 23
 #> $ game_id                    <chr> "2020_20_TB_GB", "2020_20_TB_GB", "2020_20_…
