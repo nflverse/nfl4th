@@ -6,6 +6,7 @@ loads `nflfastR` data and computes 4th down probabilities (depending on
 your computer, this may take up to a minute or two per season).
 
 ``` r
+
 library(nfl4th)
 library(tidyverse)
 library(gt)
@@ -20,6 +21,7 @@ Here’s what the data obtained using
 looks like:
 
 ``` r
+
 data |>
   dplyr::filter(!is.na(go_boost)) |>
   utils::head(10) |>
@@ -32,21 +34,22 @@ data |>
 ```
 
 | posteam | ydstogo | yardline_100 | go_boost | first_down_prob | wp_fail | wp_succeed | go_wp | fg_make_prob | miss_fg_wp | make_fg_wp | fg_wp | punt_wp |
-|:--------|--------:|-------------:|---------:|----------------:|--------:|-----------:|------:|-------------:|-----------:|-----------:|------:|--------:|
-| SF      |       3 |           34 |     2.03 |            0.55 |    0.67 |       0.78 |  0.73 |         0.70 |       0.67 |       0.73 |  0.71 |    0.71 |
-| ARI     |      10 |           65 |    -1.89 |            0.27 |    0.20 |       0.31 |  0.23 |         0.00 |       0.19 |       0.29 |  0.19 |    0.25 |
-| ARI     |       7 |           72 |    -0.21 |            0.38 |    0.08 |       0.14 |  0.10 |         0.00 |       0.08 |       0.15 |  0.08 |    0.11 |
-| SF      |       5 |           64 |     0.39 |            0.48 |    0.84 |       0.91 |  0.88 |         0.00 |       0.83 |       0.92 |  0.83 |    0.87 |
-| SF      |       3 |           68 |     0.60 |            0.55 |    0.64 |       0.79 |  0.72 |         0.00 |       0.62 |       0.79 |  0.62 |    0.71 |
-| ARI     |       9 |           77 |    -1.03 |            0.30 |    0.17 |       0.29 |  0.21 |         0.00 |       0.17 |       0.28 |  0.17 |    0.22 |
-| SF      |       1 |            1 |     3.34 |            0.63 |    0.77 |       0.88 |  0.84 |         0.99 |       0.75 |       0.81 |  0.81 |      NA |
-| ARI     |       5 |           34 |    -0.18 |            0.45 |    0.20 |       0.37 |  0.28 |         0.70 |       0.20 |       0.31 |  0.28 |    0.23 |
-| SF      |       9 |           36 |    -1.10 |            0.32 |    0.72 |       0.84 |  0.76 |         0.65 |       0.72 |       0.80 |  0.77 |    0.76 |
-| SF      |       2 |            6 |     0.74 |            0.54 |    0.75 |       0.87 |  0.82 |         0.99 |       0.74 |       0.81 |  0.81 |      NA |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| SF | 3 | 34 | 2.03 | 0.55 | 0.67 | 0.78 | 0.73 | 0.70 | 0.67 | 0.73 | 0.71 | 0.71 |
+| ARI | 10 | 65 | -1.89 | 0.27 | 0.20 | 0.31 | 0.23 | 0.00 | 0.19 | 0.29 | 0.19 | 0.25 |
+| ARI | 7 | 72 | -0.21 | 0.38 | 0.08 | 0.14 | 0.10 | 0.00 | 0.08 | 0.15 | 0.08 | 0.11 |
+| SF | 5 | 64 | 0.39 | 0.48 | 0.84 | 0.91 | 0.88 | 0.00 | 0.83 | 0.92 | 0.83 | 0.87 |
+| SF | 3 | 68 | 0.60 | 0.55 | 0.64 | 0.79 | 0.72 | 0.00 | 0.62 | 0.79 | 0.62 | 0.71 |
+| ARI | 9 | 77 | -1.03 | 0.30 | 0.17 | 0.29 | 0.21 | 0.00 | 0.17 | 0.28 | 0.17 | 0.22 |
+| SF | 1 | 1 | 3.34 | 0.63 | 0.77 | 0.88 | 0.84 | 0.99 | 0.75 | 0.81 | 0.81 | NA |
+| ARI | 5 | 34 | -0.18 | 0.45 | 0.20 | 0.37 | 0.28 | 0.70 | 0.20 | 0.31 | 0.28 | 0.23 |
+| SF | 9 | 36 | -1.10 | 0.32 | 0.72 | 0.84 | 0.76 | 0.65 | 0.72 | 0.80 | 0.77 | 0.76 |
+| SF | 2 | 6 | 0.74 | 0.54 | 0.75 | 0.87 | 0.82 | 0.99 | 0.74 | 0.81 | 0.81 | NA |
 
 Or we can add some filters to look up a certain game:
 
 ``` r
+
 data |>
   dplyr::filter(week == 20, posteam == "GB", down == 4) |>
   dplyr::select(
@@ -58,12 +61,12 @@ data |>
 ```
 
 | posteam | ydstogo | yardline_100 | go_boost | first_down_prob | wp_fail | wp_succeed | go_wp | fg_make_prob | miss_fg_wp | make_fg_wp | fg_wp | punt_wp |
-|:--------|--------:|-------------:|---------:|----------------:|--------:|-----------:|------:|-------------:|-----------:|-----------:|------:|--------:|
-| GB      |      17 |           65 |    -3.26 |            0.15 |    0.32 |       0.47 |  0.34 |         0.00 |       0.30 |       0.46 |  0.30 |    0.37 |
-| GB      |       6 |            6 |    -1.72 |            0.31 |    0.35 |       0.58 |  0.42 |         0.99 |       0.33 |       0.44 |  0.44 |      NA |
-| GB      |      15 |           86 |    -1.42 |            0.19 |    0.16 |       0.38 |  0.21 |         0.00 |       0.16 |       0.33 |  0.16 |    0.22 |
-| GB      |      10 |           76 |     0.83 |            0.32 |    0.15 |       0.37 |  0.22 |         0.00 |       0.14 |       0.31 |  0.14 |    0.21 |
-| GB      |       8 |            8 |     3.65 |            0.33 |    0.04 |       0.34 |  0.14 |         0.98 |       0.03 |       0.10 |  0.10 |      NA |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| GB | 17 | 65 | -3.26 | 0.15 | 0.32 | 0.47 | 0.34 | 0.00 | 0.30 | 0.46 | 0.30 | 0.37 |
+| GB | 6 | 6 | -1.72 | 0.31 | 0.35 | 0.58 | 0.42 | 0.99 | 0.33 | 0.44 | 0.44 | NA |
+| GB | 15 | 86 | -1.42 | 0.19 | 0.16 | 0.38 | 0.21 | 0.00 | 0.16 | 0.33 | 0.16 | 0.22 |
+| GB | 10 | 76 | 0.83 | 0.32 | 0.15 | 0.37 | 0.22 | 0.00 | 0.14 | 0.31 | 0.14 | 0.21 |
+| GB | 8 | 8 | 3.65 | 0.33 | 0.04 | 0.34 | 0.14 | 0.98 | 0.03 | 0.10 | 0.10 | NA |
 
 We see the infamous field goal at the bottom.
 
@@ -80,6 +83,7 @@ and the program automatically looks these up so that users don’t have to
 provide them.
 
 ``` r
+
 one_play <- tibble::tibble(
   
   # things to help find the right game (use "reg" or "post" for type)
@@ -113,8 +117,8 @@ one_play |>
 ```
 
 | posteam | ydstogo | yardline_100 | go_boost | first_down_prob | wp_fail | wp_succeed | go_wp | fg_make_prob | miss_fg_wp | make_fg_wp | fg_wp | punt_wp |
-|:--------|--------:|-------------:|---------:|----------------:|--------:|-----------:|------:|-------------:|-----------:|-----------:|------:|--------:|
-| GB      |       8 |            8 |     3.65 |            0.33 |    0.04 |       0.34 |  0.14 |         0.98 |       0.03 |        0.1 |   0.1 |      NA |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| GB | 8 | 8 | 3.65 | 0.33 | 0.04 | 0.34 | 0.14 | 0.98 | 0.03 | 0.1 | 0.1 | NA |
 
 Comparing this and the table above, we see the exact same numbers as
 expected.
@@ -128,6 +132,7 @@ function only works with one play at a time since it makes a table using
 the results from the play.
 
 ``` r
+
 one_play |>
   nfl4th::add_4th_probs() |>
   nfl4th::make_table_data() |>
@@ -158,6 +163,7 @@ assuming that the 4th down play took 6 seconds while resulting in a
 touchdown.
 
 ``` r
+
 another_play <- tibble::tibble(
   
   # things to help find the right game (use "reg" or "post")
@@ -202,6 +208,7 @@ ESPN API, which can be accessed using
 [`get_4th_plays()`](https://www.nfl4th.com/reference/get_4th_plays.md).
 
 ``` r
+
 plays <- get_4th_plays("2020_20_TB_GB") |>
   tail(1)
 

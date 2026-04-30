@@ -6,6 +6,7 @@ We begin by demonstrating the use of `nfl4th` to load all seasons for
 which 4th down calculations are available in one line of code.
 
 ``` r
+
 pbp <- nfl4th::load_4th_pbp(2014:2022, fast = T) |>
   filter(down == 4)
 ```
@@ -27,6 +28,7 @@ Let’s make a plot that shows that teams’ likelihood of going for it in
 2020 versus how large the predicted benefit would be.
 
 ``` r
+
 pbp |>
   dplyr::filter(season == 2020) |>
   dplyr::mutate(go_boost = DescTools::RoundTo(go_boost, 0.5)) |>
@@ -74,6 +76,7 @@ Here’s how to create one of the tables shown in [the piece on The
 Athletic](https://theathletic.com/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/):
 
 ``` r
+
 pbp |>
   dplyr::filter(season == 2020, !is.na(go_boost), !is.na(go)) |>
   dplyr::mutate(type = dplyr::case_when(
@@ -120,6 +123,7 @@ kicking a field goal) in terms of total expected win probability lost.
 2020’s champion is Kliff Kingsbury.
 
 ``` r
+
 pbp |>
   filter(
     season == 2020,
@@ -155,23 +159,24 @@ pbp |>
   tab_header(title = "Worst kick decisions of 2020")
 ```
 
-| Worst kick decisions of 2020 |                                                        |                                                        |      |     |     |      |         |                                                                                                |
-|------------------------------|--------------------------------------------------------|--------------------------------------------------------|------|-----|-----|------|---------|------------------------------------------------------------------------------------------------|
-|                              | Team                                                   | Opp                                                    | Week | Qtr | YTG | Diff | WP loss | Play                                                                                           |
-| 1                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png) | 9    | 4   | 1   | -3   | 11.2    | (1:58) 5-Z.Gonzalez 49 yard field goal is No Good, Short, Center-46-A.Brewer, Holder-4-A.Lee.  |
-| 2                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png) | 1    | 4   | 1   | -1   | 8.4     | (7:32) (Run formation) PENALTY on TEN, Delay of Game, 4 yards, enforced at TEN 34 - No Play.   |
-| 3                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/SF.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png) | 16   | 4   | 1   | 2    | 8.2     | (10:22) 6-M.Wishnowsky punts 44 yards to ARI 27, Center-46-T.Pepper, out of bounds.            |
-| 4                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 18   | 4   | 2   | -4   | 8.0     | (10:06) 6-B.Kern punts 25 yards to BAL 15, Center-47-M.Overton, fair catch by 13-D.Duvernay.   |
-| 5                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LV.png)  | 17   | 3   | 2   | -4   | 7.7     | (3:10) 8-B.McManus 26 yard field goal is GOOD, Center-46-J.Bobenmoyer, Holder-6-S.Martin.      |
-| 6                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png) | 18   | 4   | 1   | -12  | 7.6     | (15:00) (Punt formation) PENALTY on PIT, Delay of Game, 5 yards, enforced at PIT 46 - No Play. |
-| 7                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LV.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | 4    | 3   | 2   | -4   | 7.3     | (8:41) 2-D.Carlson 25 yard field goal is GOOD, Center-47-T.Sieg, Holder-6-A.Cole.              |
-| 8                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 8    | 4   | 1   | 4    | 6.9     | (:59) 4-J.Berry punts 48 yards to BAL 37, Center-57-K.Canaday, fair catch by 11-J.Proche.      |
-| 9                            | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png) | 1    | 4   | 1   | 3    | 6.8     | (2:35) 6-J.Hekker punts 42 yards to DAL 9, Center-44-J.McQuaide, fair catch by 11-C.Wilson.    |
-| 10                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NO.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png) | 14   | 2   | 1   | -10  | 6.6     | (2:24) 6-T.Morstead punts 48 yards to PHI 4, Center-49-Z.Wood, out of bounds.                  |
+| Worst kick decisions of 2020 |  |  |  |  |  |  |  |  |
+|----|----|----|----|----|----|----|----|----|
+|  | Team | Opp | Week | Qtr | YTG | Diff | WP loss | Play |
+| 1 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png) | 9 | 4 | 1 | -3 | 11.2 | (1:58) 5-Z.Gonzalez 49 yard field goal is No Good, Short, Center-46-A.Brewer, Holder-4-A.Lee. |
+| 2 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png) | 1 | 4 | 1 | -1 | 8.4 | (7:32) (Run formation) PENALTY on TEN, Delay of Game, 4 yards, enforced at TEN 34 - No Play. |
+| 3 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/SF.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/ARI.png) | 16 | 4 | 1 | 2 | 8.2 | (10:22) 6-M.Wishnowsky punts 44 yards to ARI 27, Center-46-T.Pepper, out of bounds. |
+| 4 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 18 | 4 | 2 | -4 | 8.0 | (10:06) 6-B.Kern punts 25 yards to BAL 15, Center-47-M.Overton, fair catch by 13-D.Duvernay. |
+| 5 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LV.png) | 17 | 3 | 2 | -4 | 7.7 | (3:10) 8-B.McManus 26 yard field goal is GOOD, Center-46-J.Bobenmoyer, Holder-6-S.Martin. |
+| 6 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png) | 18 | 4 | 1 | -12 | 7.6 | (15:00) (Punt formation) PENALTY on PIT, Delay of Game, 5 yards, enforced at PIT 46 - No Play. |
+| 7 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LV.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | 4 | 3 | 2 | -4 | 7.3 | (8:41) 2-D.Carlson 25 yard field goal is GOOD, Center-47-T.Sieg, Holder-6-A.Cole. |
+| 8 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 8 | 4 | 1 | 4 | 6.9 | (:59) 4-J.Berry punts 48 yards to BAL 37, Center-57-K.Canaday, fair catch by 11-J.Proche. |
+| 9 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png) | 1 | 4 | 1 | 3 | 6.8 | (2:35) 6-J.Hekker punts 42 yards to DAL 9, Center-44-J.McQuaide, fair catch by 11-C.Wilson. |
+| 10 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NO.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png) | 14 | 2 | 1 | -10 | 6.6 | (2:24) 6-T.Morstead punts 48 yards to PHI 4, Center-49-Z.Wood, out of bounds. |
 
 ### NFL coaches are increasingly adhering to `nfl4th` recommendations
 
 ``` r
+
 # labels on the plot
 text_df <- tibble(
   label = c("NFL coaches<br>in <span style='color:#00BFC4'>**2020**</span>", "NFL coaches<br>in <span style='color:#F8766D'>**2014**</span>"),
@@ -289,6 +294,7 @@ loss (and thus open the coach up to being blamed for a loss).
 When do teams start going for it?
 
 ``` r
+
 pbp |>
   mutate(
     wp = 100 * wp,
@@ -368,18 +374,18 @@ The worst playoff games since 2014 in terms of total win probability
 lost by conservative decisions on 4th downs. Five of these happened in
 2020!
 
-| Win probability lost by kicking in playoff games, 2014-2022 |                                                        |                                                        |        |      |         |     |                                                        |                                                        |        |      |         |
-|-------------------------------------------------------------|--------------------------------------------------------|--------------------------------------------------------|--------|------|---------|-----|--------------------------------------------------------|--------------------------------------------------------|--------|------|---------|
-|                                                             | Team                                                   | Opp                                                    | Season | Week | WP Lost |     | Team                                                   | Opp                                                    | Season | Week | WP Lost |
-| 1                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NE.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | 2019   | WC   | 18.0    | 11  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NO.png)  | 2018   | CONF | 12.4    |
-| 2                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 2014   | WC   | 14.8    | 12  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TB.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NO.png)  | 2020   | DIV  | 12.4    |
-| 3                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/IND.png) | 2014   | DIV  | 13.8    | 13  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | 2022   | DIV  | 11.5    |
-| 4                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png) | 2020   | WC   | 13.0    | 14  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/KC.png)  | 2020   | CONF | 11.3    |
-| 5                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NE.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png)  | 2018   | SB   | 12.7    | 15  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/GB.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png) | 2014   | CONF | 10.7    |
-| 6                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 2020   | WC   | 12.7    | 16  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png) | 2017   | WC   | 10.2    |
-| 7                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CHI.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png) | 2018   | WC   | 12.6    | 17  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png)  | 2020   | WC   | 9.9     |
-| 8                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CIN.png) | 2021   | NA   | 12.5    | 18  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NYG.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/GB.png)  | 2016   | WC   | 9.8     |
-| 9                                                           | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NE.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png) | 2017   | CONF | 12.5    | 19  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LAC.png) | 2018   | WC   | 9.7     |
-| 10                                                          | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DET.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png) | 2014   | WC   | 12.4    | 20  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png)  | ![](https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png) | 2017   | WC   | 9.1     |
+| Win probability lost by kicking in playoff games, 2014-2022 |  |  |  |  |  |  |  |  |  |  |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|
+|  | Team | Opp | Season | Week | WP Lost |  | Team | Opp | Season | Week | WP Lost |
+| 1 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NE.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | 2019 | WC | 18.0 | 11 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NO.png) | 2018 | CONF | 12.4 |
+| 2 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 2014 | WC | 14.8 | 12 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TB.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NO.png) | 2020 | DIV | 12.4 |
+| 3 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/IND.png) | 2014 | DIV | 13.8 | 13 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/MIA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | 2022 | DIV | 11.5 |
+| 4 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PIT.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CLE.png) | 2020 | WC | 13.0 | 14 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/KC.png) | 2020 | CONF | 11.3 |
+| 5 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NE.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png) | 2018 | SB | 12.7 | 15 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/GB.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png) | 2014 | CONF | 10.7 |
+| 6 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/TEN.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | 2020 | WC | 12.7 | 16 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BUF.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png) | 2017 | WC | 10.2 |
+| 7 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CHI.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/PHI.png) | 2018 | WC | 12.6 | 17 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/SEA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png) | 2020 | WC | 9.9 |
+| 8 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/CIN.png) | 2021 | NA | 12.5 | 18 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NYG.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/GB.png) | 2016 | WC | 9.8 |
+| 9 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/NE.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/JAX.png) | 2017 | CONF | 12.5 | 19 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/BAL.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LAC.png) | 2018 | WC | 9.7 |
+| 10 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DET.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/DAL.png) | 2014 | WC | 12.4 | 20 | ![](https://a.espncdn.com/i/teamlogos/nfl/500/LA.png) | ![](https://a.espncdn.com/i/teamlogos/nfl/500/ATL.png) | 2017 | WC | 9.1 |
 
 More coming, maybe. . .

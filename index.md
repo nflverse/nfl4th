@@ -16,6 +16,7 @@ The easiest way to get the released version of nfl4th is to install it
 from [CRAN](https://cran.r-project.org/package=nfl4th) with:
 
 ``` r
+
 install.packages("nfl4th")
 ```
 
@@ -24,12 +25,14 @@ can install the development version of nfl4th from
 [GitHub](https://github.com/nflverse/nfl4th/) with:
 
 ``` r
+
 install.packages("nfl4th", repos = c("https://nflverse.r-universe.dev", getOption("repos")))
 ```
 
 or by using remotes:
 
 ``` r
+
 if (!require("pak")) install.packages("pak")
 pak::pak("nflverse/nfl4th")
 ```
