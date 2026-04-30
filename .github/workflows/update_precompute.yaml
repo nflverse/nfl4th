@@ -77,7 +77,6 @@ jobs:
           extra-packages: |
             nflverse/nflverse-data
             nflverse/nflreadr
-            qsbase/qs
 
       - name: Run update script
         run: Rscript -e 'source("data-raw/_save_computed_numbers.R")'
