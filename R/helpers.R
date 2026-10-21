@@ -186,6 +186,13 @@ flip_team <- function(df) {
     )
 }
 
+# yardline_100 where the receiving team starts after a kickoff. The 2024
+# kickoff rules moved the touchback to the 30 and drives have started around
+# there since, so use the 30 from 2024 on
+kickoff_yardline <- function(season) {
+  dplyr::case_when(season >= 2024 ~ 70L, TRUE ~ 75L)
+}
+
 # helper function to move the game to start of 3rd Q on an end-of-half play
 # on the plays where we find that the half has ended
 flip_half <- function(df) {
@@ -205,7 +212,11 @@ flip_half <- function(df) {
       qtr = ifelse(end_of_half == 1, 3L, qtr),
       down = ifelse(end_of_half == 1, 1, down),
       ydstogo = ifelse(end_of_half == 1, 10L, ydstogo),
-      yardline_100 = ifelse(end_of_half == 1, 75L, yardline_100),
+      yardline_100 = ifelse(
+        end_of_half == 1,
+        kickoff_yardline(season),
+        yardline_100
+      ),
       half_seconds_remaining = ifelse(
         end_of_half == 1,
         1800,
