@@ -31,7 +31,7 @@ get_punt_wp <- function(pbp) {
       ),
       yardline_100 = ifelse(
         yardline_after == 100,
-        as.integer(75),
+        kickoff_yardline(season),
         as.integer(yardline_100)
       ),
 
@@ -113,7 +113,7 @@ get_fg_wp <- function(pbp) {
     # win prob after receiving kickoff for touchback and other team has 3 more points
     flip_team() |>
     mutate(
-      yardline_100 = 75,
+      yardline_100 = kickoff_yardline(season),
       score_differential = score_differential - 3
     ) |>
 
@@ -204,8 +204,8 @@ get_2pt_wp <- function(pbp) {
         away_team == posteam ~ home_team
       ),
 
-      # 1st & 10 after touchback
-      yardline_100 = 75,
+      # 1st & 10 after the kickoff
+      yardline_100 = kickoff_yardline(season),
       down = 1,
       ydstogo = 10
     ) |>
