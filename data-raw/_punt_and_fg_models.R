@@ -97,7 +97,7 @@ outliers <- points |>
 return_tds <- outliers |>
   mutate(
     yardline_after = 100,
-    density = bin_blocked_pct
+    density = bin_td_pct
   ) |>
   select(yardline_100, yardline_after, density) |>
   filter(density > 0)
@@ -106,7 +106,7 @@ blocks <- outliers |>
   mutate(
     # not used for anything except to pick these out later
     yardline_after = 999,
-    density = bin_td_pct
+    density = bin_blocked_pct
   ) |>
   select(yardline_100, yardline_after, density) |>
   filter(density > 0)

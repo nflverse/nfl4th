@@ -1,3 +1,8 @@
+# nfl4th (development version)
+
+* From 2024 on, kickoffs after scores and to start the second half put the receiving team at its own 30 instead of its own 25, to match the new kickoff rules. (#60)
+* Fix the punt model's return touchdown and blocked punt rates, which were swapped. (#60)
+
 # nfl4th 1.0.7
 
 * Further improvements to internal cache handling by CRAN request. (#56)
