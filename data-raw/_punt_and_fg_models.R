@@ -4,16 +4,8 @@ options(scipen = 999999)
 
 # using more seasons for the punt model to help smooth out blocks/td returns some
 seasons <- 2010:2019
-pbp <- purrr::map_df(seasons, function(x) {
-  readRDS(
-    url(
-      glue::glue(
-        "https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds"
-      )
-    )
-  ) |>
-    filter(play_type_nfl == "PUNT")
-})
+pbp <- nflreadr::load_pbp(seasons) |>
+  filter(play_type_nfl == "PUNT")
 
 # thank you to Thomas Mock for the function
 # https://themockup.blog/posts/2020-08-28-heatmaps-in-ggplot2/
@@ -28,12 +20,15 @@ get_density <- function(x, y, ...) {
 
 # figure out before and after of each punt
 points <- pbp |>
-  select(desc, yardline_100, kick_distance, return_yards, fumble_lost) |>
+  select(desc, yardline_100, kick_distance, return_yards, fumble_lost, touchback) |>
   mutate(
     # give return yards too
     yardline_after = yardline_100 - kick_distance + return_yards,
+    # nflreadr fills in kick_distance on touchbacks (to the goal line), so use
+    # the touchback flag too or they land at the 1 instead of the 20
     yardline_after = if_else(
-      stringr::str_detect(desc, "end zone") & is.na(kick_distance),
+      (stringr::str_detect(desc, "end zone") & is.na(kick_distance)) |
+        touchback %in% 1,
       20,
       yardline_after
     ),
