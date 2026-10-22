@@ -56,7 +56,7 @@ get_games_file <- function() {
 
       # for field goal model
       fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
-      fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
+      fg_era = get_fg_era(season),
       fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
 
       home_total = (total_line + spread_line) / 2,
@@ -191,6 +191,17 @@ flip_team <- function(df) {
 # there since, so use the 30 from 2024 on
 kickoff_yardline <- function(season) {
   dplyr::case_when(season >= 2024 ~ 70L, TRUE ~ 75L)
+}
+
+# Era bucket for the field goal model. Kicking has improved steadily rather
+# than in steps: adjusting for distance, make probability has risen about 0.04
+# log-odds per season since 2019. This is a recency bucket, not a rule-change
+# boundary. Splitting at 2023 gives +0.22 log-odds indoor and +0.26 outdoor
+# against earlier seasons, with both roofs well sampled either side.
+# Used by both the prediction path and data-raw/_punt_and_fg_models.R, so it
+# lives here rather than being written out twice.
+get_fg_era <- function(season) {
+  dplyr::if_else(season >= 2023, 1L, 0L)
 }
 
 # helper function to move the game to start of 3rd Q on an end-of-half play
