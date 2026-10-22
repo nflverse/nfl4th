@@ -1,0 +1,10 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  articles/4th-down-research: 4th-down-research.html
+  articles/nfl4th: nfl4th.html
+last_built: 2026-10-22T18:45Z
+urls:
+  reference: https://www.nfl4th.com/reference
+  article: https://www.nfl4th.com/articles
