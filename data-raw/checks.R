@@ -137,7 +137,8 @@ plot_prepare <- function(df) {
     dplyr::slice(1) |>
     # for the charts: if you've been told to punt at 4th & X
     # you should also be told to punt from that yardline at 4th & X and longer
-    # a better alternative would be some sort of smoother or picking a given game
+    # a better alternative would be some sort of smoother or picking a given
+    # game
     # but ain't nobody got time for that
 
     # and same with FGs
@@ -205,7 +206,8 @@ current <- pbp |>
   arrange(posteam)
 
 my_title <- glue::glue(
-  "Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> 2020"
+  "Which teams <span style='color:red'>go for it</span> when they ",
+  "<span style='color:red'>should?</span> 2020"
 )
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(
@@ -232,7 +234,8 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
     title = my_title,
     subtitle = "Gain in win prob. at least 1.5 percentage points",
     caption = glue::glue(
-      "Sample size in parentheses\nExcl. final 30 seconds of game. Win prob >20%"
+      "Sample size in parentheses\n",
+      "Excl. final 30 seconds of game. Win prob >20%"
     )
   ) +
   geom_text(
@@ -245,7 +248,7 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   )
 
 
-# # # # # ########################################################## current season stuff
+# # # # # ################################################ current season stuff
 
 library(tidyverse)
 
@@ -362,7 +365,8 @@ current <- pbp |>
   arrange(posteam)
 
 my_title <- glue::glue(
-  "Which teams <span style='color:red'>go for it</span> when they <span style='color:red'>should?</span> 2022"
+  "Which teams <span style='color:red'>go for it</span> when they ",
+  "<span style='color:red'>should?</span> 2022"
 )
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(
@@ -399,7 +403,8 @@ ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
       "percentage points | Win probability > 10% or 1st quarter"
     ),
     caption = glue::glue(
-      "At least {num} opportunities | Sample size in parentheses | {lubridate::today()} | @benbbaldwin"
+      "At least {num} opportunities | Sample size in parentheses | ",
+      "{lubridate::today()} | @benbbaldwin"
     )
   ) +
   geom_text(
@@ -525,7 +530,8 @@ current <- pbp |>
   arrange(posteam)
 
 my_title <- glue::glue(
-  "WP per game <span style='color:red'>lost by kicking in go situations</span>, 2022"
+  "WP per game <span style='color:red'>lost by kicking in go situations</span>",
+  ", 2022"
 )
 ggplot(data = current, aes(x = reorder(posteam, -go), y = go)) +
   geom_col(

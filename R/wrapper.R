@@ -57,7 +57,8 @@ add_4th_probs <- function(df) {
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
-    # message("type not found. Assuming an nflfastR df and doing necessary cleaning . . .")
+    # message("type not found. Assuming an nflfastR df and doing necessary
+    # cleaning . . .")
     modified_df <- original_df |>
       prepare_nflfastr_data() |>
       filter(down == 4)
@@ -138,8 +139,9 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
         cli::cli_alert_info("Loading season {.x}")
         nflfastR::load_pbp(.x) |>
           left_join(
-            readRDS(url(
-              "https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
+            nflreadr::rds_from_url(paste0(
+              "https://github.com/nflverse/nfl4th/releases/download/",
+              "nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
             )),
             by = c("game_id", "play_id")
           )
@@ -169,7 +171,8 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
         0,
         go
       ),
-      # if it's a run formation or pass formation and there's a dead ball penalty, set go to NA
+      # if it's a run formation or pass formation and there's a dead ball
+      # penalty, set go to NA
       # since we can't know the intention of the play
       go = case_when(
         stringr::str_detect(
@@ -236,7 +239,8 @@ add_2pt_probs <- function(df) {
 
   if (!"type" %in% names(df)) {
     message(
-      "type not found. Assuming an nflfastR df and doing necessary cleaning . . ."
+      "type not found. Assuming an nflfastR df and doing necessary ",
+      "cleaning . . ."
     )
     modified_df <- original_df |>
       prepare_nflfastr_data() |>

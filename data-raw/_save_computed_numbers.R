@@ -30,7 +30,8 @@ if (type == "season") {
     seq(2014, nflreadr::most_recent_season()),
     function(s) {
       glue::glue(
-        "https://github.com/nflverse/nfl4th/releases/download/nfl4th_infrastructure/pre_computed_go_boost_{s}.rds"
+        "https://github.com/nflverse/nfl4th/releases/download/",
+        "nfl4th_infrastructure/pre_computed_go_boost_{s}.rds"
       ) |>
         nflreadr::rds_from_url()
     },

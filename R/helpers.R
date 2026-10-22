@@ -56,7 +56,7 @@ get_games_file <- function() {
 
       # for field goal model
       fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
-      fg_era = case_when(season >= 2020 ~ 1, TRUE ~ 0),
+      fg_era = get_fg_era(season),
       fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
 
       home_total = (total_line + spread_line) / 2,
@@ -103,7 +103,8 @@ get_games_file <- function() {
 # data prep function
 prepare_df <- function(df) {
   df |>
-    # if an nflfastR df is passed, need to drop all this so we don't get redundant cols
+    # if an nflfastR df is passed, need to drop all this so we don't get
+    # redundant cols
     dplyr::select(-dplyr::any_of(drop.cols)) |>
     left_join(
       .games_nfl4th(),
@@ -193,6 +194,23 @@ kickoff_yardline <- function(season) {
   dplyr::case_when(season >= 2024 ~ 70L, TRUE ~ 75L)
 }
 
+# Era bucket for the field goal model. Kicking has improved steadily rather
+# than in steps: adjusting for distance, make probability has risen about 0.04
+# log-odds per season since 2019. This is a recency bucket, not a rule-change
+# boundary. Splitting at 2023 gives +0.22 log-odds indoor and +0.26 outdoor
+# against earlier seasons, with both roofs well sampled either side.
+# Used by both the prediction path and data-raw/_punt_and_fg_models.R, so it
+# lives here rather than being written out twice.
+# Callers come from the schedule and pbp files, where season is never missing,
+# but an NA here would silently produce an fg_model_roof level the model has
+# never seen, so fail loudly instead.
+get_fg_era <- function(season) {
+  if (anyNA(season)) {
+    cli::cli_abort("{.arg season} must not contain missing values.")
+  }
+  dplyr::if_else(season >= 2023, 1L, 0L)
+}
+
 # helper function to move the game to start of 3rd Q on an end-of-half play
 # on the plays where we find that the half has ended
 flip_half <- function(df) {
@@ -263,8 +281,9 @@ end_game_fn <- function(pbp) {
 }
 
 
-# #########################################################################################
-# other: this isn't used by the bot or shiny app but helps get an nflfastR df read
+# ##############################################################################
+# other: this isn't used by the bot or shiny app but helps get an nflfastR df
+# read
 
 # prepare raw pbp data
 prepare_nflfastr_data <- function(pbp) {
@@ -305,16 +324,18 @@ raw_rds_from_url <- function(url) {
 
 load_fd_model <- function() {
   # this rds file is a raw vector that xgboost::xgb.load.raw() can read
-  raw_rds_from_url(
-    "https://github.com/nflverse/nfl4th/releases/download/model_archive/fd_model.rds"
-  )
+  raw_rds_from_url(paste0(
+    "https://github.com/nflverse/nfl4th/releases/download/",
+    "model_archive/fd_model.rds"
+  ))
 }
 
 load_wp_model <- function() {
   # this rds file is a raw vector that xgboost::xgb.load.raw() can read
-  raw_rds_from_url(
-    "https://github.com/nflverse/nfl4th/releases/download/model_archive/wp_model.rds"
-  )
+  raw_rds_from_url(paste0(
+    "https://github.com/nflverse/nfl4th/releases/download/",
+    "model_archive/wp_model.rds"
+  ))
 }
 
 # additional release issue bullets for usethis::use_release_issue()
