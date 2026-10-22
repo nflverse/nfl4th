@@ -87,12 +87,12 @@ model_vars <- pbp |>
 # tune
 set.seed(2013)
 
-full_train = xgboost::xgb.DMatrix(
+full_train <- xgboost::xgb.DMatrix(
   model.matrix(~ . + 0, data = model_vars |> dplyr::select(-label)),
   label = as.integer(model_vars$label)
 )
 
-nrounds = 5000
+nrounds <- 5000
 
 grid <- grid_latin_hypercube(
   finalize(mtry(), model_vars),
@@ -144,9 +144,9 @@ get_metrics <- function(df, row = 1) {
   )
 
   output <- params
-  output$iter = fd_model$best_iteration
-  output$logloss = fd_model$evaluation_log[output$iter]$test_mlogloss_mean
-  output$error = fd_model$evaluation_log[output$iter]$test_merror_mean
+  output$iter <- fd_model$best_iteration
+  output$logloss <- fd_model$evaluation_log[output$iter]$test_mlogloss_mean
+  output$error <- fd_model$evaluation_log[output$iter]$test_merror_mean
 
   this_param <- bind_rows(output)
 
@@ -194,7 +194,7 @@ results |>
 # ******************************************************************************
 # train
 
-nrounds = 1124
+nrounds <- 1124
 params <-
   list(
     booster = "gbtree",
@@ -209,7 +209,7 @@ params <-
     min_child_weight = 0.8
   )
 
-full_train = xgboost::xgb.DMatrix(
+full_train <- xgboost::xgb.DMatrix(
   model.matrix(~ . + 0, data = model_vars |> dplyr::select(-label)),
   label = as.integer(model_vars$label)
 )
@@ -288,13 +288,13 @@ model_data <- pbp |>
   )
 
 
-full_train = xgboost::xgb.DMatrix(
+full_train <- xgboost::xgb.DMatrix(
   model.matrix(~ . + 0, data = model_data |> select(-label)),
   label = model_data$label
 )
 
 #params
-nrounds = 15000
+nrounds <- 15000
 
 grid <- dials::grid_latin_hypercube(
   dials::finalize(dials::mtry(), model_data |> select(-label)),
@@ -354,9 +354,9 @@ get_metrics <- function(df, row = 1) {
   )
 
   output <- params
-  output$iter = wp_cv_model$best_iteration
-  output$logloss = wp_cv_model$evaluation_log[output$iter]$test_logloss_mean
-  output$error = wp_cv_model$evaluation_log[output$iter]$test_error_mean
+  output$iter <- wp_cv_model$best_iteration
+  output$logloss <- wp_cv_model$evaluation_log[output$iter]$test_logloss_mean
+  output$error <- wp_cv_model$evaluation_log[output$iter]$test_error_mean
 
   this_param <- bind_rows(output)
 
@@ -461,7 +461,7 @@ wp_cv_model <- xgboost::xgb.cv(
 # ******************************************************************************
 # train
 
-nrounds = 21
+nrounds <- 21
 params <-
   list(
     booster = "gbtree",
