@@ -39,7 +39,8 @@ get_4th_plays <- function(gid) {
   tryCatch(
     expr = {
       game_url <- paste0(
-        "http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=",
+        "http://site.api.espn.com/apis/site/v2/sports/football/nfl/",
+        "summary?event=",
         df$espn
       )
       pbp <- game_url |>
@@ -50,7 +51,8 @@ get_4th_plays <- function(gid) {
       }
 
       # get plays out of the drives lists
-      # i think current drive duplicates a drive in previous drive so might be ok to cut this
+      # i think current drive duplicates a drive in previous drive so might be
+      # ok to cut this
       if (
         "current" %in% names(pbp$drives) & "previous" %in% names(pbp$drives)
       ) {
@@ -100,7 +102,8 @@ get_4th_plays <- function(gid) {
           ) |>
           dplyr::filter(qtr <= 4) |>
           dplyr::mutate(
-            # time column is wacky so extract it from play description when possible
+            # time column is wacky so extract it from play description when
+            # possible
             play_time = stringr::str_extract(desc, "\\([^()]+(?=\\)\\s)"),
             play_time = substr(play_time, 2, nchar(play_time)),
             play_min = stringr::str_extract(play_time, "[^()]+(?=\\:)") |>
@@ -151,7 +154,10 @@ get_4th_plays <- function(gid) {
             half = if_else(qtr <= 2, 1, 2),
             challenge_team = stringr::str_extract(
               desc,
-              "[:alpha:]*\\s*[:alpha:]*\\s*[:alpha:]*[:alpha:]+(?=\\schallenged)"
+              paste0(
+                "[:alpha:]*\\s*[:alpha:]*\\s*[:alpha:]*",
+                "[:alpha:]+(?=\\schallenged)"
+              )
             ),
             challenge_team = stringr::str_replace_all(
               challenge_team,
@@ -343,7 +349,8 @@ get_4th_plays <- function(gid) {
           ) |>
           # put in end of game conditions
           dplyr::mutate(
-            # if there's a conversion with fewer than 5 minutes left and a lead, run off 40 seconds
+            # if there's a conversion with fewer than 5 minutes left and a lead,
+            # run off 40 seconds
             runoff = if_else(
               between(quarter_seconds_remaining, 167, 300) &
                 score_differential > 0 &
@@ -351,7 +358,8 @@ get_4th_plays <- function(gid) {
               40,
               runoff
             ),
-            # if there's a conversion right before 2 minute warning, run down to 2 minute warning
+            # if there's a conversion right before 2 minute warning, run down to
+            # 2 minute warning
             runoff = if_else(
               between(quarter_seconds_remaining, 127, 166) &
                 score_differential > 0 &

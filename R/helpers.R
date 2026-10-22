@@ -103,7 +103,8 @@ get_games_file <- function() {
 # data prep function
 prepare_df <- function(df) {
   df |>
-    # if an nflfastR df is passed, need to drop all this so we don't get redundant cols
+    # if an nflfastR df is passed, need to drop all this so we don't get
+    # redundant cols
     dplyr::select(-dplyr::any_of(drop.cols)) |>
     left_join(
       .games_nfl4th(),
@@ -274,8 +275,9 @@ end_game_fn <- function(pbp) {
 }
 
 
-# #########################################################################################
-# other: this isn't used by the bot or shiny app but helps get an nflfastR df read
+# ##############################################################################
+# other: this isn't used by the bot or shiny app but helps get an nflfastR df
+# read
 
 # prepare raw pbp data
 prepare_nflfastr_data <- function(pbp) {
@@ -316,16 +318,18 @@ raw_rds_from_url <- function(url) {
 
 load_fd_model <- function() {
   # this rds file is a raw vector that xgboost::xgb.load.raw() can read
-  raw_rds_from_url(
-    "https://github.com/nflverse/nfl4th/releases/download/model_archive/fd_model.rds"
-  )
+  raw_rds_from_url(paste0(
+    "https://github.com/nflverse/nfl4th/releases/download/",
+    "model_archive/fd_model.rds"
+  ))
 }
 
 load_wp_model <- function() {
   # this rds file is a raw vector that xgboost::xgb.load.raw() can read
-  raw_rds_from_url(
-    "https://github.com/nflverse/nfl4th/releases/download/model_archive/wp_model.rds"
-  )
+  raw_rds_from_url(paste0(
+    "https://github.com/nflverse/nfl4th/releases/download/",
+    "model_archive/wp_model.rds"
+  ))
 }
 
 # additional release issue bullets for usethis::use_release_issue()

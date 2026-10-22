@@ -1,18 +1,20 @@
 library(tidyverse)
 library(tidymodels)
 # for getting data ready for the model
-source(
-  'https://raw.githubusercontent.com/nflverse/nflfastR/master/R/helper_add_nflscrapr_mutations.R'
-)
+source(paste0(
+  "https://raw.githubusercontent.com/nflverse/nflfastR/master/R/",
+  "helper_add_nflscrapr_mutations.R"
+))
 
-# **************************************************************************************
+# ******************************************************************************
 # data
 seasons <- 2014:2019
 pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
       glue::glue(
-        "https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds"
+        "https://raw.githubusercontent.com/nflverse/nflfastR-data/master/",
+        "data/play_by_play_{x}.rds"
       )
     )
   )
@@ -30,12 +32,16 @@ pbp <- purrr::map_df(seasons, function(x) {
 
 model_vars <- pbp |>
   mutate(
-    # we need a way to account for defensive penalties that give auto first downs
-    # hacky "solution" is saying here that a penalty that gives a first down goes for the yards to go
+    # we need a way to account for defensive penalties that give auto first
+    # downs
+    # hacky "solution" is saying here that a penalty that gives a first down
+    # goes for the yards to go
     # unless the actual penalty yardage is higher
 
-    # the drawback is that a defensive holding on eg 4th and 8 is coded as an 8 yard gain
-    # the alternative is to estimate a separate model for penalties or have their own category
+    # the drawback is that a defensive holding on eg 4th and 8 is coded as an 8
+    # yard gain
+    # the alternative is to estimate a separate model for penalties or have
+    # their own category
     # but first down penalties on 4th and long are very rare:
     # https://twitter.com/benbbaldwin/status/1322530446371074050
     yards_gained = case_when(
@@ -77,7 +83,7 @@ model_vars <- pbp |>
   # 0 = 10 yard loss
   mutate(label = label + 10)
 
-# **************************************************************************************
+# ******************************************************************************
 # tune
 set.seed(2013)
 
@@ -185,7 +191,7 @@ results |>
 
 # [1124] test-merror:0.676584+0.008136	test-mlogloss:2.858089+0.027665
 
-# **************************************************************************************
+# ******************************************************************************
 # train
 
 nrounds = 1124
@@ -223,7 +229,7 @@ importance <- xgboost::xgb.importance(
 xgboost::xgb.ggplot.importance(importance_matrix = importance)
 
 
-# **************************************************************************************
+# ******************************************************************************
 # 2pt model
 
 if (grepl("Documents", getwd())) {
@@ -238,7 +244,8 @@ pbp <- purrr::map_df(seasons, function(x) {
   readRDS(
     url(
       glue::glue(
-        "https://raw.githubusercontent.com/nflverse/nflfastR-data/master/data/play_by_play_{x}.rds"
+        "https://raw.githubusercontent.com/nflverse/nflfastR-data/master/",
+        "data/play_by_play_{x}.rds"
       )
     )
   )
@@ -451,7 +458,7 @@ wp_cv_model <- xgboost::xgb.cv(
 )
 
 
-# **************************************************************************************
+# ******************************************************************************
 # train
 
 nrounds = 21

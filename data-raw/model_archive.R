@@ -1,15 +1,18 @@
 ## DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING ##
 
 # this is the code that was used to re-save models in the model_archive tag
-# of the nfl4th repo in order to fix xgboost compatibility issues with R serialized files
+# of the nfl4th repo in order to fix xgboost compatibility issues with R
+# serialized files
 
-# We keep this only for future reference but we don't really need it anymore (hopefully)
+# We keep this only for future reference but we don't really need it anymore
+# (hopefully)
 
 load_fd_model <- function() {
   fd_model <- NULL
-  con <- url(
-    "https://github.com/guga31bb/fourth_calculator/blob/main/data/fd_model_v2.Rdata?raw=true"
-  )
+  con <- url(paste0(
+    "https://github.com/guga31bb/fourth_calculator/blob/main/data/",
+    "fd_model_v2.Rdata?raw=true"
+  ))
   try(load(con), silent = TRUE)
   close(con)
   fd_model
@@ -17,9 +20,10 @@ load_fd_model <- function() {
 
 load_wp_model <- function() {
   wp_model <- NULL
-  con <- url(
-    "https://github.com/guga31bb/fourth_calculator/blob/main/data/home_wp_model.Rdata?raw=true"
-  )
+  con <- url(paste0(
+    "https://github.com/guga31bb/fourth_calculator/blob/main/data/",
+    "home_wp_model.Rdata?raw=true"
+  ))
   try(load(con), silent = TRUE)
   close(con)
   wp_model

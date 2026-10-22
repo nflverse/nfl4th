@@ -1,4 +1,4 @@
-# #########################################################################################
+# ##############################################################################
 # now the main functions that calculate WP for a given decision
 
 # punts
@@ -14,7 +14,8 @@ get_punt_wp <- function(pbp) {
       yardline_100 = 100 - yardline_after,
 
       # deal with punt return TD (yardline_after == 100) or muff (muff == 1)
-      # we want punting team to be receiving a kickoff so have to flip everything back
+      # we want punting team to be receiving a kickoff so have to flip
+      # everything back
       posteam = case_when(
         (yardline_after == 100 | muff == 1) &
           original_posteam == away_team ~ away_team,
@@ -90,10 +91,12 @@ get_fg_wp <- function(pbp) {
       fg_index = 1:n()
     )
 
-  # win prob after receiving kickoff for touchback and other team has 3 more points
+  # win prob after receiving kickoff for touchback and other team has 3 more
+  # points
   make_df <- dat |>
 
-    # win prob after receiving kickoff for touchback and other team has 3 more points
+    # win prob after receiving kickoff for touchback and other team has 3 more
+    # points
     flip_team() |>
     mutate(
       yardline_100 = kickoff_yardline(season),
@@ -276,7 +279,8 @@ get_go_wp <- function(pbp) {
       )
     ) |>
 
-    # this step is to combine all the TD probs into one (for gains longer than possible)
+    # this step is to combine all the TD probs into one (for gains longer than
+    # possible)
     group_by(go_index, gain) |>
     mutate(prob = sum(prob)) |>
     dplyr::slice(1) |>
@@ -321,7 +325,8 @@ get_go_wp <- function(pbp) {
       half_seconds_remaining = half_seconds_remaining - 6,
       game_seconds_remaining = game_seconds_remaining - 6,
 
-      # additional runoff after successful non-td conversion (entered from user input)
+      # additional runoff after successful non-td conversion (entered from user
+      # input)
       half_seconds_remaining = ifelse(
         turnover == 0 & yardline_100 > 0,
         half_seconds_remaining - runoff,
@@ -337,7 +342,8 @@ get_go_wp <- function(pbp) {
       half_seconds_remaining = max(half_seconds_remaining, 0),
       game_seconds_remaining = max(game_seconds_remaining, 0),
 
-      # if now goal to go for either team, use yardline for yards to go, otherwise it's 1st and 10
+      # if now goal to go for either team, use yardline for yards to go,
+      # otherwise it's 1st and 10
       ydstogo = ifelse(yardline_100 < 10, yardline_100, 10)
     ) |>
     ungroup()
@@ -366,7 +372,8 @@ get_go_wp <- function(pbp) {
       # get the TD probs computed separately
       vegas_wp = ifelse(yardline_100 == 0, wp_td, vegas_wp),
 
-      # fill in end of game situation when team can kneel out clock after successful non-td conversion
+      # fill in end of game situation when team can kneel out clock after
+      # successful non-td conversion
       defteam_timeouts_remaining = ifelse(
         posteam == home_team,
         away_timeouts_remaining,
@@ -390,7 +397,8 @@ get_go_wp <- function(pbp) {
           defteam_timeouts_remaining == 2 ~ 1,
         TRUE ~ vegas_wp
       ),
-      # fill in end of game situation when other team can kneel out clock after failed attempt
+      # fill in end of game situation when other team can kneel out clock after
+      # failed attempt
       vegas_wp = case_when(
         score_differential > 0 &
           turnover == 1 &

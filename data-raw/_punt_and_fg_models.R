@@ -2,7 +2,8 @@ library(tidyverse)
 library(viridis)
 options(scipen = 999999)
 
-# using more seasons for the punt model to help smooth out blocks/td returns some
+# using more seasons for the punt model to help smooth out blocks/td returns
+# some
 seasons <- 2010:2019
 pbp <- nflreadr::load_pbp(seasons) |>
   filter(play_type_nfl == "PUNT")
@@ -20,7 +21,14 @@ get_density <- function(x, y, ...) {
 
 # figure out before and after of each punt
 points <- pbp |>
-  select(desc, yardline_100, kick_distance, return_yards, fumble_lost, touchback) |>
+  select(
+    desc,
+    yardline_100,
+    kick_distance,
+    return_yards,
+    fumble_lost,
+    touchback
+  ) |>
   mutate(
     # give return yards too
     yardline_after = yardline_100 - kick_distance + return_yards,
@@ -179,7 +187,7 @@ bind_rows(
   saveRDS('data-raw/punt_data.rds')
 
 
-# **************************************************************************************
+# ******************************************************************************
 # field goals
 
 # 4th downs as well as kicks: the attempt rate among 4th downs is what tells us

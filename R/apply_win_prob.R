@@ -93,13 +93,15 @@ calculate_win_probability <- function(pbp_data) {
     wp2
   ) |>
     mutate(
-      # wp model estimates home wp. flip back for away teams. WP is from perspective of team with 4th down decision (original posteam)
+      # wp model estimates home wp. flip back for away teams. WP is from
+      # perspective of team with 4th down decision (original posteam)
       vegas_home_wp = ifelse(
         original_posteam == away_team,
         1 - vegas_home_wp,
         vegas_home_wp
       ),
-      # nflfastr wp model uses possession team. flip back to original possession team
+      # nflfastr wp model uses possession team. flip back to original possession
+      # team
       vegas_wp = ifelse(posteam != original_posteam, 1 - vegas_wp, vegas_wp),
       # take the average
       vegas_wp = (vegas_home_wp + vegas_wp) / 2
