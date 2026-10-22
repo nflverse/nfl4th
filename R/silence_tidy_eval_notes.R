@@ -34,6 +34,7 @@ utils::globalVariables(
     "fg_index",
     "fg_make_prob",
     "fg_model_roof",
+    "fg_prob_df",
     "fg_roof",
     "fg_wp",
     "first_down_prob",

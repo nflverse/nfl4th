@@ -321,14 +321,19 @@ for (group in levels(pbp$fg_model_roof)) {
   )
   rows <- fg_prob_df$fg_model_roof == group
   fg_prob_df$p_unselected[rows] <- as.numeric(
-    stats::predict(unselected_fit, newdata = fg_prob_df[rows, ], type = "response")
+    stats::predict(
+      unselected_fit,
+      newdata = fg_prob_df[rows, ],
+      type = "response"
+    )
   )
 }
 
 fg_prob_df <- fg_prob_df |>
   mutate(
     blended = inv_logit(
-      weight * logit(squeeze(p_observed)) +
+      weight *
+        logit(squeeze(p_observed)) +
         (1 - weight) * logit(squeeze(p_unselected))
     ),
     # the correction may only pull down, never up
