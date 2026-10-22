@@ -226,14 +226,20 @@ save(fg_model, file = 'data-raw/fg_model.Rdata')
 # rather than pretend to estimate it the curve is tapered to zero.
 # ---------------------------------------------------------------------------
 
-UNSELECTED_MAX <- 51 # yards; attempt rate is flat below this
+# A distance counts as "unselected" while the attempt rate is still this share
+# of the group's own plateau. Indoors that holds two to three yards further out
+# than outdoors, which is why the range is derived per group rather than fixed.
+WEIGHT_FLOOR <- 0.80
 TAPER_FROM <- 62 # yards; last distance with enough data to say anything
 TAPER_ZERO <- 71 # yards; beyond here, call it zero
+PLATEAU_MAX <- 51 # yards; every group is still unselected below this
 
-# How often is a field goal attempted, by distance? Restricted to 4th downs
-# where going for it is unattractive and it is not an end-of-half heave, so the
-# attempt rate reflects confidence in making the kick rather than strategy.
-propensity <- pbp_fourth |>
+# How often is a field goal attempted, by distance and by roof/era group?
+# Restricted to 4th downs where going for it is unattractive and it is not an
+# end-of-half heave, so the attempt rate reflects confidence in making the kick
+# rather than strategy. Smoothed over distance per group, because the raw
+# per-distance cells are thin once split four ways.
+fourth_downs <- pbp_fourth |>
   filter(
     down == 4,
     ydstogo >= 5,
@@ -241,32 +247,46 @@ propensity <- pbp_fourth |>
     fg_dist <= 75,
     is.na(half_seconds_remaining) | half_seconds_remaining >= 30
   ) |>
-  group_by(fg_dist) |>
-  summarise(attempt_rate = mean(play_type_nfl == "FIELD_GOAL"), .groups = "drop")
+  mutate(attempted = play_type_nfl == "FIELD_GOAL")
 
-# The attempt rate plateaus near 0.88 rather than 1 in the unselected range,
-# because some teams go for it instead. That is strategy, not kicker doubt, so
-# rescale the plateau to 1 and let the weight fall only where it really falls.
-plateau <- propensity |>
-  filter(fg_dist <= UNSELECTED_MAX) |>
-  pull(attempt_rate) |>
-  median()
-
-propensity <- propensity |>
-  mutate(weight = pmin(attempt_rate / plateau, 1))
-
-# Fit on the unselected range only. Logit-linear rather than a spline or
-# polynomial so that it extrapolates monotonically instead of curling back up.
-fg_model_unselected <- stats::glm(
-  sp ~ fg_dist * fg_model_roof,
-  data = pbp |> filter(fg_dist <= UNSELECTED_MAX),
-  family = stats::binomial()
+attempt_model <- mgcv::bam(
+  attempted ~ s(fg_dist, by = interaction(fg_model_roof)) + fg_model_roof,
+  data = fourth_downs,
+  family = "binomial"
 )
+
+propensity <- tidyr::expand_grid(
+  fg_dist = 30:75,
+  fg_model_roof = levels(pbp$fg_model_roof)
+) |>
+  mutate(
+    fg_model_roof = factor(fg_model_roof, levels = levels(pbp$fg_model_roof))
+  )
+propensity$attempt_rate <- as.numeric(
+  mgcv::predict.bam(attempt_model, newdata = propensity, type = "response")
+)
+
+# The attempt rate plateaus below 1 even at short range, because some teams go
+# for it instead. That is strategy, not kicker doubt, so rescale each group
+# against its own plateau and let the weight fall only where it really falls.
+propensity <- propensity |>
+  group_by(fg_model_roof) |>
+  mutate(
+    plateau = stats::median(attempt_rate[fg_dist <= PLATEAU_MAX]),
+    weight = pmin(attempt_rate / plateau, 1)
+  ) |>
+  ungroup()
+
+unselected_max <- propensity |>
+  filter(weight >= WEIGHT_FLOOR) |>
+  group_by(fg_model_roof) |>
+  summarise(max_dist = max(fg_dist), .groups = "drop")
+
+print(unselected_max)
 
 logit <- function(p) log(p / (1 - p))
 inv_logit <- function(x) 1 / (1 + exp(-x))
 squeeze <- function(p) pmin(pmax(p, 1e-6), 1 - 1e-6)
-weight_at <- stats::approxfun(propensity$fg_dist, propensity$weight, rule = 2)
 
 # Only compute out to TAPER_ZERO; the spline would extrapolate nonsensically
 # past the data and everything beyond is zero anyway.
@@ -276,16 +296,34 @@ fg_prob_df <- tidyr::expand_grid(
 ) |>
   mutate(
     fg_model_roof = factor(fg_model_roof, levels = levels(pbp$fg_model_roof)),
-    fg_dist = yardline_100 + 17,
-    weight = pmin(pmax(weight_at(fg_dist), 0), 1)
-  )
+    fg_dist = yardline_100 + 17
+  ) |>
+  left_join(
+    propensity |> select(fg_dist, fg_model_roof, weight),
+    by = c("fg_dist", "fg_model_roof")
+  ) |>
+  mutate(weight = pmin(pmax(dplyr::coalesce(weight, 1), 0), 1))
 
 fg_prob_df$p_observed <- as.numeric(
   mgcv::predict.bam(fg_model, newdata = fg_prob_df, type = "response")
 )
-fg_prob_df$p_unselected <- as.numeric(
-  stats::predict(fg_model_unselected, newdata = fg_prob_df, type = "response")
-)
+
+# Curve from the unselected range only, fit per group on that group's own
+# range. Logit-linear rather than a spline or polynomial so that it
+# extrapolates monotonically instead of curling back up.
+fg_prob_df$p_unselected <- NA_real_
+for (group in levels(pbp$fg_model_roof)) {
+  limit <- unselected_max$max_dist[unselected_max$fg_model_roof == group]
+  unselected_fit <- stats::glm(
+    sp ~ fg_dist,
+    data = pbp |> filter(fg_model_roof == group, fg_dist <= limit),
+    family = stats::binomial()
+  )
+  rows <- fg_prob_df$fg_model_roof == group
+  fg_prob_df$p_unselected[rows] <- as.numeric(
+    stats::predict(unselected_fit, newdata = fg_prob_df[rows, ], type = "response")
+  )
+}
 
 fg_prob_df <- fg_prob_df |>
   mutate(
@@ -330,7 +368,14 @@ stopifnot(
   all(fg_prob_df$fg_make_prob >= 0 & fg_prob_df$fg_make_prob <= 1),
   nrow(distinct(fg_prob_df, yardline_100, fg_model_roof)) == nrow(fg_prob_df),
   # one row per field position per group, so the lookup is a clean 1:1 join
-  nrow(fg_prob_df) == 99 * nlevels(pbp$fg_model_roof)
+  nrow(fg_prob_df) == 99 * nlevels(pbp$fg_model_roof),
+  # make probability must fall with distance within every group
+  all(
+    fg_prob_df |>
+      group_by(fg_model_roof) |>
+      summarise(ok = all(diff(fg_make_prob) <= 1e-12), .groups = "drop") |>
+      pull(ok)
+  )
 )
 
 saveRDS(fg_prob_df, "data-raw/fg_prob.rds")
