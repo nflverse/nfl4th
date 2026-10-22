@@ -1,5 +1,7 @@
 # nfl4th (development version)
 
+* Field goal make probability is now corrected for selection bias in long attempts. Only teams confident in their kicker try them, so the raw model curve was too generous past about 52 yards; probability from 55 to 61 yards drops by 5 to 10 percentage points. This replaces the linear decay that was anchored on the predicted 58 yard probability. (#63)
+* The field goal model's era cutoff moves from 2020 to 2023, and the definition is now shared between the prediction and model-fitting code so the two cannot drift. (#63)
 * From 2024 on, kickoffs after scores and to start the second half put the receiving team at its own 30 instead of its own 25, to match the new kickoff rules. (#61)
 * Fix the punt model's return touchdown and blocked punt rates, which were swapped. (#60)
 
