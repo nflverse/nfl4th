@@ -66,44 +66,27 @@ get_punt_wp <- function(pbp) {
 
 # field goals
 get_fg_wp <- function(pbp) {
-  # probability field goal is made
-  fg_prob <- as.numeric(mgcv::predict.bam(
-    fg_model,
-    newdata = pbp,
-    type = "response"
-  )) |>
-    as_tibble() |>
-    dplyr::rename(fg_make_prob = value)
-
-  # probability 58 yard field goal is made in environment (indoor/ourdoor) / era (2014-2019 or 2020+)
-  # used to decay prob for longer kicks
-  fg_prob_58 <- as.numeric(mgcv::predict.bam(
-    fg_model,
-    newdata = pbp |> mutate(yardline_100 = 40),
-    type = "response"
-  )) |>
-    as_tibble() |>
-    dplyr::rename(fg_make_prob_58 = value)
+  # Make probability is a lookup rather than a call to fg_model. The table is
+  # built in data-raw/_punt_and_fg_models.R and already accounts for the fact
+  # that only teams who trust their kicker attempt long field goals, so the
+  # raw model curve is too generous past about 52 yards. It is also tapered to
+  # zero past 71 yards. There is therefore no decay to apply here.
+  fg_prob <- pbp |>
+    dplyr::transmute(
+      yardline_100 = as.integer(yardline_100),
+      fg_model_roof = as.character(fg_model_roof)
+    ) |>
+    dplyr::left_join(
+      fg_prob_df |> dplyr::mutate(fg_model_roof = as.character(fg_model_roof)),
+      by = c("yardline_100", "fg_model_roof")
+    ) |>
+    dplyr::select(fg_make_prob)
 
   dat <- bind_cols(
     pbp,
-    fg_prob,
-    fg_prob_58
+    fg_prob
   ) |>
     mutate(
-      # linear drop from prob at 58 yards (40 yard line) to 0 at 71 (53 yard line)
-      # example: kick at 44 yard line (62 yard FG) has 69% chance of what a 58 yard FG has (40 yard line)
-      # this is very hacky but selection bias in kicks makes long FG hard
-      scalar = (53 - yardline_100) / 13,
-      fg_make_prob = ifelse(
-        yardline_100 > 40,
-        scalar * fg_make_prob_58,
-        fg_make_prob
-      ),
-
-      # don't recommend kicking when fg is over 70 yards (this is very scientific)
-      fg_make_prob = ifelse(yardline_100 >= 53, 0, fg_make_prob),
-
       fg_index = 1:n()
     )
 
