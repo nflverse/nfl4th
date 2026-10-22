@@ -201,7 +201,13 @@ kickoff_yardline <- function(season) {
 # against earlier seasons, with both roofs well sampled either side.
 # Used by both the prediction path and data-raw/_punt_and_fg_models.R, so it
 # lives here rather than being written out twice.
+# Callers come from the schedule and pbp files, where season is never missing,
+# but an NA here would silently produce an fg_model_roof level the model has
+# never seen, so fail loudly instead.
 get_fg_era <- function(season) {
+  if (anyNA(season)) {
+    cli::cli_abort("{.arg season} must not contain missing values.")
+  }
   dplyr::if_else(season >= 2023, 1L, 0L)
 }
 

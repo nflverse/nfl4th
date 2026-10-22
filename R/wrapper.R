@@ -139,10 +139,10 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
         cli::cli_alert_info("Loading season {.x}")
         nflfastR::load_pbp(.x) |>
           left_join(
-            readRDS(url(paste0(
+            nflreadr::rds_from_url(paste0(
               "https://github.com/nflverse/nfl4th/releases/download/",
               "nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
-            ))),
+            )),
             by = c("game_id", "play_id")
           )
       }
