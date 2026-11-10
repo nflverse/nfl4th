@@ -4,11 +4,11 @@
 #
 # 1. conversion: probability of gaining the line to gain (or a first down by
 #    penalty). Logistic GAM in distance and field position with a 4th down
-#    effect, team strength (spread and total), the era (2001-2019 and 2020+,
-#    see get_fd_era(); the latest era covers future seasons) and a late game
-#    term (offenses that trail late convert more often against defenses that
-#    play soft, so those attempts don't set the rate for the rest of the
-#    game).
+#    effect, team strength (spread and total) and the era (2001-2019 and
+#    2020+, see get_fd_era(); the latest era covers future seasons). There is
+#    no time left / game situation term: offenses trailing late convert long
+#    distances a bit more often, but in season grouped CV the term doesn't
+#    improve 4th down log loss (-0.00014, 95% CI -0.0005 to +0.0002).
 # 2. touchdown given a conversion that isn't goal to go, by the room left
 #    between the line to gain and the end zone.
 # 3. where a conversion that doesn't score ends: yards past the line to gain,
@@ -20,7 +20,11 @@
 #
 # The models are fit on 3rd and 4th down runs, passes and sacks (and defensive
 # penalties that give a first down) from 2001 on, then tabulated for 4th down
-# so predictions are table lookups (see R/go_model.R).
+# so predictions are table lookups (see R/go_model.R). 3rd downs help: fit on
+# 4th downs only, season grouped CV log loss on 4th downs is worse (+0.0006);
+# leaving out 3rd downs since 2020, when teams going for it more often may have
+# made 3rd downs less all-or-nothing, makes no difference. The era by down term
+# carries the larger 3rd to 4th down gap since 2020.
 #
 # The old model (a 76 class xgboost classifier, 2014-2019) is replaced because
 # its conversion probability jumped from one yard line to the next and it
@@ -32,7 +36,7 @@
 
 library(dplyr)
 library(mgcv)
-# get_fd_era() and fd_desperate() are shared with the prediction code
+# get_fd_era() is shared with the prediction code
 source("R/helpers.R")
 source("R/go_model.R")
 
@@ -75,8 +79,7 @@ fd_model_data <- function(pbp) {
       yl = yardline_100,
       fgtg = factor(gtg, levels = c(0, 1)),
       fera = factor(get_fd_era(season), levels = c(0, 1)),
-      r = yardline_100 - ydstogo,
-      desp = fd_desperate(game_seconds_remaining, score_differential)
+      r = yardline_100 - ydstogo
     ) |>
     filter(!is.na(gain))
 }
@@ -95,7 +98,6 @@ fd_fit <- function(tr, nthreads = parallel::detectCores()) {
     s(yl, by = fgtg, k = 5) +
     posteam_spread +
     total_line +
-    desp +
     f4:fera
   if (length(eras) == 1) {
     f_conv <- stats::update(f_conv, . ~ . - f4:fera)
@@ -197,7 +199,6 @@ fd_tabulate <- function(fit, all_eras = 0:1) {
         yl = yardline_100,
         posteam_spread = 0,
         total_line = 45,
-        desp = 0,
         fera = factor(ref, levels = as.character(fit$eras))
       )
   }
@@ -247,7 +248,7 @@ fd_tabulate <- function(fit, all_eras = 0:1) {
   }
   list(
     conv = round(conv, 6),
-    conv_coef = cf(fit$m_conv, c("posteam_spread", "total_line", "desp")),
+    conv_coef = cf(fit$m_conv),
     conv_era = era_effect(fit$m_conv, g),
     td = round(td, 6),
     td_coef = cf(fit$m_td),
@@ -273,9 +274,7 @@ if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
     "play_type_nfl",
     "first_down_penalty",
     "penalty_yards",
-    "yards_gained",
-    "game_seconds_remaining",
-    "score_differential"
+    "yards_gained"
   )
   pbp <- purrr::map(
     2001:nflreadr::most_recent_season(),
