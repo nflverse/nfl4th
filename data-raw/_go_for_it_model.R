@@ -4,7 +4,8 @@
 #
 # 1. conversion: probability of gaining the line to gain (or a first down by
 #    penalty). Logistic GAM in distance and field position with a 4th down
-#    effect, team strength (spread and total), a season trend and a late game
+#    effect, team strength (spread and total), the era (2001-2019 and 2020+,
+#    see get_fd_era(); the latest era covers future seasons) and a late game
 #    term (offenses that trail late convert more often against defenses that
 #    play soft, so those attempts don't set the rate for the rest of the
 #    game).
@@ -31,20 +32,13 @@
 
 library(dplyr)
 library(mgcv)
+# get_fd_era() and fd_desperate() are shared with the prediction code
+source("R/helpers.R")
+source("R/go_model.R")
 
 fd_t_max <- 30L # distances beyond this use 30
 fd_r_max <- 40L # room past the line to gain beyond this uses 40
 fd_fail_t_max <- 20L
-
-# last 5 minutes and trailing by more than a field goal, or last 2 minutes and
-# trailing. The same definition is used for predictions (R/go_model.R)
-fd_desperate <- function(game_seconds_remaining, score_differential) {
-  as.numeric(
-    (game_seconds_remaining <= 300 & score_differential < -3) |
-      (game_seconds_remaining <= 120 & score_differential < 0)
-  ) |>
-    dplyr::coalesce(0)
-}
 
 fd_model_data <- function(pbp) {
   pbp |>
@@ -80,7 +74,7 @@ fd_model_data <- function(pbp) {
       lt = log(ydstogo),
       yl = yardline_100,
       fgtg = factor(gtg, levels = c(0, 1)),
-      seas = season,
+      fera = factor(get_fd_era(season), levels = c(0, 1)),
       r = yardline_100 - ydstogo,
       desp = fd_desperate(game_seconds_remaining, score_differential)
     ) |>
@@ -88,19 +82,26 @@ fd_model_data <- function(pbp) {
 }
 
 fd_fit <- function(tr, nthreads = parallel::detectCores()) {
-  # 1. conversion
+  # 1. conversion. The era term is by down; with training data from one era
+  # only (e.g. a holdout fit) it is left out
+  eras <- sort(unique(as.integer(as.character(tr$fera))))
+  tr$fera <- factor(tr$fera, levels = as.character(eras))
+  f_conv <- conv ~ f4 +
+    s(lt, k = 10) +
+    s(lt, by = f4, k = 6) +
+    s(yl, k = 10) +
+    ti(lt, yl, k = c(5, 5)) +
+    fgtg +
+    s(yl, by = fgtg, k = 5) +
+    posteam_spread +
+    total_line +
+    desp +
+    f4:fera
+  if (length(eras) == 1) {
+    f_conv <- stats::update(f_conv, . ~ . - f4:fera)
+  }
   m_conv <- bam(
-    conv ~ f4 +
-      s(lt, k = 10) +
-      s(lt, by = f4, k = 6) +
-      s(yl, k = 10) +
-      ti(lt, yl, k = c(5, 5)) +
-      fgtg +
-      s(yl, by = fgtg, k = 5) +
-      posteam_spread +
-      total_line +
-      desp +
-      s(seas, k = 6),
+    f_conv,
     data = tr,
     family = binomial(),
     discrete = TRUE,
@@ -114,8 +115,7 @@ fd_fit <- function(tr, nthreads = parallel::detectCores()) {
       s(lt, k = 6) +
       ti(lr, lt, k = c(5, 5)) +
       posteam_spread +
-      total_line +
-      s(seas, k = 5),
+      total_line,
     data = cv,
     family = binomial(),
     discrete = TRUE,
@@ -179,14 +179,15 @@ fd_fit <- function(tr, nthreads = parallel::detectCores()) {
     m_haz = m_haz,
     haz_levels = levels(agg$fe),
     fail = fail,
-    last_season = max(tr$season)
+    eras = eras
   )
 }
 
-# Tabulate the fit for 4th down: logits at spread 0, total 45 and the last
-# season, plus the spread and total coefficients and the season effects
-fd_tabulate <- function(fit, seasons = 2001:2040) {
-  ref <- fit$last_season
+# Tabulate the fit for 4th down: logits at spread 0, total 45 and the latest
+# era, plus the spread, total and late game coefficients and the shift of each
+# era (eras the training data doesn't cover use the latest era it does)
+fd_tabulate <- function(fit, all_eras = 0:1) {
+  ref <- max(fit$eras)
   base <- function(d) {
     d |>
       mutate(
@@ -197,15 +198,17 @@ fd_tabulate <- function(fit, seasons = 2001:2040) {
         posteam_spread = 0,
         total_line = 45,
         desp = 0,
-        seas = ref
+        fera = factor(ref, levels = as.character(fit$eras))
       )
   }
-  season_effect <- function(m, nd) {
-    x <- nd[rep(1, length(seasons)), ]
-    x$seas <- pmin(pmax(seasons, 2001), ref)
+  era_effect <- function(m, nd) {
+    x <- nd[rep(1, length(all_eras)), ]
+    e <- pmin(all_eras, ref)
+    e <- vapply(e, \(v) max(fit$eras[fit$eras <= v], min(fit$eras)), 1)
+    x$fera <- factor(e, levels = as.character(fit$eras))
     stats::setNames(
       round(as.numeric(predict(m, x) - predict(m, nd[1, ])), 6),
-      seasons
+      all_eras
     )
   }
   # 1. conversion [distance, yardline]
@@ -245,15 +248,12 @@ fd_tabulate <- function(fit, seasons = 2001:2040) {
   list(
     conv = round(conv, 6),
     conv_coef = cf(fit$m_conv, c("posteam_spread", "total_line", "desp")),
-    conv_season = season_effect(fit$m_conv, g),
+    conv_era = era_effect(fit$m_conv, g),
     td = round(td, 6),
     td_coef = cf(fit$m_td),
-    td_season = season_effect(fit$m_td, gt),
     hazard = signif(hazard, 4),
     fail = lapply(fit$fail, \(p) signif(p, 6)),
-    ref_total = 45,
-    first_season = 2001L,
-    last_season = ref
+    ref_total = 45
   )
 }
 

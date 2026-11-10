@@ -6,9 +6,9 @@
 #   2. a touchdown given a conversion that isn't goal to go,
 #   3. where a conversion that doesn't score ends,
 #   4. where a failed attempt ends,
-# tabulated for 4th down by distance and field position. Spread, total and
-# season shift the conversion and touchdown logits, and so does a late game
-# term for conversion (see fd_desperate()).
+# tabulated for 4th down by distance and field position. Spread and total
+# shift the conversion and touchdown logits; the era (see get_fd_era()) and a
+# late game term (see fd_desperate()) shift conversion.
 
 # last 5 minutes and trailing by more than a field goal, or last 2 minutes and
 # trailing. Offenses in this spot convert more often (defenses play soft). The
@@ -39,7 +39,7 @@ fd_gain_probs <- function(x, tb = fd_tables) {
   t_raw <- pmax(as.integer(x$ydstogo), 1L)
   t_raw <- pmin(t_raw, y)
   t <- pmin(t_raw, t_max)
-  seas <- as.character(pmin(pmax(x$season, tb$first_season), tb$last_season))
+  era <- as.character(get_fd_era(x$season))
   spread <- dplyr::coalesce(as.numeric(x$posteam_spread), 0)
   ztot <- dplyr::coalesce(as.numeric(x$total_line), tb$ref_total) - tb$ref_total
   desp <- if (
@@ -49,12 +49,12 @@ fd_gain_probs <- function(x, tb = fd_tables) {
   } else {
     rep(0, n)
   }
-  # conversion and touchdown: logits at spread 0 and total 45 in the last
-  # training season, shifted by the game's spread, total and season. Distances
-  # beyond the table use its longest distance
+  # conversion and touchdown: logits at spread 0 and total 45 in the current
+  # era, shifted by the game's spread, total and era. Distances beyond the table
+  # use its longest distance
   pc <- stats::plogis(
     tb$conv[cbind(t, y)] +
-      tb$conv_season[seas] +
+      tb$conv_era[era] +
       tb$conv_coef[1] * spread +
       tb$conv_coef[2] * ztot +
       tb$conv_coef[3] * desp
@@ -62,7 +62,6 @@ fd_gain_probs <- function(x, tb = fd_tables) {
   r <- y - t_raw
   ptd <- stats::plogis(
     tb$td[cbind(t, pmax(r, 1L))] +
-      tb$td_season[seas] +
       tb$td_coef[1] * spread +
       tb$td_coef[2] * ztot
   )

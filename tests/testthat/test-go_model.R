@@ -61,8 +61,14 @@ test_that("touchdowns get likelier closer to the end zone", {
   expect_true(all(diff(td) > 0))
 })
 
-test_that("the season is clamped to the training seasons", {
-  a <- gp_summary(fd_play(season = 2040))
-  b <- gp_summary(fd_play(season = fd_tables$last_season))
-  expect_equal(a, b)
+test_that("future seasons use the current era", {
+  expect_equal(
+    get_fd_era(c(2001, 2019, 2020, 2025, 2040)),
+    c(0L, 0L, 1L, 1L, 1L)
+  )
+  expect_equal(
+    gp_summary(fd_play(season = 2040)),
+    gp_summary(fd_play(season = 2025))
+  )
+  expect_error(get_fd_era(NA), "season")
 })
