@@ -40,6 +40,8 @@ Suggests:
     testthat (>= 2.0.0),
     tictoc,
     withr
+Remotes:
+    nflverse/nflfastR@wp-regulation-model
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
