@@ -28,6 +28,16 @@ Original data frame Data frame plus the following columns added:
 Get various probabilities associated with each option on 4th downs (go
 for it, kick field goal, punt).
 }
+\details{
+Overtime plays (\code{qtr > 4}) are valued with the overtime rules of
+the game (sudden death, modified sudden death, or both teams getting the
+ball) using nflfastR's overtime win probability model. \code{quarter_seconds_remaining}
+is then the time left in the overtime period. Add \code{ot_possession} (1 for the
+first possession of overtime, 2 for the second, 3 for any later possession)
+to tell which possession it is. Without it, a tied game is assumed to be in
+the first possession and a team that trails in the second. \code{nflfastR} data
+doesn't need it, the possessions are counted from the plays.
+}
 \examples{
 \dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 \donttest{

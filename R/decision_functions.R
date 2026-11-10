@@ -7,10 +7,25 @@ get_punt_wp <- function(pbp) {
   pbp <- pbp |> mutate(punt_index = 1:n())
 
   # get wp associated with punt
+  # spots without punt data (too close to the end zone) get no punt WP
   probs <- pbp |>
-    left_join(punt_df, by = "yardline_100") |>
+    inner_join(punt_df, by = "yardline_100") |>
+    mutate(.ot_possession = ot_possession) |>
     flip_team() |>
     mutate(
+      # overtime: a muffed punt recovered by the punting team keeps its
+      # possession going, a return touchdown ends the game
+      ot_possession = dplyr::if_else(
+        muff %in% 1,
+        .ot_possession,
+        ot_possession
+      ),
+      ot_end = dplyr::case_when(
+        qtr > 4 & yardline_after %in% 100 ~ 0,
+        muff %in% 1 ~ NA_real_,
+        TRUE ~ ot_end
+      ),
+
       yardline_100 = 100 - yardline_after,
 
       # deal with punt return TD (yardline_after == 100) or muff (muff == 1)
@@ -50,6 +65,7 @@ get_punt_wp <- function(pbp) {
 
       ydstogo = ifelse(yardline_100 < 10, yardline_100, as.integer(ydstogo))
     ) |>
+    select(-".ot_possession") |>
     flip_half() |>
     calculate_win_probability() |>
     end_game_fn() |>
@@ -96,8 +112,9 @@ get_fg_wp <- function(pbp) {
   make_df <- dat |>
 
     # win prob after receiving kickoff for touchback and other team has 3 more
-    # points
-    flip_team() |>
+    # points. In overtime the rules decide whether the game goes on
+    ot_field_goal() |>
+    flip_team(ot_stop = FALSE) |>
     mutate(
       yardline_100 = kickoff_yardline(season),
       score_differential = score_differential - 3
@@ -178,10 +195,17 @@ get_2pt_wp <- function(pbp) {
     xp_prob
   )
 
+  # in overtime the rules decide whether the game goes on after the try
   probs <- bind_rows(
-    pbp |> mutate(pts = 0, score_differential = -score_differential),
-    pbp |> mutate(pts = 1, score_differential = -score_differential - 1),
-    pbp |> mutate(pts = 2, score_differential = -score_differential - 2)
+    pbp |>
+      ot_touchdown(0) |>
+      mutate(pts = 0, score_differential = -score_differential),
+    pbp |>
+      ot_touchdown(1) |>
+      mutate(pts = 1, score_differential = -score_differential - 1),
+    pbp |>
+      ot_touchdown(2) |>
+      mutate(pts = 2, score_differential = -score_differential - 2)
   ) |>
     mutate(
       # switch posteam
@@ -296,6 +320,23 @@ get_go_wp <- function(pbp) {
       turnover = ifelse(gain < ydstogo, 1, 0),
       down = 1,
 
+      # overtime: a team that trails in the second possession loses when it
+      # turns the ball over, otherwise the other team's possession starts
+      ot_end = dplyr::if_else(
+        turnover == 1 &
+          qtr > 4 &
+          ot_rule != "SD" &
+          ot_possession == 2 &
+          score_differential < 0,
+        0,
+        ot_end
+      ),
+      ot_possession = dplyr::case_when(
+        turnover == 0 | qtr <= 4 ~ ot_possession,
+        ot_rule == "SD" ~ 3,
+        TRUE ~ pmin(ot_possession + 1, 3)
+      ),
+
       # flip a bunch of columns on turnover on downs where other team gets ball
       # # note: touchdowns are dealt with separately later
       yardline_100 = ifelse(turnover == 1, 100 - yardline_100, yardline_100),
@@ -380,6 +421,7 @@ get_go_wp <- function(pbp) {
         home_timeouts_remaining
       ),
       vegas_wp = case_when(
+        qtr > 4 ~ vegas_wp,
         score_differential > 0 &
           turnover == 0 &
           yardline_100 > 0 &
@@ -400,6 +442,7 @@ get_go_wp <- function(pbp) {
       # fill in end of game situation when other team can kneel out clock after
       # failed attempt
       vegas_wp = case_when(
+        qtr > 4 ~ vegas_wp,
         score_differential > 0 &
           turnover == 1 &
           game_seconds_remaining < 120 &

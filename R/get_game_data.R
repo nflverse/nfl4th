@@ -19,6 +19,7 @@
 #' \item{desc}{Play description from ESPN.}
 #' \item{type_text}{Play type text from ESPN.}
 #' \item{index}{Index number of play from a given game. Useful for tracking plays (e.g. for 4th down bot).}
+#' \item{ot_possession}{Overtime possession number (1, 2, or 3 for any later possession), `NA` in regulation.}
 #' \item{The rest}{All the columns needed for `add_4th_probs().`}
 #' }
 #' @export
@@ -100,7 +101,6 @@ get_4th_plays <- function(gid) {
             desc = text,
             time = clock_display_value
           ) |>
-          dplyr::filter(qtr <= 4) |>
           dplyr::mutate(
             # time column is wacky so extract it from play description when
             # possible
@@ -151,7 +151,8 @@ get_4th_plays <- function(gid) {
           ) |>
           mutate(
             defteam = if_else(posteam == home_team, away_team, home_team),
-            half = if_else(qtr <= 2, 1, 2),
+            # overtime periods count their timeouts on their own
+            half = dplyr::case_when(qtr <= 2 ~ 1, qtr <= 4 ~ 2, TRUE ~ qtr),
             challenge_team = stringr::str_extract(
               desc,
               paste0(
@@ -234,8 +235,10 @@ get_4th_plays <- function(gid) {
               timeout_team != away_team ~ 0,
               is.na(timeout_team) ~ 0
             ),
-            home_timeouts_remaining = 3,
-            away_timeouts_remaining = 3
+            # two timeouts per team in overtime (the overtime win probability
+            # model does not use them)
+            home_timeouts_remaining = if_else(qtr > 4, 2, 3),
+            away_timeouts_remaining = if_else(qtr > 4, 2, 3)
           ) |>
           dplyr::group_by(half) |>
           arrange(qtr, desc(mins), desc(secs), id) |>
@@ -282,8 +285,24 @@ get_4th_plays <- function(gid) {
               1,
               0
             ),
-            type = df$type
+            type = df$type,
+            # overtime possession number, counted over the snaps
+            game_id = df$game_id,
+            down = dplyr::if_else(
+              down %in%
+                1:4 &
+                !type_text %in%
+                  c(
+                    "Timeout",
+                    "Two-minute warning",
+                    "End Period",
+                    "End of Game"
+                  ),
+              down,
+              NA_integer_
+            )
           ) |>
+          ot_possession_from_pbp() |>
           filter(
             down == 4,
             !(time < 15 & qtr %in% c(4)),
@@ -345,7 +364,8 @@ get_4th_plays <- function(gid) {
             home_score,
             away_score,
             type_text,
-            season
+            season,
+            ot_possession
           ) |>
           # put in end of game conditions
           dplyr::mutate(

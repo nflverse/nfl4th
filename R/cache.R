@@ -6,6 +6,9 @@ nfl4th_games_path <- function() {
 nfl4th_fdmodel_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "fd_model.rds")
 }
+# the win probability model used to be downloaded and cached here. It now
+# lives in the package, the path is kept so that nfl4th_clear_cache() can
+# remove an old file
 nfl4th_wpmodel_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
 }
@@ -24,15 +27,10 @@ fd_model <- function() {
   cached_model("fd")
 }
 
-wp_model <- function() {
-  cached_model("wp")
-}
-
-cached_model <- function(type = c("wp", "fd")) {
+cached_model <- function(type = c("fd")) {
   type <- arg_match(type)
   model_load <- switch(
     type,
-    "wp" = load_wp_model,
     "fd" = load_fd_model
   )
   # a.) we don't want to handle any sort of cache
@@ -48,7 +46,6 @@ cached_model <- function(type = c("wp", "fd")) {
   # if the model is cached, it is saved under this file path
   model_path <- switch(
     type,
-    "wp" = nfl4th_wpmodel_path(),
     "fd" = nfl4th_fdmodel_path()
   )
 
@@ -88,8 +85,8 @@ cached_model <- function(type = c("wp", "fd")) {
 #'   `"games"` will remove an internally used games file.
 #'   `"fd_model"` will remove the nfl4th 4th down model (only necessary in the
 #'   unlikely case of a model update).
-#'   `"wp_model"` will remove the nfl4th win probability model (only necessary in the
-#'   unlikely case of a model update).
+#'   `"wp_model"` will remove a win probability model cached by earlier nfl4th
+#'   versions (the model now ships with the package).
 #'   `"all"` will remove all of the above.
 #'
 #' @return Returns `TRUE` invisibly if cache has been cleared.

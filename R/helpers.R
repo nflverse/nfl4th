@@ -120,10 +120,11 @@ prepare_df <- function(df) {
         TRUE ~ 0
       ),
       down = 4,
-      half_seconds_remaining = if_else(
-        qtr == 2 | qtr == 4,
-        quarter_seconds_remaining,
-        quarter_seconds_remaining + 900
+      # in overtime both are the time left in the overtime period
+      half_seconds_remaining = dplyr::case_when(
+        qtr > 4 ~ quarter_seconds_remaining,
+        qtr == 2 | qtr == 4 ~ quarter_seconds_remaining,
+        TRUE ~ quarter_seconds_remaining + 900
       ),
       game_seconds_remaining = if_else(
         qtr <= 2,
@@ -156,11 +157,52 @@ prepare_df <- function(df) {
         defteam_timeouts_remaining
       ),
       original_posteam = posteam
+    ) |>
+    prepare_ot()
+}
+
+# overtime columns: the rules in force, the possession number (see
+# R/overtime.R) and the final WP of states where the rules end the game
+prepare_ot <- function(df) {
+  if (!"ot_possession" %in% names(df)) {
+    df$ot_possession <- NA_real_
+  }
+  ot <- df$qtr > 4
+  guess <- ot & is.na(df$ot_possession)
+  if (any(guess)) {
+    cli::cli_warn(c(
+      "{.field ot_possession} is missing for {sum(guess)} overtime play{?s}.",
+      "i" = paste(
+        "Assuming the first possession of overtime when the score is tied",
+        "and the second when the team with the ball trails."
+      ),
+      "i" = paste(
+        "Add {.field ot_possession} (1, 2 or 3 for any later possession)",
+        "to get the right rules."
+      )
+    ))
+  }
+  df |>
+    mutate(
+      ot_rule = ot_rule(season, type),
+      ot_possession = dplyr::case_when(
+        qtr <= 4 ~ NA_real_,
+        !is.na(ot_possession) ~ pmin(pmax(as.numeric(ot_possession), 1), 3),
+        score_differential < 0 ~ 2,
+        TRUE ~ 1
+      ),
+      ot_end = NA_real_
     )
 }
 
-# helper function for switching possession and running off 6 seconds
-flip_team <- function(df) {
+# helper function for switching possession and running off 6 seconds. In
+# overtime a change of possession without a score also moves the possession
+# number on (see R/overtime.R). After a score the caller does that instead
+# (`ot_stop = FALSE`).
+flip_team <- function(df, ot_stop = TRUE) {
+  if (ot_stop) {
+    df <- ot_change_possession(df)
+  }
   df |>
     mutate(
       # switch posteam
@@ -187,11 +229,19 @@ flip_team <- function(df) {
     )
 }
 
-# yardline_100 where the receiving team starts after a kickoff. The 2024
-# kickoff rules moved the touchback to the 30 and drives have started around
-# there since, so use the 30 from 2024 on
+# yardline_100 of the receiving team's first snap after a kickoff, by kickoff
+# rule regime: the average first snap in each regime (the same spots nflfastR's
+# win probability model uses). 2011-2015 kickoffs from the 35 with touchbacks
+# at the 20, 2016-2023 touchbacks at the 25, the 2024 dynamic kickoff with
+# touchbacks at the 30 and 2025+ with touchbacks at the 35.
 kickoff_yardline <- function(season) {
-  dplyr::case_when(season >= 2024 ~ 70L, TRUE ~ 75L)
+  dplyr::case_when(
+    season >= 2025 ~ 69L,
+    season >= 2024 ~ 70L,
+    season >= 2016 ~ 75L,
+    season >= 2011 ~ 78L,
+    TRUE ~ 72L
+  )
 }
 
 # Era bucket for the field goal model. Kicking has improved steadily rather
@@ -266,6 +316,7 @@ end_game_fn <- function(pbp) {
         home_timeouts_remaining
       ),
       vegas_wp = case_when(
+        qtr > 4 ~ vegas_wp,
         score_differential > 0 &
           game_seconds_remaining < 120 &
           defteam_timeouts_remaining == 0 ~ 0,
@@ -287,17 +338,18 @@ end_game_fn <- function(pbp) {
 
 # prepare raw pbp data
 prepare_nflfastr_data <- function(pbp) {
-  # some prep
+  # some prep. The possession number in overtime has to be counted before the
+  # plays are filtered down to 4th downs
   data <- pbp |>
     dplyr::mutate(
       type = ifelse(tolower(season_type) == "reg", "reg", "post")
     ) |>
+    ot_possession_from_pbp() |>
     filter(
-      game_seconds_remaining > 15,
+      game_seconds_remaining > 15 | qtr > 4,
       !is.na(half_seconds_remaining),
       !is.na(qtr),
-      !is.na(posteam),
-      qtr <= 4
+      !is.na(posteam)
     )
 
   return(data)
@@ -327,14 +379,6 @@ load_fd_model <- function() {
   raw_rds_from_url(paste0(
     "https://github.com/nflverse/nfl4th/releases/download/",
     "model_archive/fd_model.rds"
-  ))
-}
-
-load_wp_model <- function() {
-  # this rds file is a raw vector that xgboost::xgb.load.raw() can read
-  raw_rds_from_url(paste0(
-    "https://github.com/nflverse/nfl4th/releases/download/",
-    "model_archive/wp_model.rds"
   ))
 }
 

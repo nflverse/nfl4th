@@ -18,13 +18,17 @@ two_pt_model <- xgboost::xgb.load("data-raw/two_pt_model.ubj") |>
 # get_2pt_wp() still predicts the PAT from it, at a distance where the raw
 # curve is fine (no selection bias on extra points).
 # two point models and fg_model live in the package together with the punt_df
-# There are two other models (fd_model and wp_model) that are too big to keep
-# them in the package. They are loaded and cached on package load.
+# win probability model for 1st down states, built in data-raw/_wp_model.R
+wp_first_down_model <- readRDS("data-raw/wp_first_down_model.rds")
+
+# The go for it model (fd_model) is too big to keep in the package. It is
+# loaded and cached on first use.
 usethis::use_data(
   two_pt_model,
   fg_model,
   fg_prob_df,
   punt_df,
+  wp_first_down_model,
   no_cache,
   internal = TRUE,
   overwrite = TRUE

@@ -11,8 +11,8 @@ nfl4th_clear_cache(type = c("games", "fd_model", "wp_model", "all"))
 \code{"games"} will remove an internally used games file.
 \code{"fd_model"} will remove the nfl4th 4th down model (only necessary in the
 unlikely case of a model update).
-\code{"wp_model"} will remove the nfl4th win probability model (only necessary in the
-unlikely case of a model update).
+\code{"wp_model"} will remove a win probability model cached by earlier nfl4th
+versions (the model now ships with the package).
 \code{"all"} will remove all of the above.}
 }
 \value{

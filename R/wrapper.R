@@ -10,6 +10,14 @@
 #' for it, kick field goal, punt).
 #'
 #' @param df A data frame of decisions to be computed for.
+#' @details Overtime plays (`qtr > 4`) are valued with the overtime rules of
+#' the game (sudden death, modified sudden death, or both teams getting the
+#' ball) using nflfastR's overtime win probability model. `quarter_seconds_remaining`
+#' is then the time left in the overtime period. Add `ot_possession` (1 for the
+#' first possession of overtime, 2 for the second, 3 for any later possession)
+#' to tell which possession it is. Without it, a tied game is assumed to be in
+#' the first possession and a team that trails in the second. `nflfastR` data
+#' doesn't need it, the possessions are counted from the plays.
 #' @return Original data frame Data frame plus the following columns added:
 #' \describe{
 #' \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
@@ -195,6 +203,14 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' for it, kick PAT).
 #'
 #' @param df A data frame of decisions to be computed for.
+#' @details Overtime plays (`qtr > 4`) are valued with the overtime rules of
+#' the game (sudden death, modified sudden death, or both teams getting the
+#' ball) using nflfastR's overtime win probability model. `quarter_seconds_remaining`
+#' is then the time left in the overtime period. Add `ot_possession` (1 for the
+#' first possession of overtime, 2 for the second, 3 for any later possession)
+#' to tell which possession it is. Without it, a tied game is assumed to be in
+#' the first possession and a team that trails in the second. `nflfastR` data
+#' doesn't need it, the possessions are counted from the plays.
 #' @return Original data frame Data frame plus the following columns added:
 #' \describe{
 #'  first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
