@@ -21,14 +21,17 @@ two_pt_model <- xgboost::xgb.load("data-raw/two_pt_model.ubj") |>
 # win probability model for 1st down states, built in data-raw/_wp_model.R
 wp_first_down_model <- readRDS("data-raw/wp_first_down_model.rds")
 
-# The go for it model (fd_model) is too big to keep in the package. It is
-# loaded and cached on first use.
+# go for it model (yards gained when going for it), built in
+# data-raw/_go_for_it_model.R
+fd_tables <- readRDS("data-raw/fd_tables.rds")
+
 usethis::use_data(
   two_pt_model,
   fg_model,
   fg_prob_df,
   punt_df,
   wp_first_down_model,
+  fd_tables,
   no_cache,
   internal = TRUE,
   overwrite = TRUE

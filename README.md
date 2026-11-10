@@ -52,7 +52,9 @@ pak::pak("nflverse/nfl4th")
 
 - The **go for it** model gives probabilities for possibilities of yards
   gained and includes the possibility of earning a first down via
-  defensive penalty
+  defensive penalty. It is built from smooth models of conversion,
+  touchdowns, and where the play ends, fit on 3rd and 4th downs since
+  2001
 - The **punt** model includes the possibility for getting blocked,
   returned for a touchdown, or fumbled on the return
 - The **field goal** model is a simple model of field goal % by distance

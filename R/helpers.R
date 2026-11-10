@@ -363,25 +363,6 @@ add_probs <- function(df) {
     get_punt_wp()
 }
 
-raw_rds_from_url <- function(url) {
-  con <- url(url)
-  on.exit(close(con))
-  load <- try(readRDS(con), silent = TRUE)
-  if (inherits(load, "try-error")) {
-    cli::cli_warn("Failed to readRDS from {.url {url}}")
-    return(NULL)
-  }
-  load
-}
-
-load_fd_model <- function() {
-  # this rds file is a raw vector that xgboost::xgb.load.raw() can read
-  raw_rds_from_url(paste0(
-    "https://github.com/nflverse/nfl4th/releases/download/",
-    "model_archive/fd_model.rds"
-  ))
-}
-
 # additional release issue bullets for usethis::use_release_issue()
 release_bullets <- function() {
   c(

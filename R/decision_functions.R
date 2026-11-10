@@ -247,67 +247,17 @@ get_2pt_wp <- function(pbp) {
 
 # go for it on 4th down WP
 get_go_wp <- function(pbp) {
-  n_plays <- nrow(pbp)
   pbp <- pbp |> mutate(go_index = 1:n())
 
-  # stuff in the go for it model
-  data <- pbp |>
-    select(
-      down,
-      ydstogo,
-      yardline_100,
-      era3,
-      era4,
-      outdoors,
-      retractable,
-      dome,
-      posteam_spread,
-      total_line,
-      posteam_total
-    )
-
-  # get model output from situation
-  preds <- stats::predict(
-    fd_model(),
-    as.matrix(data)
-  )
-
-  # xgboost v3 returns a matrix of predictions but the below code is designed
-  # to work with a vector as returned by xgboost v1.
-  # We switch back to the vector (transposing might be expensive) in order
-  # to keep the rest of the code (for now).
-  if (is.matrix(preds)) {
-    preds <- preds |>
-      t() |>
-      as.vector("numeric")
-  }
-  preds_df <- preds |>
-    tibble::as_tibble() |>
-    dplyr::rename(prob = "value") |>
-    dplyr::bind_cols(
-      tibble::tibble(
-        "gain" = rep_len(-10:65, length.out = n_plays * 76),
-        "go_index" = rep(
-          pbp$go_index,
-          times = rep_len(76, length.out = n_plays)
-        )
-      ) |>
-        dplyr::left_join(pbp, by = "go_index")
-    ) |>
-    dplyr::mutate(
-      # if predicted gain is more than possible, call it a TD
-      gain = ifelse(
-        gain > yardline_100,
-        as.integer(yardline_100),
-        as.integer(gain)
-      )
-    ) |>
-
-    # this step is to combine all the TD probs into one (for gains longer than
-    # possible)
-    group_by(go_index, gain) |>
-    mutate(prob = sum(prob)) |>
-    dplyr::slice(1) |>
+  # distribution of yards gained when going for it (see R/go_model.R). A gain
+  # equal to yardline_100 is a touchdown
+  gains <- fd_gain_probs(pbp)
+  preds_df <- tibble::tibble(
+    go_index = pbp$go_index[gains$row],
+    gain = as.integer(gains$gain),
+    prob = gains$prob
+  ) |>
+    dplyr::left_join(pbp, by = "go_index") |>
 
     # needed for the max() step later
     group_by(go_index) |>
