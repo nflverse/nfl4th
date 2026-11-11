@@ -9,8 +9,8 @@
       
       |choice             | choice_prob| success_prob| fail_wp| success_wp|
       |:------------------|-----------:|------------:|-------:|----------:|
-      |Go for it          |       12.69|        36.34|    2.40|      30.71|
-      |Field goal attempt |        6.60|        97.65|    1.68|       6.71|
+      |Go for it          |       12.64|        36.34|    2.35|      30.67|
+      |Field goal attempt |        6.34|        97.65|    1.64|       6.45|
       |Punt               |          NA|           NA|      NA|         NA|
 
 # add_2pt_probs works
@@ -25,6 +25,6 @@
       
       |choice   | choice_prob| success_prob| fail_wp| success_wp|
       |:--------|-----------:|------------:|-------:|----------:|
-      |Go for 2 |       30.71|        54.49|   17.69|      41.59|
-      |Kick XP  |       23.38|        93.31|   17.69|      23.79|
+      |Go for 2 |       30.67|        54.49|   17.46|      41.71|
+      |Kick XP  |       23.23|        93.31|   17.46|      23.64|
 

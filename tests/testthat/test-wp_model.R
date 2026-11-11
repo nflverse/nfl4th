@@ -40,10 +40,88 @@ test_that("a team can't be worse off after scoring a touchdown", {
     ydstogo = 1
   )
   wp <- wpfd_predict(x)
-  post <- 0.94 *
+  # the PAT is a 33 yard field goal
+  pat <- wpfd_pat_prob(x)
+  expect_true(all(pat > 0.9 & pat < 0.99))
+  post <- pat *
     (1 - wpfd_raw(wpfd_post_td_state(x, 7))) +
-    0.06 * (1 - wpfd_raw(wpfd_post_td_state(x, 6)))
+    (1 - pat) * (1 - wpfd_raw(wpfd_post_td_state(x, 6)))
   expect_true(all(wp <= post + 1e-12))
+})
+
+test_that("a team ahead that can kneel out the clock is at 0.9998", {
+  # 1st and 10 up 3 with 1:00 left: the defense's 2 timeouts stop the clock
+  # twice, so three kneels run off 52 seconds
+  x <- wp_state(
+    game_seconds_remaining = c(0, 30, 60, 90),
+    score_differential = 3,
+    yardline_100 = 70,
+    defteam_timeouts_remaining = 2
+  )
+  wp <- wpfd_predict(x)
+  expect_true(all(wp[1:3] >= 0.9998))
+  # 38 seconds beyond the kneel time the model is nearly back
+  expect_lt(wp[4], 0.9998)
+})
+
+test_that("a team behind deep in its own half with seconds left rarely wins", {
+  x <- wp_state(
+    game_seconds_remaining = c(0, 2, 10, 19),
+    score_differential = -1,
+    yardline_100 = 80
+  )
+  wp <- wpfd_predict(x)
+  expect_equal(wp[1], 0)
+  expect_lt(wp[2], 0.02)
+  expect_true(all(diff(wp) > 0))
+})
+
+test_that("win probability is smooth at the end of the game", {
+  # one second steps in the last 4 minutes
+  g <- expand.grid(
+    t = 1:250,
+    sd = c(-8, -3, 0, 3),
+    yl = c(5, 35, 60, 95)
+  )
+  x <- wp_state(
+    game_seconds_remaining = g$t,
+    score_differential = g$sd,
+    yardline_100 = g$yl,
+    ydstogo = pmin(10, g$yl)
+  )
+  g$wp <- wpfd_predict(x)
+  g <- g[order(g$sd, g$yl, g$t), ]
+  same <- c(FALSE, diff(g$t) == 1)
+  # the largest is real: down 3 at the 5 in the last seconds, where each second
+  # decides whether a touchdown try still leaves time for the tying kick (about
+  # 3 points a second; the clock window narrows to nothing at 0:00)
+  expect_lt(max(abs(diff(g$wp))[same[-1]]), 0.04)
+  # one yard steps between the 5s, last minute
+  g <- expand.grid(yl = 5:95, t = c(3, 8, 15, 30, 60), sd = c(-3, -1, 0))
+  g$wp <- wpfd_predict(wp_state(
+    game_seconds_remaining = g$t,
+    score_differential = g$sd,
+    yardline_100 = g$yl,
+    ydstogo = pmin(10, g$yl)
+  ))
+  step <- unlist(lapply(split(g, list(g$t, g$sd)), function(z) diff(z$wp)))
+  expect_lt(max(abs(step)), 0.06)
+})
+
+test_that("a field goal at the end of the game is valued by the result", {
+  # down 3 at the opponent's 10 with 3 seconds left: a make ties the game,
+  # worth about the overtime model's coin toss value
+  x <- wp_state(
+    game_seconds_remaining = 3,
+    score_differential = -3,
+    yardline_100 = 10
+  )
+  p <- wpfd_fg_prob(x)
+  v <- wpfd_fg_value(x, wp_first_down_model, p)
+  expect_equal(v, p * wpfd_ot_start(x), tolerance = 1e-6)
+  # down 1, a make wins
+  x$score_differential <- -1
+  expect_equal(wpfd_fg_value(x, wp_first_down_model, p), p, tolerance = 1e-6)
 })
 
 test_that("field goal range keeps its value at the end of the 1st half", {

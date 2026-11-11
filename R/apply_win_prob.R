@@ -26,7 +26,14 @@
 #    than five minutes left, WP is capped at the value of a TD + PAT.
 # 5. A team can't be worse off than if it kicked a field goal on this snap: WP
 #    is at least the value of the attempt (made: 3 points and a kickoff, missed:
-#    the other team takes over at the spot of the kick).
+#    the other team takes over at the spot of the kick). A kick at the end of
+#    the game is valued by the final result, a tie by nflfastR's overtime model.
+# 6. The end of the game, as in nflfastR's vegas_wp (nflfastR#625): in the last
+#    4 minutes WP is averaged over +-16 seconds and +-2 yards; a team ahead
+#    that can kneel out the clock is at 0.9998, moving back to the model 10 to
+#    40 seconds short of that; a team behind deep in its own half moves to 0
+#    over the last 20 seconds. (nflfastR's rule for 4th down kicks in the last
+#    30 seconds doesn't apply: every state here is a 1st down.)
 #
 # In regulation nfl4th averages this model with nflfastR's vegas_wp. Overtime
 # states are valued with nflfastR's overtime model (see R/overtime.R).
@@ -227,8 +234,8 @@ wpfd_tree_margin <- function(booster, X, n, inclusive) {
   ))
 }
 
-# WP of the team with the ball, without the touchdown cap
-wpfd_raw <- function(x, model = wp_first_down_model) {
+# logit of the WP of the team with the ball: offset plus trees
+wpfd_logit <- function(x, model = wp_first_down_model) {
   k <- model$constants
   n <- nrow(x)
   if (n == 0) {
@@ -252,7 +259,125 @@ wpfd_raw <- function(x, model = wp_first_down_model) {
     b <- F[[as.character(sch$n[jj + 1L])]][i]
     tm[i] <- (1 - w[i]) * a + w[i] * b
   }
-  stats::plogis(wpfd_offset(x, model$beta, k) + tm)
+  wpfd_offset(x, model$beta, k) + tm
+}
+
+# The end of the game, as in nflfastR's vegas_wp (nflfastR#625).
+#
+# In the last minutes the trees (up to 1,500, with few plays per state) put
+# steps of several points between consecutive seconds and adjacent yard lines.
+# The clock at the snap and the length of a play vary by more than a second,
+# and the spot by more than a yard, so there the logit is averaged over 11
+# points within +-wpfd_end_smooth seconds and +-wpfd_end_yards yards. Each
+# point has its own clock and yard offset (each yard offset is used 2 or 3
+# times, symmetric around the state and uncorrelated with the clock offset),
+# which smooths about as well as all 55 combinations at the cost of 11. The
+# clock window narrows to nothing at 0:00 and at wpfd_end_window seconds left,
+# the yard window at either goal line.
+wpfd_end_smooth <- 16
+wpfd_end_yards <- 2
+wpfd_end_window <- 240
+wpfd_end_u <- seq(-1, 1, length.out = 11)
+wpfd_end_v <- c(1, -2, 0, 2, -1, 0, 1, -2, 0, 2, -1) / 2
+
+# WP of the team with the ball, without the touchdown cap and the field goal
+# floor
+wpfd_raw <- function(x, model = wp_first_down_model) {
+  if (nrow(x) == 0) {
+    return(numeric(0))
+  }
+  l <- wpfd_logit(x, model)
+  t <- x$game_seconds_remaining
+  i <- which(!is.na(l) & !is.na(t) & t > 0 & t < wpfd_end_window)
+  if (length(i) > 0) {
+    xi <- x[i, , drop = FALSE]
+    r <- pmin(wpfd_end_smooth, t[i], wpfd_end_window - t[i])
+    yl <- xi$yardline_100
+    ry <- pmin(wpfd_end_yards, yl - 1, 99 - yl)
+    ry[is.na(ry)] <- 0
+    acc <- 0
+    for (k in seq_along(wpfd_end_u)) {
+      xi$game_seconds_remaining <- xi$half_seconds_remaining <- t[i] +
+        wpfd_end_u[k] * r
+      xi$yardline_100 <- yl + round(wpfd_end_v[k] * ry)
+      acc <- acc + wpfd_logit(xi, model)
+    }
+    l[i] <- acc / length(wpfd_end_u)
+  }
+  p <- stats::plogis(l)
+  # every state this model values is a 1st down
+  down <- if (is.null(x[["down"]])) {
+    1
+  } else {
+    dplyr::coalesce(as.numeric(x$down), 1)
+  }
+  # A team ahead with the ball wins if it can kneel out the clock, and nearly
+  # always if it is a few seconds short
+  kn <- which(!is.na(p) & x$score_differential > 0 & t >= 0 & t < 300)
+  if (length(kn) > 0) {
+    over <- t[kn] -
+      wpfd_kneel_time(
+        t[kn],
+        rep_len(down, nrow(x))[kn],
+        x$defteam_timeouts_remaining[kn]
+      )
+    w <- pmin(pmax((40 - over) / 30, 0), 1)
+    p[kn] <- pmax(p[kn], (1 - w) * p[kn] + w * wpfd_kneel_value)
+  }
+  # A team behind deep in its own half with seconds left rarely wins: WP moves
+  # to 0 over the last wpfd_behind_t seconds, fading in from the own 45 to the
+  # own 35
+  bh <- which(
+    !is.na(p) &
+      x$score_differential < 0 &
+      x$yardline_100 > 55 &
+      t >= 0 &
+      t < wpfd_behind_t
+  )
+  if (length(bh) > 0) {
+    wy <- pmin((x$yardline_100[bh] - 55) / 10, 1)
+    p[bh] <- p[bh] * (1 - wy * (1 - t[bh] / wpfd_behind_t))
+  }
+  p
+}
+wpfd_behind_t <- 20
+
+# Seconds a team can run off by kneeling: each kneel takes about 3 seconds and
+# 40 more run off between kneels unless the other team stops the clock (its
+# timeouts, and the 2 minute warning once). WP is wpfd_kneel_value up to 10
+# seconds beyond this, moving to the model's value at 40.
+wpfd_kneel_time <- function(t, down, dto) {
+  n <- 5 - down
+  stops <- dto + as.numeric(t > 120)
+  3 * n + 40 * pmax(n - 1 - stops, 0)
+}
+wpfd_kneel_value <- 0.9998
+
+# seconds left after a kick at the end of the game below which the field goal
+# value moves toward the final result
+wpfd_fg_end_t <- 15
+
+# value of the final score of regulation for the team with the ball (a tie
+# goes to overtime)
+wpfd_end_value <- function(sd, tie = 0.5) {
+  ifelse(sd > 0, 1, ifelse(sd < 0, 0, tie))
+}
+
+# WP of the team with the ball at the start of overtime, before the coin toss,
+# from nflfastR's overtime model (0.5 with an nflfastR that doesn't have it)
+wpfd_ot_start <- function(x) {
+  f <- get0("wp_ot_start", envir = asNamespace("nflfastR"), inherits = FALSE)
+  if (is.null(f)) {
+    return(rep(0.5, nrow(x)))
+  }
+  n <- nrow(x)
+  season <- if (is.null(x[["season"]])) rep(NA_real_, n) else x[["season"]]
+  type <- if (is.null(x[["type"]])) rep("reg", n) else x[["type"]]
+  f(data.frame(
+    season = season,
+    season_type = ifelse(type %in% "post", "POST", "REG"),
+    posteam_spread = x$posteam_spread
+  ))
 }
 
 # The state of the next possession after the offense scores `pts` on this snap:
@@ -290,13 +415,21 @@ wpfd_fg_prob <- function(x) {
   dplyr::coalesce(fg_prob_df$fg_make_prob[i], 0)
 }
 
+# probability that the PAT after a touchdown is good: a field goal from the 15
+# since 2015 (the 2 before)
+wpfd_pat_prob <- function(x) {
+  x$yardline_100 <- ifelse(x$season >= 2015, 15, 2)
+  wpfd_fg_prob(x)
+}
+
 # WP of kicking a field goal on this snap: made, the other team receives the
-# kickoff; missed, it takes over at the spot of the kick (or its 20)
+# kickoff; missed, it takes over at the spot of the kick, 8 yards behind the
+# line of scrimmage (or its 20)
 wpfd_fg_value <- function(x, model, p_fg, dt = 5) {
   made <- wpfd_post_td_state(x, 3, dt)
   miss <- made
   miss$score_differential <- -x$score_differential
-  miss$yardline_100 <- pmin(100 - (x$yardline_100 + 7), 80)
+  miss$yardline_100 <- pmin(100 - (x$yardline_100 + 8), 80)
   # a kick at the end of the 1st half ends the half: value it just before
   # halftime, where the 2nd half kickoff still counts
   first <- x$game_seconds_remaining > 1800
@@ -308,9 +441,25 @@ wpfd_fg_value <- function(x, model, p_fg, dt = 5) {
   g <- ifelse(first, 1800 + h, made$game_seconds_remaining)
   made$half_seconds_remaining <- miss$half_seconds_remaining <- h
   made$game_seconds_remaining <- miss$game_seconds_remaining <- g
-  p_fg *
-    (1 - wpfd_raw(made, model)) +
-    (1 - p_fg) * (1 - wpfd_raw(miss, model))
+  v_made <- 1 - wpfd_raw(made, model)
+  v_miss <- 1 - wpfd_raw(miss, model)
+  # A kick at the end of the game decides it: made, the team wins if it is
+  # ahead; missed, the score stands (a tie goes to overtime). The model doesn't
+  # know that the game ends, so with up to wpfd_fg_end_t seconds left after the
+  # kick its value is blended toward the final result.
+  w <- ifelse(
+    first,
+    1,
+    pmin(pmax(x$game_seconds_remaining - dt, 0) / wpfd_fg_end_t, 1)
+  )
+  tie <- rep(0.5, nrow(x))
+  end <- which(w < 1)
+  if (length(end) > 0) {
+    tie[end] <- wpfd_ot_start(x[end, , drop = FALSE])
+  }
+  v_made <- w * v_made + (1 - w) * wpfd_end_value(x$score_differential + 3, tie)
+  v_miss <- w * v_miss + (1 - w) * wpfd_end_value(x$score_differential, tie)
+  p_fg * v_made + (1 - p_fg) * v_miss
 }
 
 # WP of the team with the ball (regulation). WP is at least the value of
@@ -318,18 +467,14 @@ wpfd_fg_value <- function(x, model, p_fg, dt = 5) {
 # touchdown on this snap, except in the last five minutes (where not scoring
 # can be the better play) and in the last seconds of a half (where the next
 # possession is not a kickoff return).
-wpfd_predict <- function(x, model = wp_first_down_model, pat = 0.94, dt = 6) {
+wpfd_predict <- function(x, model = wp_first_down_model, dt = 6) {
   x <- as.data.frame(x)
   w <- wpfd_raw(x, model)
-  # nothing is in field goal range from behind the own 40
-  fl <- which(x$yardline_100 <= 60 & !is.na(w))
+  p_fg <- wpfd_fg_prob(x)
+  fl <- which(p_fg > 0 & !is.na(w))
   if (length(fl) > 0) {
     xf <- x[fl, , drop = FALSE]
-    w[fl] <- pmax(
-      w[fl],
-      wpfd_fg_value(xf, model, wpfd_fg_prob(xf)),
-      na.rm = TRUE
-    )
+    w[fl] <- pmax(w[fl], wpfd_fg_value(xf, model, p_fg[fl]), na.rm = TRUE)
   }
   cap <- which(
     x$game_seconds_remaining > 300 &
@@ -338,6 +483,7 @@ wpfd_predict <- function(x, model = wp_first_down_model, pat = 0.94, dt = 6) {
   )
   if (length(cap) > 0) {
     xc <- x[cap, , drop = FALSE]
+    pat <- wpfd_pat_prob(xc)
     post <- pat *
       (1 - wpfd_raw(wpfd_post_td_state(xc, 7, dt), model)) +
       (1 - pat) * (1 - wpfd_raw(wpfd_post_td_state(xc, 6, dt), model))
