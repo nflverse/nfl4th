@@ -68,7 +68,13 @@ fd_model_data <- function(pbp) {
       !is.na(spread_line),
       ydstogo >= 1,
       play_type_nfl %in%
-        c("RUSH", "PASS", "SACK", "INTERCEPTION", "FUMBLE_RECOVERED_BY_OPPONENT") |
+        c(
+          "RUSH",
+          "PASS",
+          "SACK",
+          "INTERCEPTION",
+          "FUMBLE_RECOVERED_BY_OPPONENT"
+        ) |
         first_down_penalty %in% 1
     ) |>
     mutate(
@@ -88,7 +94,10 @@ fd_model_data <- function(pbp) {
             dplyr::coalesce(as.numeric(return_yards), 0),
           ydstogo - 1
         ),
-        turnover ~ pmin(dplyr::coalesce(as.numeric(yards_gained), 0), ydstogo - 1),
+        turnover ~ pmin(
+          dplyr::coalesce(as.numeric(yards_gained), 0),
+          ydstogo - 1
+        ),
         TRUE ~ as.numeric(yards_gained)
       ),
       gain = pmin(pmax(yards_gained, -10), 65),
