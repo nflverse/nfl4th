@@ -9,7 +9,7 @@
       
       |choice             | choice_prob| success_prob| fail_wp| success_wp|
       |:------------------|-----------:|------------:|-------:|----------:|
-      |Go for it          |       12.64|        36.34|    2.35|      30.67|
+      |Go for it          |       12.65|        36.38|    2.35|      30.67|
       |Field goal attempt |        6.34|        97.65|    1.64|       6.45|
       |Punt               |          NA|           NA|      NA|         NA|
 

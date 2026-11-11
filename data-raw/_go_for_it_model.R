@@ -459,13 +459,23 @@ if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
     "qtr",
     "game_seconds_remaining",
     "score_differential",
-    "vegas_wp"
+    "vegas_wp",
+    # to find games with a broken running score (see data-raw/repair_games.R)
+    "game_id",
+    "home_score",
+    "away_score",
+    "total_home_score",
+    "total_away_score"
   )
   pbp <- purrr::map(
     2001:nflreadr::most_recent_season(),
     \(s) nflreadr::load_pbp(s) |> select(all_of(cols))
   ) |>
     bind_rows()
+  # the 2001-2002 JAX home games and 2011_13_DET_NO have the wrong score (and
+  # vegas_wp) in the released data, which the late terms use
+  source("data-raw/repair_games.R")
+  pbp <- repair_broken_games(pbp)
   model_data <- fd_model_data(pbp)
   cat(
     "training rows:",

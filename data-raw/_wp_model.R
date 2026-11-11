@@ -115,37 +115,10 @@ pbp <- purrr::map(
   \(s) nflreadr::load_pbp(s) |> select(all_of(cols))
 ) |>
   bind_rows()
-
-# Games whose running score doesn't end at the final score were parsed with
-# bugs fixed in nflfastR 6.0.0 (nflfastR#625): every Jacksonville home game of
-# 2001 and 2002 credited the home team's touchdowns and safeties to the
-# visitors, and 2011_13_DET_NO had two touchdowns twice, so their
-# score_differential is wrong. Until the released data are rebuilt, rebuild
-# those games here, as nflfastR's own WP model does. Needs nflfastR 6.0.0+.
-running_score_ok <- function(p) {
-  p |>
-    group_by(game_id) |>
-    summarise(
-      ok = max(total_home_score, na.rm = TRUE) == first(home_score) &
-        max(total_away_score, na.rm = TRUE) == first(away_score),
-      .groups = "drop"
-    )
-}
-bad <- running_score_ok(pbp) |>
-  filter(!ok) |>
-  pull(game_id)
-cat("games rebuilt because the running score doesn't end at the final:\n")
-print(bad)
-if (length(bad) > 0) {
-  rebuilt <- nflfastR::build_nflfastR_pbp(bad, decode = FALSE) |>
-    select(all_of(cols))
-  if (!all(running_score_ok(rebuilt)$ok)) {
-    stop(
-      "Rebuilt games still have the wrong running score: needs nflfastR 6.0.0+"
-    )
-  }
-  pbp <- bind_rows(filter(pbp, !game_id %in% bad), rebuilt)
-}
+# the 2001-2002 JAX home games and 2011_13_DET_NO have the wrong score in the
+# released data (see data-raw/repair_games.R)
+source("data-raw/repair_games.R")
+pbp <- repair_broken_games(pbp)
 
 model_data <- pbp |>
   filter(!is.na(result), result != 0) |>
