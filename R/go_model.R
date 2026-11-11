@@ -7,15 +7,47 @@
 #   3. where a conversion that doesn't score ends,
 #   4. where a failed attempt ends,
 # tabulated for 4th down by distance and field position. Spread and total
-# shift the conversion and touchdown logits, and the era (see get_fd_era())
-# shifts conversion.
+# shift the conversion and touchdown logits (the spread's effect on conversion
+# depends on distance), and the era (see get_fd_era()) and a late or desperate
+# situation (see fd_is_late()) shift conversion by amounts that depend on
+# distance.
+
+# Late and desperate plays: the last 10 minutes of the 4th quarter (or
+# overtime) while trailing, or a win probability below 15% for the team with the
+# ball. Late 4th and long attempts convert more often than normal ones
+# (2001-2026, not goal to go, 4th and 8-10: 36.1% vs 27.6%; 11+: 23.3% vs
+# 17.5%), against defenses that give up more underneath. The last 2 minutes of
+# the 1st half aren't late: those 4th downs convert like normal ones or worse
+# (4-5 yards: 38.2% vs 46.8% normal and 49.1% late; 8-10: 25.7% vs 27.6% and
+# 36.1%). The go for it model is fit with this flag and
+# data-raw/_go_for_it_model.R uses this function too. Missing values count as
+# not late.
+fd_is_late <- function(qtr, score_differential, game_seconds_remaining, wp) {
+  dplyr::coalesce(
+    (qtr >= 4 & score_differential < 0 & game_seconds_remaining <= 600) |
+      (!is.na(wp) & wp < 0.15),
+    FALSE
+  )
+}
+
+# fd_is_late() for prepared 4th down plays, with nflfastR's win probability of
+# the 4th down state (the model is fit with that, not nfl4th's average)
+fd_late <- function(pbp) {
+  fd_is_late(
+    pbp$qtr,
+    pbp$score_differential,
+    pbp$game_seconds_remaining,
+    fastr_win_probability(pbp)
+  )
+}
 
 # Long data frame of gain probabilities for the plays in `x` (needs ydstogo,
 # yardline_100, posteam_spread, total_line and season). A gain equal to
 # yardline_100 is a touchdown. Failed attempts never end behind the offense's
-# own 1. Returns columns row (index into x), gain and prob; the probabilities of
-# each row sum to 1.
-fd_gain_probs <- function(x, tb = fd_tables) {
+# own 1. `late` marks late and desperate plays (see fd_is_late()), recycled to
+# the rows of x. Returns columns row (index into x), gain and prob; the
+# probabilities of each row sum to 1.
+fd_gain_probs <- function(x, late = FALSE, tb = fd_tables) {
   n <- nrow(x)
   if (n == 0) {
     return(data.frame(row = integer(), gain = integer(), prob = numeric()))
@@ -27,17 +59,19 @@ fd_gain_probs <- function(x, tb = fd_tables) {
   t_raw <- pmax(as.integer(x$ydstogo), 1L)
   t_raw <- pmin(t_raw, y)
   t <- pmin(t_raw, t_max)
-  era <- as.character(get_fd_era(x$season))
+  era <- match(as.character(get_fd_era(x$season)), colnames(tb$conv_era))
   spread <- dplyr::coalesce(as.numeric(x$posteam_spread), 0)
   ztot <- dplyr::coalesce(as.numeric(x$total_line), tb$ref_total) - tb$ref_total
+  late <- rep_len(dplyr::coalesce(as.numeric(late), 0), n)
   # conversion and touchdown: logits at spread 0 and total 45 in the current
-  # era, shifted by the game's spread, total and era. Distances beyond the table
-  # use its longest distance
+  # era in a normal situation, shifted by the game's spread, total, era and
+  # situation. Distances beyond the table use its longest distance
   pc <- stats::plogis(
     tb$conv[cbind(t, y)] +
-      tb$conv_era[era] +
-      tb$conv_coef[1] * spread +
-      tb$conv_coef[2] * ztot
+      tb$conv_era[cbind(t, era)] +
+      tb$conv_late[t] * late +
+      tb$conv_spread[t] * spread +
+      tb$conv_coef[["total_line"]] * ztot
   )
   r <- y - t_raw
   ptd <- stats::plogis(

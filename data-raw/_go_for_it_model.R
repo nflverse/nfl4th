@@ -5,10 +5,12 @@
 # 1. conversion: probability of gaining the line to gain (or a first down by
 #    penalty). Logistic GAM in distance and field position with a 4th down
 #    effect, team strength (spread and total) and the era (2001-2019 and
-#    2020+, see get_fd_era(); the latest era covers future seasons). There is
-#    no time left / game situation term: offenses trailing late convert long
-#    distances a bit more often, but in season grouped CV the term doesn't
-#    improve 4th down log loss (-0.00014, 95% CI -0.0005 to +0.0002).
+#    2020+, see get_fd_era(); the latest era covers future seasons). The era
+#    shift applies to 4th downs and is a smooth in distance (see
+#    fd_era_vars()), and on 4th downs the spread's effect changes with distance
+#    (see fd_spread_vars()). Late and desperate 4th downs get their own
+#    smooth in distance, which predictions use for late plays (see
+#    fd_late_vars() and fd_is_late()).
 # 2. touchdown given a conversion that isn't goal to go, by the room left
 #    between the line to gain and the end zone.
 # 3. where a conversion that doesn't score ends: yards past the line to gain,
@@ -18,13 +20,15 @@
 # 4. where a failed attempt ends: 4th down counts by distance, shrunk toward
 #    3rd and 4th downs combined.
 #
-# The models are fit on 3rd and 4th down runs, passes and sacks (and defensive
-# penalties that give a first down) from 2001 on, then tabulated for 4th down
+# The models are fit on 3rd and 4th down runs, passes and sacks (plus defensive
+# penalties that give a first down, and turnovers as failed attempts, see
+# fd_model_data()) from 2001 on, then tabulated for 4th down
 # so predictions are table lookups (see R/go_model.R). 3rd downs help: fit on
 # 4th downs only, season grouped CV log loss on 4th downs is worse (+0.0006);
 # leaving out 3rd downs since 2020, when teams going for it more often may have
-# made 3rd downs less all-or-nothing, makes no difference. The era by down term
-# carries the larger 3rd to 4th down gap since 2020.
+# made 3rd downs less all-or-nothing, makes no difference, and neither does
+# down-weighting 3rd downs (weight 0.4). The 4th down era term carries
+# the larger 3rd to 4th down gap since 2020.
 #
 # The old model (a 76 class xgboost classifier, 2014-2019) is replaced because
 # its conversion probability jumped from one yard line to the next and it
@@ -44,6 +48,14 @@ fd_t_max <- 30L # distances beyond this use 30
 fd_r_max <- 40L # room past the line to gain beyond this uses 40
 fd_fail_t_max <- 20L
 
+# Training data: 3rd and 4th down runs, passes and sacks, defensive penalties
+# that give a first down, and interceptions and lost fumbles. A turnover is a
+# failed attempt: the other team takes over where the play ended (for an
+# interception, the spot of the catch less the return), counted at most one
+# yard short of the line to gain. Leaving turnovers out (as an earlier version
+# did) dropped 4% of late 4th down attempts, almost all failures, and made 4th
+# and 8+ look about 2.5 points easier to convert. Fake punts and plays wiped out
+# by other penalties are left out.
 fd_model_data <- function(pbp) {
   pbp |>
     filter(
@@ -55,9 +67,13 @@ fd_model_data <- function(pbp) {
       !is.na(yardline_100),
       !is.na(spread_line),
       ydstogo >= 1,
-      play_type_nfl %in% c("RUSH", "PASS", "SACK") | first_down_penalty %in% 1
+      play_type_nfl %in%
+        c("RUSH", "PASS", "SACK", "INTERCEPTION", "FUMBLE_RECOVERED_BY_OPPONENT") |
+        first_down_penalty %in% 1
     ) |>
     mutate(
+      turnover = !first_down_penalty %in% 1 &
+        (interception %in% 1 | fumble_lost %in% 1),
       # a defensive penalty that gives a first down counts as gaining the
       # distance, or the penalty yards if they are more
       yards_gained = case_when(
@@ -67,6 +83,12 @@ fd_model_data <- function(pbp) {
         first_down_penalty %in% 1 & penalty_yards >= ydstogo ~ as.numeric(
           penalty_yards
         ),
+        interception %in% 1 ~ pmin(
+          dplyr::coalesce(as.numeric(air_yards), 0) -
+            dplyr::coalesce(as.numeric(return_yards), 0),
+          ydstogo - 1
+        ),
+        turnover ~ pmin(dplyr::coalesce(as.numeric(yards_gained), 0), ydstogo - 1),
         TRUE ~ as.numeric(yards_gained)
       ),
       gain = pmin(pmax(yards_gained, -10), 65),
@@ -84,11 +106,82 @@ fd_model_data <- function(pbp) {
     filter(!is.na(gain))
 }
 
+# Era indicators for the conversion model: one per later era, 1 on that era's
+# 4th downs. Each gets its own smooth in log distance, so the era shift can
+# differ between short and long distances. The smooths aren't centered (numeric
+# by variables), so they also carry the level of the shift. Since 2020 4th down
+# conversion is up at short and medium distances and slightly down at long
+# ones. In season grouped CV a single shift per down was 4.4 points too high on
+# 2020-2026 4th and 8+ (1.5 with the smooth shift). No era adjustment, an
+# earlier boundary (2014 or 2017, about half the sample) and a shift on 4th and
+# short only were all worse, mostly at long distances. 3rd downs get no era
+# term: it made no difference to 4th downs (log loss within 0.00001).
+fd_era_names <- function(eras) {
+  if (length(eras) < 2) {
+    return(character())
+  }
+  paste0("era", eras[-1], "_d4")
+}
+fd_era_vars <- function(d, eras) {
+  for (e in eras[-1]) {
+    d[[paste0("era", e, "_d4")]] <- as.numeric(
+      as.character(d$fera) == as.character(e) & d$f4 == "1"
+    )
+  }
+  d
+}
+
+# 4th down spread terms: an extra spread slope on 4th downs that changes
+# linearly in log distance (centered at 4th and 5). The spread matters less on
+# 4th and long: the slope is about 0.017 at 4th and 1 (as on 3rd downs), 0.011
+# at 4th and 5 and 0.009 at 4th and 10. With one shared slope, 7+ point
+# favorites converted 4.6 points less often than predicted on 4th and 6+
+# (2001-2026, season grouped CV; 2.9 with these terms). Log loss can't tell the
+# two apart once the late terms below are in, which carry much of what this
+# term first picked up (95% of 4th and 6+ attempts by 7+ point underdogs are
+# late, 52% of those by 7+ point favorites). A constant
+# 4th down slope barely moved and a 4th down total slope made no difference.
+fd_spread_ref <- log(5)
+fd_spread_vars <- function(d) {
+  is4 <- as.numeric(d$f4 == "1")
+  d$sp4 <- d$posteam_spread * is4
+  d$sp4lt <- d$posteam_spread * is4 * (d$lt - fd_spread_ref)
+  d
+}
+
+# Late and desperate situations (see fd_is_late() in R/go_model.R; here with the
+# play's vegas_wp). Most 4th and long attempts come late in a game the offense
+# is losing (2015-2026, 4th and 8-10: 527 of 665 in the last 10 minutes of the
+# 4th quarter while trailing), against defenses that give up more underneath,
+# and they convert more often than 4th and long in a normal situation
+# (2001-2026: 36.1% vs 27.6% at 8-10 yards, 23.3% vs 17.5% at 11+). With one
+# curve for both, normal 4th and long was predicted at the late rate (season
+# grouped CV, not goal to go: 8-10 35.8% vs 27.6% actual, z -2.5; 11+ 23.3% vs
+# 17.5%, z -1.8). Late 3rd downs get a constant and late 4th downs a smooth in
+# distance, and the tables carry the late 4th down shift by distance, which
+# predictions add for late plays. In the same CV both normal and late 4th downs
+# are then calibrated at every distance (|z| <= 1.0) and log loss on 4th downs
+# improves (-0.0005, normal ones -0.0009). The last 2 minutes of the 1st half
+# aren't late: counting them gave about the same log loss but overpredicted
+# those 4th downs, which convert like normal ones or worse (see fd_is_late()).
+fd_late_vars <- function(d) {
+  late <- fd_is_late(
+    d$qtr,
+    d$score_differential,
+    d$game_seconds_remaining,
+    d$vegas_wp
+  )
+  d$late3 <- as.numeric(late & d$f4 == "0")
+  d$late4 <- as.numeric(late & d$f4 == "1")
+  d
+}
+
 fd_fit <- function(tr, nthreads = parallel::detectCores()) {
-  # 1. conversion. The era term is by down; with training data from one era
-  # only (e.g. a holdout fit) it is left out
+  # 1. conversion. With training data from one era only (e.g. a holdout fit)
+  # the era terms are left out
   eras <- sort(unique(as.integer(as.character(tr$fera))))
   tr$fera <- factor(tr$fera, levels = as.character(eras))
+  tr <- fd_era_vars(tr, eras) |> fd_spread_vars() |> fd_late_vars()
   f_conv <- conv ~ f4 +
     s(lt, k = 10) +
     s(lt, by = f4, k = 6) +
@@ -97,10 +190,17 @@ fd_fit <- function(tr, nthreads = parallel::detectCores()) {
     fgtg +
     s(yl, by = fgtg, k = 5) +
     posteam_spread +
+    sp4 +
+    sp4lt +
     total_line +
-    f4:fera
-  if (length(eras) == 1) {
-    f_conv <- stats::update(f_conv, . ~ . - f4:fera)
+    late3 +
+    s(lt, by = late4, k = 5)
+  if (length(eras) > 1) {
+    era_terms <- sprintf("s(lt, by = %s, k = 5)", fd_era_names(eras))
+    f_conv <- stats::update(
+      f_conv,
+      stats::as.formula(paste(". ~ . +", paste(era_terms, collapse = " + ")))
+    )
   }
   m_conv <- bam(
     f_conv,
@@ -185,9 +285,10 @@ fd_fit <- function(tr, nthreads = parallel::detectCores()) {
   )
 }
 
-# Tabulate the fit for 4th down: logits at spread 0, total 45 and the latest
-# era, plus the spread, total and late game coefficients and the shift of each
-# era (eras the training data doesn't cover use the latest era it does)
+# Tabulate the fit for 4th down in a normal situation (late terms 0): logits at
+# spread 0, total 45 and the latest era, plus the total coefficient, the spread
+# slope by distance, the shift of each era by distance (eras the training data
+# doesn't cover use the latest era it does) and the late shift by distance
 fd_tabulate <- function(fit, all_eras = 0:1) {
   ref <- max(fit$eras)
   base <- function(d) {
@@ -200,17 +301,42 @@ fd_tabulate <- function(fit, all_eras = 0:1) {
         posteam_spread = 0,
         total_line = 45,
         fera = factor(ref, levels = as.character(fit$eras))
-      )
+      ) |>
+      fd_era_vars(fit$eras) |>
+      fd_spread_vars() |>
+      mutate(late3 = 0, late4 = 0)
   }
-  era_effect <- function(m, nd) {
-    x <- nd[rep(1, length(all_eras)), ]
-    e <- pmin(all_eras, ref)
-    e <- vapply(e, \(v) max(fit$eras[fit$eras <= v], min(fit$eras)), 1)
-    x$fera <- factor(e, levels = as.character(fit$eras))
-    stats::setNames(
-      round(as.numeric(predict(m, x) - predict(m, nd[1, ])), 6),
-      all_eras
+  # conversion logit of each era minus the latest one [distance, era]. The era
+  # terms are smooths in distance only, so the shift doesn't depend on field
+  # position
+  era_effect <- function(m) {
+    nd <- data.frame(ydstogo = seq_len(fd_t_max), yardline_100 = 75) |>
+      base() |>
+      mutate(fgtg = factor(0, levels = c(0, 1)))
+    ref_lp <- predict(m, nd)
+    out <- vapply(
+      all_eras,
+      function(v) {
+        e <- max(fit$eras[fit$eras <= min(v, ref)], min(fit$eras))
+        x <- nd
+        x$fera <- factor(e, levels = as.character(fit$eras))
+        x <- fd_era_vars(x, fit$eras)
+        round(as.numeric(predict(m, x) - ref_lp), 6)
+      },
+      numeric(fd_t_max)
     )
+    colnames(out) <- all_eras
+    out
+  }
+  # conversion logit of a late 4th down minus a normal one [distance]. The late
+  # term is a smooth in distance only
+  late_effect <- function(m) {
+    nd <- data.frame(ydstogo = seq_len(fd_t_max), yardline_100 = 75) |>
+      base() |>
+      mutate(fgtg = factor(0, levels = c(0, 1)))
+    lt <- nd
+    lt$late4 <- 1
+    round(as.numeric(predict(m, lt) - predict(m, nd)), 6)
   }
   # 1. conversion [distance, yardline]
   g <- expand.grid(ydstogo = seq_len(fd_t_max), yardline_100 = 1:99) |>
@@ -246,10 +372,20 @@ fd_tabulate <- function(fit, all_eras = 0:1) {
   cf <- function(m, terms = c("posteam_spread", "total_line")) {
     round(stats::coef(m)[terms], 6)
   }
+  # spread slope of the 4th down conversion logit [distance]
+  b <- stats::coef(fit$m_conv)
+  conv_spread <- round(
+    b[["posteam_spread"]] +
+      b[["sp4"]] +
+      b[["sp4lt"]] * (log(seq_len(fd_t_max)) - fd_spread_ref),
+    6
+  )
   list(
     conv = round(conv, 6),
-    conv_coef = cf(fit$m_conv),
-    conv_era = era_effect(fit$m_conv, g),
+    conv_coef = cf(fit$m_conv, "total_line"),
+    conv_spread = conv_spread,
+    conv_era = era_effect(fit$m_conv),
+    conv_late = late_effect(fit$m_conv),
     td = round(td, 6),
     td_coef = cf(fit$m_td),
     hazard = signif(hazard, 4),
@@ -274,7 +410,16 @@ if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
     "play_type_nfl",
     "first_down_penalty",
     "penalty_yards",
-    "yards_gained"
+    "yards_gained",
+    "interception",
+    "fumble_lost",
+    "air_yards",
+    "return_yards",
+    # game situation, for the late terms (see fd_late_vars())
+    "qtr",
+    "game_seconds_remaining",
+    "score_differential",
+    "vegas_wp"
   )
   pbp <- purrr::map(
     2001:nflreadr::most_recent_season(),

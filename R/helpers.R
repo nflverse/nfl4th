@@ -264,9 +264,11 @@ get_fg_era <- function(season) {
 # Era for the go for it model's conversion probability: 2001-2019 and 2020 on.
 # Adjusting for distance, field position, team strength and the scoring
 # environment, 4th down attempts convert about as often as 3rd downs through
-# 2019 and more often since 2020 (57% vs 53% on 4th downs overall). A smooth
-# season trend or other splits did not do better. The latest era covers future
-# seasons. Used by both the prediction path (R/go_model.R) and
+# 2019 and more often since 2020 (57% vs 53% on 4th downs overall): more often
+# at short and medium distances, slightly less at long ones, so the era shift
+# depends on distance (see data-raw/_go_for_it_model.R). A smooth season trend
+# or other splits did not do better. The latest era covers future seasons.
+# Used by both the prediction path (R/go_model.R) and
 # data-raw/_go_for_it_model.R. Like get_fg_era(), a missing season is an error.
 get_fd_era <- function(season) {
   if (anyNA(season)) {

@@ -249,9 +249,10 @@ get_2pt_wp <- function(pbp) {
 get_go_wp <- function(pbp) {
   pbp <- pbp |> mutate(go_index = 1:n())
 
-  # distribution of yards gained when going for it (see R/go_model.R). A gain
-  # equal to yardline_100 is a touchdown
-  gains <- fd_gain_probs(pbp)
+  # distribution of yards gained when going for it (see R/go_model.R), which
+  # converts more often in late and desperate situations. A gain equal to
+  # yardline_100 is a touchdown
+  gains <- fd_gain_probs(pbp, late = fd_late(pbp))
   preds_df <- tibble::tibble(
     go_index = pbp$go_index[gains$row],
     gain = as.integer(gains$gain),

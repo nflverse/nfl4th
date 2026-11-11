@@ -273,7 +273,32 @@ calculate_win_probability <- function(pbp_data) {
     return(pbp_data)
   }
 
-  x <- pbp_data |>
+  x <- wp_inputs(pbp_data)
+  fastr <- fastr_wp(x)
+
+  wp <- rep(NA_real_, nrow(x))
+  ot <- x$qtr > 4
+  reg <- which(!ot)
+  if (length(reg) > 0) {
+    wp[reg] <- (wpfd_predict(x[reg, , drop = FALSE]) + fastr[reg]) / 2
+  }
+  if (any(ot)) {
+    wp[ot] <- ot_win_probability(x[ot, , drop = FALSE], fastr[ot])
+  }
+
+  # from the point of view of the team with the 4th down decision
+  wp <- ifelse(x$posteam != x$original_posteam, 1 - wp, wp)
+  if ("ot_end" %in% names(x)) {
+    wp <- ifelse(!is.na(x$ot_end), x$ot_end, wp)
+  }
+  pbp_data$vegas_wp <- wp
+  pbp_data
+}
+
+# columns the win probability models need, from the point of view of the team
+# with the ball
+wp_inputs <- function(pbp_data) {
+  pbp_data |>
     dplyr::mutate(
       home = as.numeric(posteam == home_team),
       posteam_spread = dplyr::if_else(home == 1, spread_line, -spread_line),
@@ -295,9 +320,12 @@ calculate_win_probability <- function(pbp_data) {
         home_timeouts_remaining
       )
     )
+}
 
-  # nflfastR: vegas_wp in regulation, the overtime model in overtime
-  fastr <- nflfastR::calculate_win_probability(data.frame(
+# nflfastR's win probability for the team with the ball: vegas_wp in
+# regulation, the overtime model in overtime. `x` comes from wp_inputs()
+fastr_wp <- function(x) {
+  nflfastR::calculate_win_probability(data.frame(
     receive_2h_ko = x$receive_2h_ko,
     home_team = x$home_team,
     posteam = x$posteam,
@@ -317,22 +345,13 @@ calculate_win_probability <- function(pbp_data) {
     roof = x$roof,
     stringsAsFactors = FALSE
   ))$vegas_wp
+}
 
-  wp <- rep(NA_real_, nrow(x))
-  ot <- x$qtr > 4
-  reg <- which(!ot)
-  if (length(reg) > 0) {
-    wp[reg] <- (wpfd_predict(x[reg, , drop = FALSE]) + fastr[reg]) / 2
+# nflfastR's win probability of the states in `pbp_data` for the team with the
+# ball, without the average with nfl4th's own model (see fd_late())
+fastr_win_probability <- function(pbp_data) {
+  if (nrow(pbp_data) == 0) {
+    return(numeric(0))
   }
-  if (any(ot)) {
-    wp[ot] <- ot_win_probability(x[ot, , drop = FALSE], fastr[ot])
-  }
-
-  # from the point of view of the team with the 4th down decision
-  wp <- ifelse(x$posteam != x$original_posteam, 1 - wp, wp)
-  if ("ot_end" %in% names(x)) {
-    wp <- ifelse(!is.na(x$ot_end), x$ot_end, wp)
-  }
-  pbp_data$vegas_wp <- wp
-  pbp_data
+  fastr_wp(wp_inputs(pbp_data))
 }

@@ -1,5 +1,5 @@
-gp_summary <- function(x) {
-  gp <- fd_gain_probs(x)
+gp_summary <- function(x, late = FALSE) {
+  gp <- fd_gain_probs(x, late = late)
   rows <- split(seq_len(nrow(gp)), gp$row)
   data.frame(
     total = vapply(rows, \(j) sum(gp$prob[j]), 1),
@@ -22,12 +22,12 @@ gp_summary <- function(x) {
     worst = vapply(seq_along(rows), \(i) min(gp$gain[rows[[i]]]), 1)
   )
 }
-fd_play <- function(ydstogo = 1, yardline_100 = 50, season = 2025) {
+fd_play <- function(ydstogo = 1, yardline_100 = 50, season = 2025, spread = 0) {
   data.frame(
     ydstogo = ydstogo,
     yardline_100 = yardline_100,
     season = season,
-    posteam_spread = 0,
+    posteam_spread = spread,
     total_line = 45
   )
 }
@@ -71,4 +71,46 @@ test_that("future seasons use the current era", {
     gp_summary(fd_play(season = 2025))
   )
   expect_error(get_fd_era(NA), "season")
+})
+
+test_that("the era shift depends on distance", {
+  # since 2020 4th downs convert more often at short distances, not at long ones
+  shift <- function(t) {
+    stats::qlogis(gp_summary(fd_play(ydstogo = t, season = 2025))$conv) -
+      stats::qlogis(gp_summary(fd_play(ydstogo = t, season = 2015))$conv)
+  }
+  expect_gt(shift(2), 0.1)
+  expect_lt(shift(12), 0)
+})
+
+test_that("the spread matters less on 4th and long", {
+  # favorites convert 4th and short more often, but not 4th and long
+  edge <- function(t) {
+    stats::qlogis(gp_summary(fd_play(ydstogo = t, spread = 7))$conv) -
+      stats::qlogis(gp_summary(fd_play(ydstogo = t, spread = 0))$conv)
+  }
+  expect_gt(edge(1), 0.1)
+  expect_lt(edge(10), 0.6 * edge(1))
+})
+
+test_that("late and desperate 4th and long converts more often than normal", {
+  # 2001-2026 4th and 8-10: 38.2% late or desperate, 28.7% otherwise
+  x <- fd_play(ydstogo = c(1, 10), yardline_100 = 50)
+  normal <- gp_summary(x)$conv
+  late <- gp_summary(x, late = TRUE)$conv
+  expect_gt(normal[1], 0.65)
+  expect_lt(normal[2], 0.33)
+  expect_gt(late[2], normal[2] + 0.07)
+  expect_lt(abs(late[1] - normal[1]), 0.05)
+})
+
+test_that("late means trailing late in the game or a low WP", {
+  # the end of the 1st half isn't late
+  late <- fd_is_late(
+    qtr = c(4, 4, 4, 2, 1, 5, 3, NA),
+    score_differential = c(-3, 3, -3, 7, 0, -3, 0, 0),
+    game_seconds_remaining = c(500, 500, 700, 1830, 3000, 300, 1200, NA),
+    wp = c(0.4, 0.9, 0.4, 0.6, 0.5, 0.4, 0.1, NA)
+  )
+  expect_equal(late, c(TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE))
 })
