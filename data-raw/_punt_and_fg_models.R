@@ -2,6 +2,10 @@
 library(tidyverse)
 options(scipen = 999999)
 
+# kick distance: the line of scrimmage, 10 yards of end zone and the hold 8
+# yards behind the line (kick_distance is yardline_100 + 18 on 90% of attempts)
+KICK_YARDS <- 18
+
 # ******************************************************************************
 # field goals
 
@@ -14,7 +18,7 @@ pbp_fourth <- nflreadr::load_pbp(2014:nflreadr::get_current_season()) |>
     # same definition as the prediction path, so the two cannot drift
     fg_era = nfl4th:::get_fg_era(season),
     fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
-    fg_dist = yardline_100 + 17
+    fg_dist = yardline_100 + KICK_YARDS
   )
 
 pbp <- pbp_fourth |>
@@ -45,16 +49,20 @@ save(fg_model, file = 'data-raw/fg_model.Rdata')
 # the unselected range takes over. The blend may only lower the probability,
 # never raise it, because selection bias has a known sign.
 #
-# Past TAPER_FROM there are fewer than 30 attempts per roof since 2014, so
-# rather than pretend to estimate it the curve is tapered to zero.
+# Past TAIL_FROM there are fewer than 30 attempts per roof since 2014, too few
+# to fit a curve, so it continues from there with the log odds slope of the
+# unselected curve. No one has made a 71+ yard field goal in a game, and 68-70
+# yard kicks are rare heaves (1 of 5 since 2023), so from TAIL_FADE it fades
+# linearly to zero at TAIL_END. Same tail as nflfastR's data-raw/fg_model.R.
 # ---------------------------------------------------------------------------
 
 # A distance counts as "unselected" while the attempt rate is still this share
 # of the group's own plateau. Indoors that holds two to three yards further out
 # than outdoors, which is why the range is derived per group rather than fixed.
 WEIGHT_FLOOR <- 0.80
-TAPER_FROM <- 62 # yards; last distance with enough data to say anything
-TAPER_ZERO <- 71 # yards; beyond here, call it zero
+TAIL_FROM <- 62 # yards; last distance with enough data to fit a curve
+TAIL_FADE <- 65 # yards; from here the tail fades linearly ...
+TAIL_END <- 75 # yards; ... to zero here
 PLATEAU_MAX <- 51 # yards; every group is still unselected below this
 
 # How often is a field goal attempted, by distance and by roof/era group?
@@ -111,15 +119,15 @@ logit <- function(p) log(p / (1 - p))
 inv_logit <- function(x) 1 / (1 + exp(-x))
 squeeze <- function(p) pmin(pmax(p, 1e-6), 1 - 1e-6)
 
-# Only compute out to TAPER_ZERO; the spline would extrapolate nonsensically
+# Only compute out to TAIL_END; the spline would extrapolate nonsensically
 # past the data and everything beyond is zero anyway.
 fg_prob_df <- tidyr::expand_grid(
-  yardline_100 = 1:(TAPER_ZERO - 17),
+  yardline_100 = 1:(TAIL_END - KICK_YARDS),
   fg_model_roof = levels(pbp$fg_model_roof)
 ) |>
   mutate(
     fg_model_roof = factor(fg_model_roof, levels = levels(pbp$fg_model_roof)),
-    fg_dist = yardline_100 + 17
+    fg_dist = yardline_100 + KICK_YARDS
   ) |>
   left_join(
     propensity |> select(fg_dist, fg_model_roof, weight),
@@ -165,15 +173,25 @@ fg_prob_df <- fg_prob_df |>
   arrange(fg_model_roof, yardline_100) |>
   group_by(fg_model_roof) |>
   # make probability has to fall with distance
-  mutate(fg_make_prob = cummin(fg_make_prob)) |>
-  mutate(anchor = fg_make_prob[fg_dist == TAPER_FROM]) |>
-  ungroup() |>
   mutate(
-    fg_make_prob = case_when(
-      fg_dist <= TAPER_FROM ~ fg_make_prob,
-      fg_dist >= TAPER_ZERO ~ 0,
-      TRUE ~ anchor * (TAPER_ZERO - fg_dist) / (TAPER_ZERO - TAPER_FROM)
-    )
+    fg_make_prob = cummin(fg_make_prob),
+    anchor = fg_make_prob[fg_dist == TAIL_FROM],
+    anchor_unselected = p_unselected[fg_dist == TAIL_FROM]
+  ) |>
+  ungroup() |>
+  # past TAIL_FROM: the unselected curve's log odds slope, from the anchor
+  mutate(
+    fg_make_prob = ifelse(
+      fg_dist <= TAIL_FROM,
+      fg_make_prob,
+      inv_logit(
+        logit(squeeze(anchor)) +
+          logit(squeeze(p_unselected)) -
+          logit(squeeze(anchor_unselected))
+      )
+    ),
+    fg_make_prob = fg_make_prob *
+      pmin(pmax((TAIL_END - fg_dist) / (TAIL_END - TAIL_FADE), 0), 1)
   ) |>
   select(yardline_100, fg_model_roof, fg_make_prob)
 
@@ -181,7 +199,7 @@ fg_prob_df <- fg_prob_df |>
 fg_prob_df <- bind_rows(
   fg_prob_df,
   tidyr::expand_grid(
-    yardline_100 = (TAPER_ZERO - 16):99,
+    yardline_100 = (TAIL_END - KICK_YARDS + 1):99,
     fg_model_roof = factor(
       levels(pbp$fg_model_roof),
       levels = levels(pbp$fg_model_roof)

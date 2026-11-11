@@ -87,8 +87,8 @@ get_fg_wp <- function(pbp) {
   # Make probability is a lookup rather than a call to fg_model. The table is
   # built in data-raw/_punt_and_fg_models.R and already accounts for the fact
   # that only teams who trust their kicker attempt long field goals, so the
-  # raw model curve is too generous past about 52 yards. It is also tapered to
-  # zero past 71 yards. There is therefore no decay to apply here.
+  # raw model curve is too generous past about 52 yards. It also fades to zero
+  # from 65 to 75 yards. There is therefore no decay to apply here.
   fg_prob <- pbp |>
     dplyr::transmute(
       yardline_100 = as.integer(yardline_100),
