@@ -244,6 +244,39 @@ kickoff_yardline <- function(season) {
   )
 }
 
+# Seconds from the snap of a successful 4th down conversion (not a touchdown) to
+# the offense's next snap, which is the clock of the 1st down state that is
+# valued. The clock doesn't stop for a first down, so away from the end of a
+# half the next snap comes about 37 seconds later. Late in a half teams hurry or
+# stop the clock (out of bounds, timeouts, the 2 minute warning, which is why
+# the gap dips for conversions just before it). These are the mean gaps after
+# 3rd and 4th down conversions in 2016-2026 regular and postseason games
+# (data-raw/_conversion_runoff.R), linear in the seconds left in the half
+# between the points measured. A later conversion never leads to an earlier
+# next snap. Overtime uses the 4th quarter's.
+conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
+  h <- half_seconds_remaining
+  at <- function(x, y) stats::approx(x, y, xout = h, rule = 2)$y
+  q2 <- at(
+    c(0, 22, 37, 52, 75, 105, 135, 165, 210, 900),
+    c(6, 7.5, 9, 12, 17, 21, 17, 36, 36.5, 36.6)
+  )
+  q4_behind <- at(
+    c(0, 22, 37, 52, 75, 105, 135, 165, 210, 270, 330, 420, 540, 750, 900),
+    c(7, 11, 13, 14, 18, 20.5, 13, 23, 27, 25, 31, 32.3, 33.7, 34.4, 34.4)
+  )
+  q4_ahead <- at(
+    c(0, 75, 105, 135, 165, 210, 270, 330, 420, 900),
+    c(35, 37.5, 31.8, 15, 25, 29, 32, 40, 39.5, 39)
+  )
+  dplyr::case_when(
+    qtr %in% c(1, 3) ~ 36.6,
+    qtr == 2 ~ q2,
+    score_differential > 0 ~ q4_ahead,
+    TRUE ~ q4_behind
+  )
+}
+
 # Era bucket for the field goal model. Kicking has improved steadily rather
 # than in steps: adjusting for distance, make probability has risen about 0.04
 # log-odds per season since 2019. This is a recency bucket, not a rule-change

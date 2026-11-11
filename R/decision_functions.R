@@ -317,26 +317,23 @@ get_go_wp <- function(pbp) {
         score_differential
       ),
 
-      # run off 6 seconds
-      half_seconds_remaining = half_seconds_remaining - 6,
-      game_seconds_remaining = game_seconds_remaining - 6,
-
-      # additional runoff after successful non-td conversion (entered from user
-      # input)
-      half_seconds_remaining = ifelse(
-        turnover == 0 & yardline_100 > 0,
-        half_seconds_remaining - runoff,
-        half_seconds_remaining
+      # the clock of the next snap. A turnover on downs or a touchdown stops
+      # the clock, so the next state comes 6 seconds (the play) later. After a
+      # conversion that doesn't score the clock keeps running: the typical gap
+      # to the offense's next snap (conversion_runoff()), or 6 seconds plus
+      # `runoff` when it is supplied
+      elapsed = dplyr::case_when(
+        turnover == 1 | yardline_100 <= 0 ~ 6,
+        is.na(runoff) ~ conversion_runoff(
+          qtr,
+          half_seconds_remaining,
+          score_differential
+        ),
+        TRUE ~ 6 + runoff
       ),
-      game_seconds_remaining = ifelse(
-        turnover == 0 & yardline_100 > 0,
-        game_seconds_remaining - runoff,
-        game_seconds_remaining
-      ),
-
-      # after all that, make sure these aren't negative
-      half_seconds_remaining = max(half_seconds_remaining, 0),
-      game_seconds_remaining = max(game_seconds_remaining, 0),
+      half_seconds_remaining = pmax(half_seconds_remaining - elapsed, 0),
+      game_seconds_remaining = pmax(game_seconds_remaining - elapsed, 0),
+      elapsed = NULL,
 
       # if now goal to go for either team, use yardline for yards to go,
       # otherwise it's 1st and 10

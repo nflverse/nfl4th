@@ -37,6 +37,12 @@ first possession of overtime, 2 for the second, 3 for any later possession)
 to tell which possession it is. Without it, a tied game is assumed to be in
 the first possession and a team that trails in the second. \code{nflfastR} data
 doesn't need it, the possessions are counted from the plays.
+
+A conversion that doesn't score is valued at the offense's next snap, at the
+typical gap after a conversion for the quarter, the time left and the score
+(about 37 seconds away from the end of a half, as little as 6 to 10 in the
+last seconds). Add \code{runoff} to set the seconds that run off after the 6 of
+the play instead.
 }
 \examples{
 \dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}

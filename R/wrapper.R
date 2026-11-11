@@ -18,6 +18,12 @@
 #' to tell which possession it is. Without it, a tied game is assumed to be in
 #' the first possession and a team that trails in the second. `nflfastR` data
 #' doesn't need it, the possessions are counted from the plays.
+#'
+#' A conversion that doesn't score is valued at the offense's next snap, at the
+#' typical gap after a conversion for the quarter, the time left and the score
+#' (about 37 seconds away from the end of a half, as little as 6 to 10 in the
+#' last seconds). Add `runoff` to set the seconds that run off after the 6 of
+#' the play instead.
 #' @return Original data frame Data frame plus the following columns added:
 #' \describe{
 #' \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
@@ -76,8 +82,10 @@ add_4th_probs <- function(df) {
   df <- modified_df |>
     prepare_df()
 
+  # seconds run off after a conversion beyond the 6 of the play; NA uses the
+  # typical gap to the next snap (see conversion_runoff())
   if (!"runoff" %in% names(df)) {
-    df$runoff <- 0L
+    df$runoff <- NA_real_
   }
 
   cli::cli_alert_info("Computing probabilities for {nrow(df)} plays. . .")

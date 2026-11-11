@@ -278,7 +278,9 @@ get_4th_plays <- function(gid) {
               home_score - away_score,
               away_score - home_score
             ),
-            runoff = 0,
+            # the typical gap to the next snap after a conversion (see
+            # conversion_runoff())
+            runoff = NA_real_,
             season = df$season,
             home_opening_kickoff = if_else(
               dplyr::first(stats::na.omit(posteam)) == home_team,
@@ -366,35 +368,6 @@ get_4th_plays <- function(gid) {
             type_text,
             season,
             ot_possession
-          ) |>
-          # put in end of game conditions
-          dplyr::mutate(
-            # if there's a conversion with fewer than 5 minutes left and a lead,
-            # run off 40 seconds
-            runoff = if_else(
-              between(quarter_seconds_remaining, 167, 300) &
-                score_differential > 0 &
-                qtr == 4,
-              40,
-              runoff
-            ),
-            # if there's a conversion right before 2 minute warning, run down to
-            # 2 minute warning
-            runoff = if_else(
-              between(quarter_seconds_remaining, 127, 166) &
-                score_differential > 0 &
-                qtr == 4,
-              quarter_seconds_remaining - 120 - 6,
-              runoff
-            ),
-            # if conversion after 2 minute warning, run down 40 seconds
-            runoff = if_else(
-              quarter_seconds_remaining <= 120 &
-                score_differential > 0 &
-                qtr == 4,
-              40,
-              runoff
-            )
           )
       )
 
