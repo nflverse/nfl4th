@@ -54,28 +54,52 @@ fd_fail_t_max <- 20L
 # interception, the spot of the catch less the return), counted at most one
 # yard short of the line to gain. Leaving turnovers out (as an earlier version
 # did) dropped 4% of late 4th down attempts, almost all failures, and made 4th
-# and 8+ look about 2.5 points easier to convert. Fake punts and plays wiped out
-# by other penalties are left out.
+# and 8+ look about 2.5 points easier to convert.
+#
+# Defensive penalties that give a first down count (pass interference, holding,
+# offside, roughing the passer), also when the play itself isn't recorded as a
+# run or pass (filtering on rush or pass, as the old model did, dropped 40 4th
+# downs and 161 3rd downs, mostly offside). Encroachment and neutral zone
+# infractions don't count and are left out: the snap never happened, and the
+# offense may only have been trying to draw the defense offside before
+# punting or kicking (120 4th downs and 413 3rd downs). Pre-snap fouls by the
+# offense (a false start, delay of game) replay the down and are left out, as
+# are plays wiped out by other penalties. Fouls against a punt or field goal
+# formation (roughing the kicker, for example) belong to the kick, and fake
+# punts and field goals are left out.
+fd_kick_formation <- function(desc, play_type_nfl) {
+  play_type_nfl %in%
+    c("PUNT", "FIELD_GOAL") |
+    grepl("Punt formation|Field Goal formation|punts|field goal", desc)
+}
+
+# defensive fouls the offense can draw before the snap with a hard count
+fd_drawn_fouls <- c("Encroachment", "Neutral Zone Infraction")
+
 fd_model_data <- function(pbp) {
   pbp |>
     filter(
       season >= 2001,
       down %in% c(3, 4),
       qb_kneel == 0,
-      rush == 1 | pass == 1,
+      !qb_spike %in% 1,
       !is.na(posteam),
       !is.na(yardline_100),
       !is.na(spread_line),
       ydstogo >= 1,
-      play_type_nfl %in%
-        c(
-          "RUSH",
-          "PASS",
-          "SACK",
-          "INTERCEPTION",
-          "FUMBLE_RECOVERED_BY_OPPONENT"
-        ) |
-        first_down_penalty %in% 1
+      ((rush == 1 | pass == 1) &
+        play_type_nfl %in%
+          c(
+            "RUSH",
+            "PASS",
+            "SACK",
+            "INTERCEPTION",
+            "FUMBLE_RECOVERED_BY_OPPONENT"
+          )) |
+        (first_down_penalty %in%
+          1 &
+          !fd_kick_formation(desc, play_type_nfl) &
+          !penalty_type %in% fd_drawn_fouls)
     ) |>
     mutate(
       turnover = !first_down_penalty %in% 1 &
@@ -266,6 +290,10 @@ fd_fit <- function(tr, nthreads = parallel::detectCores()) {
       ff4,
     data = agg,
     family = binomial(),
+    # like the other parts. Without discrete = TRUE, bam warns that its inner
+    # iterations didn't converge on this data; where there is data the two fits
+    # agree to within 0.005 on the hazard
+    discrete = TRUE,
     nthreads = nthreads
   )
   # 4. failed attempts: where the play ends, 4th down counts by distance
@@ -414,10 +442,13 @@ if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
     "spread_line",
     "total_line",
     "qb_kneel",
+    "qb_spike",
     "rush",
     "pass",
     "play_type_nfl",
+    "desc",
     "first_down_penalty",
+    "penalty_type",
     "penalty_yards",
     "yards_gained",
     "interception",

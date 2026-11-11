@@ -114,3 +114,21 @@ test_that("late means trailing late in the game or a low WP", {
   )
   expect_equal(late, c(TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE))
 })
+
+test_that("2 point tries are a 4th and goal from the 2 in the latest era", {
+  x <- data.frame(
+    season = c(2010, 2025, 2025, 2025),
+    posteam_spread = c(0, 0, -7, 7),
+    total_line = 45
+  )
+  p <- two_pt_conversion_prob(x)
+  # every season uses the latest era
+  expect_equal(p[1], p[2])
+  # tries from the 2 convert about 49% of the time
+  expect_gt(p[2], 0.45)
+  expect_lt(p[2], 0.53)
+  # better teams convert more often
+  expect_lt(p[3], p[2])
+  expect_gt(p[4], p[2])
+  expect_length(two_pt_conversion_prob(x[0, ]), 0)
+})

@@ -6,8 +6,9 @@ get_punt_wp <- function(pbp) {
   # to join later
   pbp <- pbp |> mutate(punt_index = 1:n())
 
-  # get wp associated with punt
-  # spots without punt data (too close to the end zone) get no punt WP
+  # get wp associated with punt: punt_df (data-raw/_punt_model.R) has the
+  # probability of each outcome by line of scrimmage. Spots at the opponent's
+  # 30 or closer aren't in it and get no punt WP
   probs <- pbp |>
     inner_join(punt_df, by = "yardline_100") |>
     mutate(.ot_possession = ot_possession) |>
@@ -151,33 +152,36 @@ get_fg_wp <- function(pbp) {
 }
 
 # function to get WPs for go for 1 or go for 2
+# A 2 point try is a 4th and goal from the 2, so its conversion probability
+# comes from the go for it model, with the game's spread and total. Unlike 4th
+# downs, 2 point tries convert about as often in every era (48.1% in 2001-2019,
+# 49.1% since 2020), so every season uses the go for it model's latest era (see
+# get_fd_era()). The go for it model never sees a 2 point try. On 2001-2026
+# tries from the 2 it predicts 48.9% against 48.5% actual, with a lower log
+# loss than a constant (0.6902 vs 0.6927). On 2020-2026 tries its log loss is
+# 0.6916, against 0.6955 for the xgboost model this replaces (trained on
+# 2010-2019).
+two_pt_conversion_prob <- function(pbp) {
+  try_2pt <- data.frame(
+    yardline_100 = rep(2L, nrow(pbp)),
+    ydstogo = rep(2L, nrow(pbp)),
+    season = pmax(pbp$season, 2020L),
+    posteam_spread = pbp$posteam_spread,
+    total_line = pbp$total_line
+  )
+  gains <- fd_gain_probs(try_2pt)
+  as.numeric(tapply(
+    gains$prob * (gains$gain >= 2),
+    factor(gains$row, levels = seq_len(nrow(try_2pt))),
+    sum
+  ))
+}
+
 # this is here because it's needed for the going for 4th down model
 get_2pt_wp <- function(pbp) {
   pbp <- pbp |> mutate(index_2pt = 1:n())
 
-  # stuff in the 2pt model
-  data <- pbp |>
-    mutate(era2 = 0) |>
-    select(
-      era2,
-      era3,
-      era4,
-      outdoors,
-      retractable,
-      dome,
-      posteam_spread,
-      total_line,
-      posteam_total
-    )
-
-  # get probability of converting 2pt attempt from model
-  prob_2pt <- stats::predict(
-    xgboost::xgb.load.raw(two_pt_model),
-    as.matrix(data)
-  ) |>
-    tibble::as_tibble() |>
-    dplyr::rename(prob_2pt = "value") |>
-    select(prob_2pt)
+  prob_2pt <- tibble::tibble(prob_2pt = two_pt_conversion_prob(pbp))
 
   # probability of making PAT
   xp_prob <- as.numeric(mgcv::predict.bam(

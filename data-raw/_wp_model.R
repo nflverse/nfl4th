@@ -19,6 +19,12 @@ library(dplyr)
 library(xgboost)
 source("R/helpers.R")
 source("R/apply_win_prob.R")
+# the field goal table behind wpfd_predict()'s field goal floor
+fg_prob_df <- local({
+  e <- new.env()
+  load("R/sysdata.rda", envir = e)
+  e$fg_prob_df
+})
 set.seed(2013)
 
 constants <- list(
@@ -32,14 +38,15 @@ constants <- list(
   # fade_t seconds of the game
   fade_end = 0.43,
   fade_t = 900,
-  # possession value fades when the half runs out: the share of the
-  # possession left is half_seconds_remaining / (left_a * yardline + left_b)
-  left_a = 2.4,
-  left_b = 15,
-  # columns of the offset (see wpfd_design()). There is no late game timeout
-  # term: fit on 1st downs only it came out with the wrong sign (more timeouts
-  # lower WP) and cost nothing to drop. The trees learn the timeouts, with
-  # monotone constraints.
+  # columns of the offset (see wpfd_design()). The possession terms fade by
+  # the time needed to get into field goal range, toward the value of a field
+  # goal (fg_eoh), as in nflfastR's vegas_wp. There is no timeout term for the
+  # end of the game: fit on 1st downs only it came out with the wrong sign
+  # (more timeouts lower WP) and cost nothing to drop. The end of the 1st half
+  # one has the right sign. nflfastR's term for the other team's field goal
+  # chance after it gets the ball back is left out: on 1st downs alone it
+  # comes out with the wrong sign and changes nothing. The trees learn the
+  # timeouts, with monotone constraints.
   terms = c(
     "sd",
     "spread_t",
@@ -48,7 +55,10 @@ constants <- list(
     "field",
     "field2",
     "r2h",
-    "const_late"
+    "const_late",
+    "to_diff_late1",
+    "const_late1",
+    "fg_eoh"
   ),
   # number of trees used, by game seconds remaining (linear in between)
   schedule = data.frame(

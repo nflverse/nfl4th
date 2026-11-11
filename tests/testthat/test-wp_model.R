@@ -46,6 +46,39 @@ test_that("a team can't be worse off after scoring a touchdown", {
   expect_true(all(wp <= post + 1e-12))
 })
 
+test_that("field goal range keeps its value at the end of the 1st half", {
+  # 1st and 10 at the opponent's 20 with 10 seconds left is close to a free
+  # field goal, while at the own 5 the half is as good as over
+  fg_range <- wpfd_predict(wp_state(1810, yardline_100 = 20))
+  backed_up <- wpfd_predict(wp_state(1810, yardline_100 = 95))
+  expect_gt(fg_range - backed_up, 0.1)
+  # and it doesn't fade over the last two minutes
+  two_min <- wpfd_predict(wp_state(1920, yardline_100 = 20))
+  expect_lt(abs(two_min - fg_range), 0.01)
+})
+
+test_that("win probability is at least the value of kicking a field goal", {
+  g <- expand.grid(
+    t = c(3000, 1920, 1830, 1810, 1803, 600, 30, 3),
+    yl = c(5, 20, 35, 45)
+  )
+  x <- wp_state(
+    game_seconds_remaining = g$t,
+    yardline_100 = g$yl,
+    ydstogo = pmin(10, g$yl)
+  )
+  fg <- wpfd_fg_value(x, wp_first_down_model, wpfd_fg_prob(x))
+  expect_true(all(wpfd_predict(x) >= fg - 1e-12))
+  # the make probability comes from the field goal table: outdoors without a
+  # roof column, from the 35 in the current era
+  expect_equal(
+    wpfd_fg_prob(wp_state(yardline_100 = 35, season = 2025)),
+    fg_prob_df$fg_make_prob[
+      fg_prob_df$yardline_100 == 35 & fg_prob_df$fg_model_roof == "11"
+    ]
+  )
+})
+
 test_that("the xgboost iteration range convention is detected", {
   b <- wpfd_booster()
   expect_type(wpfd_inclusive_range(b), "logical")
