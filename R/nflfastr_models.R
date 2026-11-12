@@ -1,4 +1,4 @@
-# Copied from nflfastR (nflverse/nflfastR@1b2d772e, the wp-speed branch on top of #625's dc295839, MIT license, the same authors):
+# Copied from nflfastR (nflverse/nflfastR#625 at 1b2d772e, MIT license, the same authors):
 # the parts nfl4th uses, so nfl4th doesn't depend on nflfastR.
 #   - vegas_wp (regulation): the go for it model's late flag uses the WP of the
 #     4th down state
