@@ -35,8 +35,13 @@
 #    over the last 20 seconds. (nflfastR's rule for 4th down kicks in the last
 #    30 seconds doesn't apply: every state here is a 1st down.)
 #
-# In regulation nfl4th averages this model with nflfastR's vegas_wp. Overtime
-# states are valued with nflfastR's overtime model (see R/overtime.R).
+# In regulation nfl4th uses this model alone. It used to average it with
+# nflfastR's vegas_wp, but with the same data, recipe and features the two are
+# nearly the same model (logit correlation 0.996 on 2022-2026 1st downs, both
+# trained through 2021), and the average was no better out of sample (log loss
+# +0.0002, 95% CI -0.0001 to +0.0006; the best weight on vegas_wp was 0). It
+# also doubled the cost of a prediction. Overtime states are valued with
+# nflfastR's overtime model (see R/overtime.R).
 #
 # Built by data-raw/_wp_model.R and stored in R/sysdata.rda as
 # `wp_first_down_model` (list with the xgboost model as raw UBJSON, the probit
@@ -496,8 +501,8 @@ drop.me <- c("vegas_wp", "vegas_home_wp", "ep")
 
 # Win probability of the states in `pbp_data`, from the point of view of the
 # team that has the 4th down decision (`original_posteam`). Regulation states
-# are the average of nfl4th's model above and nflfastR's vegas_wp, overtime
-# states come from nflfastR's overtime model. Rows can carry `ot_end`, the final
+# are valued with nfl4th's model above, overtime states with nflfastR's
+# overtime model. Rows can carry `ot_end`, the final
 # WP (again for `original_posteam`) of states where the overtime rules end the
 # game.
 calculate_win_probability <- function(pbp_data) {
@@ -509,16 +514,16 @@ calculate_win_probability <- function(pbp_data) {
   }
 
   x <- wp_inputs(pbp_data)
-  fastr <- fastr_wp(x)
 
   wp <- rep(NA_real_, nrow(x))
   ot <- x$qtr > 4
   reg <- which(!ot)
   if (length(reg) > 0) {
-    wp[reg] <- (wpfd_predict(x[reg, , drop = FALSE]) + fastr[reg]) / 2
+    wp[reg] <- wpfd_predict(x[reg, , drop = FALSE])
   }
   if (any(ot)) {
-    wp[ot] <- ot_win_probability(x[ot, , drop = FALSE], fastr[ot])
+    xo <- x[ot, , drop = FALSE]
+    wp[ot] <- ot_win_probability(xo, fastr_wp(xo))
   }
 
   # from the point of view of the team with the 4th down decision
@@ -583,7 +588,8 @@ fastr_wp <- function(x) {
 }
 
 # nflfastR's win probability of the states in `pbp_data` for the team with the
-# ball, without the average with nfl4th's own model (see fd_late())
+# ball (vegas_wp in regulation), for the late flag of the go for it model (see
+# fd_late())
 fastr_win_probability <- function(pbp_data) {
   if (nrow(pbp_data) == 0) {
     return(numeric(0))

@@ -31,7 +31,8 @@ fd_is_late <- function(qtr, score_differential, game_seconds_remaining, wp) {
 }
 
 # fd_is_late() for prepared 4th down plays, with nflfastR's win probability of
-# the 4th down state (the model is fit with that, not nfl4th's average)
+# the 4th down state (the model is fit with vegas_wp; nfl4th's own WP model
+# only values 1st downs)
 fd_late <- function(pbp) {
   fd_is_late(
     pbp$qtr,

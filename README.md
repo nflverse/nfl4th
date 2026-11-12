@@ -59,9 +59,9 @@ pak::pak("nflverse/nfl4th")
   returned for a touchdown, or fumbled on the return
 - The **field goal** model is a simple model of field goal % by distance
   and roof type
-- The **win probability** of the 1st down that follows each choice is
-  the average of nfl4th’s own model, trained on 1st downs, and
-  nflfastR’s `vegas_wp`
+- The **win probability** of the 1st down that follows each choice
+  comes from nfl4th’s own model, trained on 1st downs with the recipe
+  of nflfastR’s `vegas_wp`
 - **Overtime** decisions follow the overtime rules of the game (sudden
   death, modified sudden death, or both teams getting the ball) using
   nflfastR’s overtime win probability model
