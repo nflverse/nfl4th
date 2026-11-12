@@ -1,3 +1,9 @@
+test_that("nfl4th loads tibble (nflreadr data frames are also data.tables)", {
+  # without tibble's methods, subsetting nflreadr play-by-play follows
+  # data.table's rules
+  expect_true("tibble" %in% names(getNamespaceImports("nfl4th")))
+})
+
 test_that("go_boost and the best option work on matrices of draws", {
   go <- matrix(c(0.5, 0.2, 0.6, 0.1), 2)
   fg <- matrix(c(0.4, NA, 0.7, NA), 2)

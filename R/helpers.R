@@ -547,7 +547,10 @@ decision_cols <- c(
 # are attached to the full rows at the end
 add_probs <- function(df) {
   # a plain data.frame: tibble's checks on every column assignment add up
-  out <- as.data.frame(df[, names(df) %in% decision_cols, drop = FALSE]) |>
+  # the columns as a plain data.frame, without `[` on the caller's data frame
+  # (an nflreadr data frame is also a data.table)
+  keep <- df_cols(df)[names(df) %in% decision_cols]
+  out <- vctrs::new_data_frame(keep, n = .row_names_info(df, 2L)) |>
     get_go_wp() |>
     get_fg_wp() |>
     get_punt_wp()

@@ -166,7 +166,10 @@ add_boot_probs <- function(x) {
   q <- vctrs::vec_unique(do.call(vctrs::vec_rbind, rec$q))
 
   # 2. and 3., in the worker processes if they are running
-  xr <- x[, names(x) %in% decision_cols, drop = FALSE]
+  xr <- vctrs::new_data_frame(
+    df_cols(x)[names(x) %in% decision_cols],
+    n = .row_names_info(x, 2L)
+  )
   ev <- boot_eval_workers(xr, q)
   if (is.null(ev)) {
     ev <- boot_eval(xr, q, others)
