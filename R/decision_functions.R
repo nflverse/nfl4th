@@ -159,14 +159,10 @@ get_2pt_wp <- function(pbp) {
   pbp$index_2pt <- seq_len(n)
   pbp$prob_2pt <- two_pt_conversion_prob(pbp)
 
-  # probability of making PAT
-  pat <- pbp
-  pat$yardline_100 <- rep(15, n)
-  pbp$prob_1pt <- as.numeric(mgcv::predict.bam(
-    fg_model,
-    newdata = pat,
-    type = "response"
-  ))
+  # probability of making PAT: the field goal model's make probability from
+  # the 15 for the roof/era group (pat_make_prob, built in
+  # data-raw/build_sysdata.R)
+  pbp$prob_1pt <- unname(pat_make_prob[as.character(pbp$fg_model_roof)])
 
   # in overtime the rules decide whether the game goes on after the try. The
   # three tries (0, 1 and 2 points) are stacked, each in the order of pbp

@@ -2,20 +2,42 @@
 
 # for standardizing team names
 team_name_fn <- function(var) {
-  stringr::str_replace_all(
-    var,
-    c(
-      "JAC" = "JAX",
-      "STL" = "LA",
-      "SL" = "LA",
-      "ARZ" = "ARI",
-      "BLT" = "BAL",
-      "CLV" = "CLE",
-      "HST" = "HOU",
-      "SD" = "LAC",
-      "OAK" = "LV"
-    )
+  # each replacement in turn, as stringr::str_replace_all() with a named vector
+  fix <- c(
+    "JAC" = "JAX",
+    "STL" = "LA",
+    "SL" = "LA",
+    "ARZ" = "ARI",
+    "BLT" = "BAL",
+    "CLV" = "CLE",
+    "HST" = "HOU",
+    "SD" = "LAC",
+    "OAK" = "LV"
   )
+  for (k in names(fix)) {
+    var <- gsub(k, fix[[k]], var, fixed = TRUE)
+  }
+  var
+}
+
+# the first match of a (PCRE) pattern, NA where there is none or x is NA
+re_extract <- function(x, pattern) {
+  m <- regexpr(pattern, x, perl = TRUE)
+  hit <- !is.na(m) & m > 0
+  out <- rep(NA_character_, length(x))
+  out[hit] <- substring(
+    x[hit],
+    m[hit],
+    m[hit] + attr(m, "match.length")[hit] - 1L
+  )
+  out
+}
+
+# whether x matches a (PCRE) pattern, NA where x is NA
+re_detect <- function(x, pattern) {
+  out <- grepl(pattern, x, perl = TRUE)
+  out[is.na(x)] <- NA
+  out
 }
 
 # helper column to avoid join errors

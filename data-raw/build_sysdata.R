@@ -7,10 +7,22 @@ punt_df <- readRDS("data-raw/punt_data.rds")
 # roof/era group, built in data-raw/_punt_and_fg_models.R
 fg_prob_df <- readRDS("data-raw/fg_prob.rds")
 
-# fg_model is kept even though make probability now comes from fg_prob_df:
-# get_2pt_wp() still predicts the PAT from it, at a distance where the raw
-# curve is fine (no selection bias on extra points). 2 point tries use the go
+# The PAT make probability comes from fg_model, the raw field goal curve (a
+# PAT has no selection bias), at the 15, by roof/era group. It is tabulated
+# here, so the package needs neither mgcv nor fg_model. 2 point tries use the go
 # for it model (fd_tables), so there is no separate 2 point model.
+pat_levels <- levels(fg_model$model$fg_model_roof)
+pat_make_prob <- stats::setNames(
+  as.numeric(mgcv::predict.bam(
+    fg_model,
+    data.frame(
+      yardline_100 = 15,
+      fg_model_roof = factor(pat_levels, levels = pat_levels)
+    ),
+    type = "response"
+  )),
+  pat_levels
+)
 
 # win probability model for 1st down states, built in data-raw/_wp_model.R
 wp_first_down_model <- readRDS("data-raw/wp_first_down_model.rds")
@@ -29,7 +41,7 @@ ot_wp_models <- nflfastr_models$ot_wp_models
 fg_prob_table <- nflfastr_models$fg_prob_table
 
 usethis::use_data(
-  fg_model,
+  pat_make_prob,
   fg_prob_df,
   punt_df,
   wp_first_down_model,

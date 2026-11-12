@@ -66,9 +66,7 @@ get_4th_plays <- function(gid) {
         previous_drives <- pbp$drives$previous
 
         drives <- bind_rows(
-          previous_drives |>
-            dplyr::select(team.abbreviation, plays) |>
-            tidyr::unnest(plays),
+          unnest_plays(previous_drives),
           current_drive
         )
       } else if ("current" %in% names(pbp$drives)) {
@@ -79,9 +77,7 @@ get_4th_plays <- function(gid) {
           mutate(team.abbreviation = current_drive$team$abbreviation)
       } else {
         previous_drives <- pbp$drives$previous
-        drives <- previous_drives |>
-          dplyr::select(team.abbreviation, plays) |>
-          tidyr::unnest(plays)
+        drives <- unnest_plays(previous_drives)
       }
 
       suppressWarnings(
@@ -90,7 +86,7 @@ get_4th_plays <- function(gid) {
           group_by(id) |>
           dplyr::slice(1) |>
           ungroup() |>
-          janitor::clean_names() |>
+          clean_names() |>
           dplyr::rename(
             posteam = team_abbreviation,
             qtr = period_number,
@@ -104,9 +100,9 @@ get_4th_plays <- function(gid) {
           dplyr::mutate(
             # time column is wacky so extract it from play description when
             # possible
-            play_time = stringr::str_extract(desc, "\\([^()]+(?=\\)\\s)"),
+            play_time = re_extract(desc, "\\([^()]+(?=\\)\\s)"),
             play_time = substr(play_time, 2, nchar(play_time)),
-            play_min = stringr::str_extract(play_time, "[^()]+(?=\\:)") |>
+            play_min = re_extract(play_time, "[^()]+(?=\\:)") |>
               as.integer(),
             play_min = if_else(
               is.na(play_min) & !is.na(play_time),
@@ -153,30 +149,23 @@ get_4th_plays <- function(gid) {
             defteam = if_else(posteam == home_team, away_team, home_team),
             # overtime periods count their timeouts on their own
             half = dplyr::case_when(qtr <= 2 ~ 1, qtr <= 4 ~ 2, TRUE ~ qtr),
-            challenge_team = stringr::str_extract(
+            challenge_team = re_extract(
               desc,
               paste0(
-                "[:alpha:]*\\s*[:alpha:]*\\s*[:alpha:]*",
-                "[:alpha:]+(?=\\schallenged)"
+                "[[:alpha:]]*\\s*[[:alpha:]]*\\s*[[:alpha:]]*",
+                "[[:alpha:]]+(?=\\schallenged)"
               )
             ),
-            challenge_team = stringr::str_replace_all(
-              challenge_team,
-              "[\r\n]",
-              ""
-            ),
-            challenge_team = stringr::str_trim(
-              challenge_team,
-              side = c("both")
-            ),
+            challenge_team = gsub("[\r\n]", "", challenge_team),
+            challenge_team = trimws(challenge_team),
             desc_timeout = if_else(
-              stringr::str_detect(desc, "Timeout #[:digit:]"),
+              re_detect(desc, "Timeout #[[:digit:]]"),
               1,
               0
             ),
-            timeout_team = stringr::str_extract(
+            timeout_team = re_extract(
               desc,
-              "(?<=Timeout #[:digit:] by )[:upper:]{2,3}"
+              "(?<=Timeout #[[:digit:]] by )[[:upper:]]{2,3}"
             ),
             timeout_team = case_when(
               # fix team abbrevs
@@ -319,19 +308,13 @@ get_4th_plays <- function(gid) {
           mutate(
             game_id = df$game_id,
             espn_id = df$espn,
-            yardline_side = purrr::map_chr(
-              stringr::str_split(yardline, " "),
-              function(x) x[1]
-            ),
+            yardline_side = split_part(yardline, 1L),
             yardline_side = case_when(
               yardline_side == "WSH" ~ "WAS",
               yardline_side == "LAR" ~ "LA",
               TRUE ~ yardline_side
             ),
-            yardline_number = as.numeric(purrr::map_chr(
-              stringr::str_split(yardline, " "),
-              function(x) x[2]
-            )),
+            yardline_number = as.numeric(split_part(yardline, 2L)),
             temp_yardline = dplyr::if_else(
               yardline_side == posteam | yardline_100 == 50,
               100 - yardline_number,
@@ -395,4 +378,43 @@ get_4th_plays <- function(gid) {
   )
 
   return(plays)
+}
+
+# tidyr::unnest() of the plays of the previous drives: each drive's plays, with
+# the drive's team
+unnest_plays <- function(drives) {
+  plays <- drives$plays
+  n <- vapply(plays, NROW, 1L)
+  out <- dplyr::bind_rows(plays[n > 0])
+  dplyr::bind_cols(
+    tibble::tibble(team.abbreviation = rep(drives$team.abbreviation, n)),
+    out
+  )
+}
+
+# janitor::clean_names() for the names ESPN uses (camelCase and dotted names to
+# snake case; duplicates get _2, _3, ...)
+clean_names <- function(df) {
+  nm <- names(df)
+  nm <- gsub("([a-z0-9])([A-Z])", "\\1_\\2", nm)
+  nm <- gsub("([A-Z]+)([A-Z][a-z])", "\\1_\\2", nm)
+  nm <- gsub("[^A-Za-z0-9]+", "_", nm)
+  nm <- tolower(gsub("^_+|_+$", "", nm))
+  for (u in unique(nm[duplicated(nm)])) {
+    i <- which(nm == u)
+    nm[i[-1]] <- paste0(u, "_", seq_along(i)[-1])
+  }
+  names(df) <- nm
+  df
+}
+
+# the k-th piece of each string split at single spaces, as
+# purrr::map_chr(stringr::str_split(x, " "), function(x) x[k]) (an empty string
+# is one empty piece)
+split_part <- function(x, k) {
+  vapply(
+    strsplit(x, " ", fixed = TRUE),
+    function(p) if (length(p) == 0L) c("", NA)[k] else p[k],
+    character(1)
+  )
 }

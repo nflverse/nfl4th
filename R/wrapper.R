@@ -149,9 +149,9 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 
   # season-by-season = less likely to result in crashes due to memory
   if (fast) {
-    data <- purrr::map_df(
+    data <- dplyr::bind_rows(lapply(
       seasons,
-      ~ {
+      function(.x) {
         cli::cli_alert_info("Loading season {.x}")
         nflreadr::load_pbp(.x) |>
           left_join(
@@ -162,16 +162,16 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
             by = c("game_id", "play_id")
           )
       }
-    )
+    ))
   } else {
-    data <- purrr::map_df(
+    data <- dplyr::bind_rows(lapply(
       seasons,
-      ~ {
+      function(.x) {
         cli::cli_alert_info("Loading season {.x}")
         nflreadr::load_pbp(.x) |>
           nfl4th::add_4th_probs()
       }
-    )
+    ))
   }
 
   data |>
@@ -183,7 +183,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
       ),
       # if it's an aborted snap in punt formation, call it a punt
       go = ifelse(
-        aborted_play == 1 & stringr::str_detect(desc, "Punt formation"),
+        aborted_play == 1 & re_detect(desc, "Punt formation"),
         0,
         go
       ),
@@ -191,14 +191,9 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
       # penalty, set go to NA
       # since we can't know the intention of the play
       go = case_when(
-        stringr::str_detect(
-          desc,
-          "(Run formation)|(Pass formation)|(Shotgun)"
-        ) &
-          stringr::str_detect(
-            desc,
-            "(False Start)|(Neutral Zone Infraction)"
-          ) ~ NA_real_,
+        re_detect(desc, "(Run formation)|(Pass formation)|(Shotgun)") &
+          re_detect(desc, "(False Start)|(Neutral Zone Infraction)") ~
+          NA_real_,
         TRUE ~ go
       )
     )

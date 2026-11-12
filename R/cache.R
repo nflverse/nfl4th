@@ -52,7 +52,7 @@ nfl4th_games_memo <- new.env(parent = emptyenv())
 nfl4th_clear_cache <- function(
   type = c("games", "fd_model", "wp_model", "all")
 ) {
-  type <- rlang::arg_match(type)
+  type <- match.arg(type)
   to_delete <- switch(
     type,
     "games" = nfl4th_games_path(),

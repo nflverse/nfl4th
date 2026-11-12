@@ -20,15 +20,9 @@ Imports:
     curl,
     data.table,
     dplyr,
-    janitor,
     jsonlite,
-    mgcv,
     nflreadr,
-    purrr,
-    rlang,
-    stringr,
     tibble,
-    tidyr,
     vctrs,
     xgboost
 Suggests: 
