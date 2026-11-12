@@ -69,6 +69,7 @@ utils::globalVariables(
     "original_posteam",
     "ot_end",
     ".ot_possession",
+    "elapsed",
     "ot_possession",
     "outdoors",
     "pass",

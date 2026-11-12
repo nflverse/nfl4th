@@ -255,7 +255,14 @@ kickoff_yardline <- function(season) {
 # between the points measured. A later conversion never leads to an earlier
 # next snap. Overtime uses the 4th quarter's.
 conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
-  h <- half_seconds_remaining
+  n <- max(
+    length(qtr),
+    length(half_seconds_remaining),
+    length(score_differential)
+  )
+  qtr <- rep_len(qtr, n)
+  score_differential <- rep_len(score_differential, n)
+  h <- rep_len(half_seconds_remaining, n)
   at <- function(x, y) stats::approx(x, y, xout = h, rule = 2)$y
   q2 <- at(
     c(0, 22, 37, 52, 75, 105, 135, 165, 210, 900),
