@@ -607,7 +607,9 @@ calculate_ot_win_probability <- function(pbp_data, model_data, wp = TRUE) {
     vegas_wp = rep(NA_real_, length(i))
   )
   if (length(ok) > 0) {
-    if (wp) out$wp[ok] <- ot_wp_states(st[ok, , drop = FALSE], use_spread = FALSE)
+    if (wp) {
+      out$wp[ok] <- ot_wp_states(st[ok, , drop = FALSE], use_spread = FALSE)
+    }
     out$vegas_wp[ok] <- ot_wp_states(st[ok, , drop = FALSE], use_spread = TRUE)
   }
   out
@@ -1152,4 +1154,3 @@ fg_make_prob <- function(season, roof, yardline_100) {
   )]
   p
 }
-
