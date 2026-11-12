@@ -32,8 +32,10 @@
 #    4 minutes WP is averaged over +-16 seconds and +-2 yards; a team ahead
 #    that can kneel out the clock is at 0.9998, moving back to the model 10 to
 #    40 seconds short of that; a team behind deep in its own half moves to 0
-#    over the last 20 seconds. (nflfastR's rule for 4th down kicks in the last
-#    30 seconds doesn't apply: every state here is a 1st down.)
+#    over the last 20 seconds; a tied game moves over the last 10 seconds to
+#    the value of the best option left at 0:00, a field goal from this spot or
+#    overtime. (nflfastR's rule for 4th down kicks in the last 30 seconds
+#    doesn't apply: every state here is a 1st down.)
 #
 # In regulation nfl4th uses this model alone. It used to average it with
 # nflfastR's vegas_wp, but with the same data, recipe and features the two are
@@ -387,6 +389,10 @@ wpfd_kneel_value <- 0.9998
 # value moves toward the final result
 wpfd_fg_end_t <- 15
 
+# seconds before the end of regulation over which a tied game's WP moves to its
+# value at 0:00 (see wpfd_predict()), nflfastR's wp_tie_t
+wpfd_tie_t <- 10
+
 # value of the final score of regulation for the team with the ball (a tie
 # goes to overtime)
 wpfd_end_value <- function(sd, tie = 0.5) {
@@ -498,9 +504,30 @@ wpfd_predict <- function(x, model = wp_first_down_model, dt = 6) {
   w <- wpfd_raw(x, model)
   p_fg <- wpfd_fg_prob(x)
   fl <- which(p_fg > 0 & !is.na(w))
+  fgv <- if (length(fl) > 0) {
+    wpfd_fg_value(x[fl, , drop = FALSE], model, p_fg[fl])
+  } else {
+    numeric(0)
+  }
+  # Tied at the end of regulation, WP moves over the last wpfd_tie_t seconds to
+  # the value of the best option left at 0:00: a field goal from this spot (a
+  # miss goes to overtime), otherwise overtime before the coin toss, where the
+  # spread counts again (the offset's weight fades to 0 at 0:00). As in
+  # nflfastR's vegas_wp (nflfastR#625)
+  g <- x$game_seconds_remaining
+  tie <- which(
+    !is.na(w) & x$score_differential %in% 0 & g >= 0 & g < wpfd_tie_t
+  )
+  if (length(tie) > 0) {
+    end <- wpfd_ot_start(x[tie, , drop = FALSE])
+    k <- match(tie, fl)
+    kick <- which(!is.na(k))
+    end[kick] <- pmax(end[kick], fgv[k[kick]], na.rm = TRUE)
+    a <- g[tie] / wpfd_tie_t
+    w[tie] <- a * w[tie] + (1 - a) * end
+  }
   if (length(fl) > 0) {
-    xf <- x[fl, , drop = FALSE]
-    w[fl] <- pmax(w[fl], wpfd_fg_value(xf, model, p_fg[fl]), na.rm = TRUE)
+    w[fl] <- pmax(w[fl], fgv, na.rm = TRUE)
   }
   cap <- which(
     x$game_seconds_remaining > 300 &

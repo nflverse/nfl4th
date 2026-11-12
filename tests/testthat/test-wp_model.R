@@ -124,6 +124,24 @@ test_that("a field goal at the end of the game is valued by the result", {
   expect_equal(wpfd_fg_value(x, wp_first_down_model, p), p, tolerance = 1e-6)
 })
 
+test_that("a tie at the end of regulation moves to its value at 0:00", {
+  # tied at the own 35, out of field goal range: over the last 10 seconds WP
+  # moves to overtime at the coin toss
+  x <- wp_state(game_seconds_remaining = c(0, 5, 9.99, 10), yardline_100 = 65)
+  wp <- wpfd_predict(x)
+  ot <- wpfd_ot_start(x[1, ])
+  expect_equal(wp[1], ot)
+  expect_equal(wp[2], 0.5 * wpfd_raw(x[2, ]) + 0.5 * ot)
+  # continuous at 10 seconds, where the model takes over
+  expect_equal(wp[4], wpfd_raw(x[4, ]))
+  expect_lt(abs(wp[3] - wp[4]), 0.005)
+  # in field goal range the kick is the better option left
+  y <- wp_state(game_seconds_remaining = 0, yardline_100 = 20)
+  fg <- wpfd_fg_value(y, wp_first_down_model, wpfd_fg_prob(y))
+  expect_gt(fg, wpfd_ot_start(y))
+  expect_equal(wpfd_predict(y), fg)
+})
+
 test_that("field goal range keeps its value at the end of the 1st half", {
   # 1st and 10 at the opponent's 20 with 10 seconds left is close to a free
   # field goal, while at the own 5 the half is as good as over
