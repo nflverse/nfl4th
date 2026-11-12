@@ -145,6 +145,7 @@ two_pt_conversion_prob <- function(pbp) {
     posteam_spread = pbp$posteam_spread,
     total_line = pbp$total_line
   )
+  try_2pt$.draw <- pbp[[".draw"]]
   gains <- fd_gain_probs(try_2pt)
   as.numeric(tapply(
     gains$prob * (gains$gain >= 2),

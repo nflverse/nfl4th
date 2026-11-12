@@ -30,6 +30,7 @@ Original data frame Data frame plus the following columns added:
 With \code{bootstrap = TRUE}, also:
 \describe{
 \item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+\item{boot_go_pct}{Percent of the draws in which going beats the better kick (go_boost > 0). The recommendation itself is the sign of go_boost; this says how often the draws agree that going is better.}
 \item{go_boost_lo, go_boost_hi}{5th and 95th percentile of go_boost across the draws, a 90\% interval.}
 \item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
 \item{go_wp_boot, fg_wp_boot, punt_wp_boot}{go_wp, fg_wp and punt_wp in each draw, likewise.}

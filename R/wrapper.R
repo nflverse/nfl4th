@@ -51,6 +51,7 @@
 #' With `bootstrap = TRUE`, also:
 #' \describe{
 #' \item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+#' \item{boot_go_pct}{Percent of the draws in which going beats the better kick (go_boost > 0). The recommendation itself is the sign of go_boost; this says how often the draws agree that going is better.}
 #' \item{go_boost_lo, go_boost_hi}{5th and 95th percentile of go_boost across the draws, a 90% interval.}
 #' \item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
 #' \item{go_wp_boot, fg_wp_boot, punt_wp_boot}{go_wp, fg_wp and punt_wp in each draw, likewise.}
@@ -105,8 +106,14 @@ add_4th_probs <- function(df, bootstrap = FALSE) {
   }
 
   cli::cli_alert_info("Computing probabilities for {nrow(df)} plays. . .")
-  prepared <- df
-  df <- add_probs(df)
+  if (isTRUE(bootstrap) && nrow(df) > 0) {
+    # the point estimate comes with the draws
+    boot <- add_boot_probs(df)
+    df <- boot$point
+  } else {
+    bootstrap <- FALSE
+    df <- add_probs(df)
+  }
   punt_prob <- if_else(is.na(df$punt_wp), 0, df$punt_wp)
   # the better kick (punt_prob is never NA)
   max_non_go <- pmax(df$fg_wp, punt_prob, na.rm = TRUE)
@@ -125,9 +132,8 @@ add_4th_probs <- function(df, bootstrap = FALSE) {
     )]
   )
 
-  if (isTRUE(bootstrap) && nrow(df) > 0) {
-    boot <- add_boot_probs(prepared, df)
-    probs <- c(probs, boot[setdiff(names(boot), "index")])
+  if (isTRUE(bootstrap)) {
+    probs <- c(probs, boot$cols)
   }
 
   out <- df_left_join(original_df, probs, by = "index")

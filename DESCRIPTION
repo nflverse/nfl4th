@@ -21,6 +21,7 @@ Imports:
     data.table,
     jsonlite,
     nflreadr,
+    parallel,
     tibble,
     vctrs (>= 0.7.0),
     xgboost

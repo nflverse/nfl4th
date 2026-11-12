@@ -105,32 +105,83 @@ boot_decision <- function(go, fg, punt) {
   apply(m, c(1, 2), which.max)
 }
 
-# Every play under every draw. `x` is what add_4th_probs() passes to add_probs()
-# and `point` its result with the shipped fit (draw 1).
-add_boot_probs <- function(x, point) {
-  bm <- bootstrap_models()
-  n_draws <- length(bm$draws)
-  n <- nrow(x)
-  go <- fg <- punt <- matrix(NA_real_, n, n_draws)
-  go[, 1] <- point$go_wp
-  fg[, 1] <- point$fg_wp
-  punt[, 1] <- point$punt_wp
-  cli::cli_progress_bar("Bootstrap draws", total = n_draws - 1)
-  for (b in seq_len(n_draws)[-1]) {
-    r <- with_draw(bm$draws[[b]], add_probs(x))
-    go[, b] <- r$go_wp
-    fg[, b] <- r$fg_wp
-    punt[, b] <- r$punt_wp
-    cli::cli_progress_update()
+# The inputs of the WP model (wpfd_tree_matrix(), wpfd_design() and the tree
+# schedule read nothing else): a state is these columns
+wpfd_inputs <- c(
+  "game_seconds_remaining",
+  "half_seconds_remaining",
+  "score_differential",
+  "posteam_spread",
+  "home",
+  "receive_2h_ko",
+  "yardline_100",
+  "posteam_timeouts_remaining",
+  "defteam_timeouts_remaining"
+)
+
+# evaluate `code` with hooks set in nfl4th_active (NULL removes one)
+with_active <- function(set, code) {
+  old <- mget(names(set), envir = nfl4th_active, ifnotfound = list(NULL))
+  on.exit(
+    for (n in names(old)) {
+      assign(n, old[[n]], envir = nfl4th_active)
+    }
+  )
+  for (n in names(set)) {
+    assign(n, set[[n]], envir = nfl4th_active)
   }
-  cli::cli_progress_done()
+  force(code)
+}
+
+# Every play under every draw. `x` is what add_4th_probs() passes to
+# add_probs(). Valuing a play asks the WP model about the same states whatever
+# the draw (the go for it tables of every draw have the same outcomes), so:
+# 1. the decisions run once with the shipped fit (draw 1), recording the states
+#    the WP model is asked about: this is the point estimate,
+# 2. each other draw's WP model scores all of them at once (a few xgboost calls
+#    per draw instead of a few hundred), and
+# 3. the decisions run once more on the plays stacked once per other draw,
+#    each copy with its draw's go for it tables and WP looked up from step 2.
+# The result is the same as running add_probs() under each draw in turn.
+# Returns add_probs(x) (`point`) and the bootstrap columns (`cols`).
+add_boot_probs <- function(x) {
+  bm <- bootstrap_models()
+  draws <- bm$draws
+  n_draws <- length(draws)
+  n <- nrow(x)
+  others <- seq_len(n_draws)[-1]
+
+  # 1. the point estimate, recording the states
+  rec <- new.env(parent = emptyenv())
+  rec$q <- list()
+  point <- with_active(
+    list(
+      logit = function(s) {
+        rec$q[[length(rec$q) + 1L]] <- as.data.frame(s)[wpfd_inputs]
+        with_active(list(logit = NULL), wpfd_logit(s))
+      }
+    ),
+    add_probs(x)
+  )
+  q <- vctrs::vec_unique(do.call(vctrs::vec_rbind, rec$q))
+
+  # 2. and 3., in the worker processes if they are running
+  xr <- x[, names(x) %in% decision_cols, drop = FALSE]
+  ev <- boot_eval_workers(xr, q)
+  if (is.null(ev)) {
+    ev <- boot_eval(xr, q, others)
+  }
+  go <- cbind(point$go_wp, ev$go)
+  fg <- cbind(point$fg_wp, ev$fg)
+  punt <- cbind(point$punt_wp, ev$punt)
+
   boost <- boot_go_boost(go, fg, punt)
   dec <- boot_decision(go, fg, punt)
   rows <- function(m) lapply(seq_len(n), function(i) m[i, ])
   qs <- apply(boost, 1, stats::quantile, probs = c(0.05, 0.95), na.rm = TRUE)
-  list(
-    index = x$index,
+  cols <- list(
     boot_pct = 100 * rowMeans(dec == dec[, 1]),
+    boot_go_pct = 100 * rowMeans(boost > 0),
     go_boost_lo = qs[1, ],
     go_boost_hi = qs[2, ],
     go_boost_boot = rows(boost),
@@ -138,4 +189,151 @@ add_boot_probs <- function(x, point) {
     fg_wp_boot = rows(fg),
     punt_wp_boot = rows(punt)
   )
+  list(point = point, cols = cols)
+}
+
+# Steps 2 and 3 of add_boot_probs() for draws `idx`: plays x draws matrices of
+# go_wp, fg_wp and punt_wp, the draws in the order of `idx`
+boot_eval <- function(x, q, idx) {
+  draws <- bootstrap_models()$draws
+  n <- nrow(x)
+  lg <- matrix(NA_real_, nrow(q), length(draws))
+  for (b in idx) {
+    lg[, b] <- wpfd_logit(q, draws[[b]]$wp)
+  }
+  xs <- x[rep(seq_len(n), length(idx)), , drop = FALSE]
+  xs$.draw <- rep(idx, each = n)
+  lookup <- function(s) {
+    s <- as.data.frame(s)
+    key <- vctrs::vec_cast(s[wpfd_inputs], q[0, , drop = FALSE])
+    i <- vctrs::vec_match(key, q)
+    out <- lg[cbind(i, s$.draw)]
+    # a state step 1 didn't see (only if the decisions took another path
+    # with other values): score it directly
+    miss <- which(is.na(i))
+    for (b in unique(s$.draw[miss])) {
+      j <- miss[s$.draw[miss] == b]
+      out[j] <- with_active(
+        list(logit = NULL),
+        wpfd_logit(s[j, , drop = FALSE], draws[[b]]$wp)
+      )
+    }
+    out
+  }
+  r <- with_active(
+    list(logit = lookup, fd_draws = lapply(draws, `[[`, "fd")),
+    add_probs(xs)
+  )
+  list(
+    go = matrix(r$go_wp, n),
+    fg = matrix(r$fg_wp, n),
+    punt = matrix(r$punt_wp, n)
+  )
+}
+
+# ---- worker processes ---------------------------------------------------------
+
+nfl4th_workers <- new.env(parent = emptyenv())
+
+#' Keep the bootstrap models in worker processes
+#'
+#' @description `add_4th_probs(bootstrap = TRUE)` values every play under 100
+#' bootstrap draws of nfl4th's models. `nfl4th_start_workers()` starts R
+#' processes that each load a share of the draws once and keep them in memory;
+#' while they run, each play's draws are evaluated in them in parallel, which
+#' cuts the time per play (about a third of a second for one play in the last
+#' minute of a game with 11 workers, against about 0.85 seconds without).
+#' `nfl4th_stop_workers()` stops them. They also stop when the R session ends.
+#'
+#' The workers are separate processes (`parallel::makePSOCKcluster()`), so they
+#' work on every platform; starting them takes a few seconds. Without workers,
+#' everything runs in the main process.
+#' @param n Number of worker processes.
+#' @return The number of workers, invisibly.
+#' @export
+#' @examples
+#' \dontrun{
+#' nfl4th_start_workers(4)
+#' # ... add_4th_probs(plays, bootstrap = TRUE) ...
+#' nfl4th_stop_workers()
+#' }
+nfl4th_start_workers <- function(
+  n = max(1L, parallel::detectCores() - 1L)
+) {
+  nfl4th_stop_workers()
+  # the draws, downloaded and checked here first
+  n_draws <- length(bootstrap_models()$draws)
+  f <- bootstrap_memo$file
+  n <- min(as.integer(n), n_draws - 1L)
+  cl <- parallel::makePSOCKcluster(n)
+  chunks <- split(seq_len(n_draws)[-1], rep_len(seq_len(n), n_draws - 1L))
+  parallel::clusterApply(
+    cl,
+    chunks,
+    function(idx, f) asNamespace("nfl4th")$boot_worker_init(idx, f),
+    f
+  )
+  nfl4th_workers$cl <- cl
+  nfl4th_workers$chunks <- chunks
+  invisible(n)
+}
+
+#' @rdname nfl4th_start_workers
+#' @export
+nfl4th_stop_workers <- function() {
+  if (!is.null(nfl4th_workers$cl)) {
+    try(parallel::stopCluster(nfl4th_workers$cl), silent = TRUE)
+  }
+  nfl4th_workers$cl <- NULL
+  nfl4th_workers$chunks <- NULL
+  invisible(0L)
+}
+
+# in a worker: its draws, their xgboost models loaded, one thread each (the
+# workers are the parallelism)
+boot_worker_init <- function(idx, f) {
+  options(nfl4th.bootstrap_models = f)
+  data.table::setDTthreads(1L)
+  draws <- bootstrap_models()$draws
+  for (b in idx) {
+    booster <- wpfd_booster(draws[[b]]$wp)
+    xgboost::xgb.model.parameters(booster) <- list(nthread = 1L)
+  }
+  nfl4th_workers$idx <- idx
+  TRUE
+}
+
+# Steps 2 and 3 in the workers, each with its own draws; NULL without workers.
+# If the workers fail, they are stopped and the play is evaluated here.
+boot_eval_workers <- function(x, q) {
+  cl <- nfl4th_workers$cl
+  if (is.null(cl)) {
+    return(NULL)
+  }
+  parts <- tryCatch(
+    parallel::clusterCall(
+      cl,
+      function(x, q) {
+        ns <- asNamespace("nfl4th")
+        ns$boot_eval(x, q, ns$nfl4th_workers$idx)
+      },
+      x,
+      q
+    ),
+    error = function(e) {
+      cli::cli_warn(c(
+        "The nfl4th workers failed, evaluating here instead.",
+        "x" = conditionMessage(e)
+      ))
+      nfl4th_stop_workers()
+      NULL
+    }
+  )
+  if (is.null(parts)) {
+    return(NULL)
+  }
+  idx <- unlist(nfl4th_workers$chunks, use.names = FALSE)
+  o <- order(idx)
+  pick <- function(k) do.call(cbind, lapply(parts, `[[`, k))[, o, drop = FALSE]
+  list(go = pick("go"), fg = pick("fg"), punt = pick("punt"))
 }

@@ -268,8 +268,13 @@ wpfd_tree_margin_unique <- function(booster, X, n, inclusive) {
   wpfd_tree_margin(booster, X[first, , drop = FALSE], n, inclusive)[id]
 }
 
-# logit of the WP of the team with the ball: offset plus trees
+# logit of the WP of the team with the ball: offset plus trees. While the
+# bootstrap evaluates its draws (add_boot_probs()), a hook answers instead
 wpfd_logit <- function(x, model = active_wp_model()) {
+  hook <- nfl4th_active$logit
+  if (!is.null(hook)) {
+    return(hook(x))
+  }
   k <- model$constants
   n <- nrow(x)
   if (n == 0) {

@@ -471,6 +471,8 @@ prepare_nflfastr_data <- function(pbp) {
 # Columns the decision functions and models read (a superset: every prepared
 # column the package code names)
 decision_cols <- c(
+  # the bootstrap draw of stacked plays (add_boot_probs())
+  ".draw",
   "play_id",
   "home_team",
   "away_team",

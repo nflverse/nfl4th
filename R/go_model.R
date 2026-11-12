@@ -54,6 +54,29 @@ fd_late <- function(pbp) {
 # the rows of x. Returns columns row (index into x), gain and prob; the
 # probabilities of each row sum to 1.
 fd_gain_probs <- function(x, late = FALSE, tb = active_fd_tables()) {
+  # plays stacked once per bootstrap draw (add_boot_probs()): each draw's
+  # rows with its own tables, in the order of the rows
+  per_draw <- nfl4th_active$fd_draws
+  if (!is.null(per_draw) && !is.null(x[[".draw"]]) && nrow(x) > 0) {
+    late <- rep_len(late, nrow(x))
+    parts <- lapply(split(seq_len(nrow(x)), x$.draw), function(i) {
+      g <- fd_gain_probs_tb(
+        x[i, , drop = FALSE],
+        late[i],
+        per_draw[[x$.draw[i[1]]]]
+      )
+      g$row <- i[g$row]
+      g
+    })
+    out <- do.call(rbind, unname(parts))
+    out <- out[order(out$row, method = "radix"), , drop = FALSE]
+    rownames(out) <- NULL
+    return(out)
+  }
+  fd_gain_probs_tb(x, late, tb)
+}
+
+fd_gain_probs_tb <- function(x, late, tb) {
   n <- nrow(x)
   if (n == 0) {
     return(data.frame(row = integer(), gain = integer(), prob = numeric()))
