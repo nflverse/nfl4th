@@ -275,6 +275,38 @@ get_go_wp <- function(pbp) {
   # conversion that doesn't score the clock keeps running: the typical gap to
   # the offense's next snap (conversion_runoff()), or 6 seconds plus `runoff`
   # when it is supplied
+  # Late in a half the clock after a conversion depends on timeouts. Without
+  # one, the clock often runs out before another snap (conversion_clock_out();
+  # the gap in conversion_runoff() is that of the conversions followed by a
+  # snap), so each such conversion is also valued with the clock run out (an
+  # extra row) and the two are weighted by that share. A team with a timeout can
+  # instead stop the clock right after the play: only the play's own time runs
+  # off (conversion_play_time(), longer for longer gains) and the timeout is
+  # spent. In the last 2:00 of the 2nd and 4th quarters each conversion is also
+  # valued that way, and the team takes the better of the two (below)
+  conv <- p$turnover == 0 & p$yardline_100 > 0 & is.na(p$runoff)
+  h0 <- p$half_seconds_remaining
+  late <- conv &
+    h0 <= 45 &
+    (p$qtr == 2 | (p$qtr == 4 & p$score_differential <= 0))
+  q <- ifelse(late %in% TRUE, conversion_clock_out(h0), 0)
+  ro <- which(q > 0)
+  home_ball <- p$posteam == p$home_team
+  to_left <- ifelse(
+    home_ball,
+    p$home_timeouts_remaining,
+    p$away_timeouts_remaining
+  )
+  stop <- which(conv & p$qtr %in% c(2, 4) & h0 <= 120 & to_left > 0)
+  n0 <- nrow(p)
+  tw <- n0 + seq_along(stop)
+  rw <- n0 + length(stop) + seq_along(ro)
+  if (length(stop) + length(ro) > 0) {
+    p <- p[c(seq_len(n0), stop, ro), , drop = FALSE]
+    h <- home_ball[stop]
+    p$home_timeouts_remaining[tw] <- p$home_timeouts_remaining[tw] - h
+    p$away_timeouts_remaining[tw] <- p$away_timeouts_remaining[tw] - !h
+  }
   elapsed <- case_when(
     p$turnover == 1 | p$yardline_100 <= 0 ~ 6,
     is.na(p$runoff) ~ conversion_runoff(
@@ -284,6 +316,8 @@ get_go_wp <- function(pbp) {
     ),
     TRUE ~ 6 + p$runoff
   )
+  elapsed[tw] <- conversion_play_time(p$gain[tw])
+  elapsed[rw] <- p$half_seconds_remaining[rw]
   p$half_seconds_remaining <- pmax(p$half_seconds_remaining - elapsed, 0)
   p$game_seconds_remaining <- pmax(p$game_seconds_remaining - elapsed, 0)
 
@@ -329,6 +363,16 @@ get_go_wp <- function(pbp) {
     sd > 0 & to == 1 & g < 40 & dto == 2 ~ 0,
     TRUE ~ preds$vegas_wp
   )
+
+  # without a timeout the clock may run out after a conversion; a team with one
+  # uses it if that is better
+  if (length(stop) + length(ro) > 0) {
+    wp <- preds$vegas_wp
+    wp[ro] <- (1 - q[ro]) * wp[ro] + q[ro] * wp[rw]
+    wp[stop] <- pmax(wp[stop], wp[tw])
+    preds$vegas_wp <- wp
+    preds <- preds[seq_len(n0), , drop = FALSE]
+  }
 
   # by play and outcome (converted or not): the probability, and the WP
   # weighted by the outcomes' probability within it. Sums by group in row

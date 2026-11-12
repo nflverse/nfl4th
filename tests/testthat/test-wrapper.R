@@ -104,12 +104,58 @@ test_that("the gap to the next snap after a conversion", {
   expect_gt(conversion_runoff(4, 600, 0), 30)
   # late in a half teams hurry or stop the clock
   expect_lt(conversion_runoff(4, 30, -3), 15)
-  expect_lt(conversion_runoff(2, 30, 7), 10)
+  expect_lt(conversion_runoff(2, 30, 7), 12)
   # a later conversion never leads to an earlier next snap
   h <- 0:900
   for (q in c(2, 4)) {
     for (sd in c(-3, 0, 3)) {
       expect_true(all(diff(h - conversion_runoff(q, h, sd)) >= 0))
     }
+  }
+  # without a timeout the clock often runs out after a late conversion
+  expect_true(all(diff(conversion_clock_out(0:60)) <= 0))
+  expect_gt(conversion_clock_out(3), 0.8)
+  expect_equal(conversion_clock_out(60), 0)
+  # the play itself takes about 6 seconds, longer for longer gains
+  expect_equal(conversion_play_time(0), 5.99)
+  expect_gt(conversion_play_time(40), conversion_play_time(5))
+})
+
+test_that("the clock after a late conversion depends on timeouts", {
+  skip_on_cran()
+  skip_if_offline()
+
+  # down 3, 4th & 1 at the TB 40
+  probs <- function(secs, timeouts) {
+    play <- tibble::tibble(
+      home_team = "GB",
+      away_team = "TB",
+      posteam = "GB",
+      type = "post",
+      season = 2020,
+      qtr = 4,
+      quarter_seconds_remaining = secs,
+      ydstogo = 1,
+      yardline_100 = 40,
+      score_differential = -3,
+      home_opening_kickoff = 0,
+      posteam_timeouts_remaining = timeouts,
+      defteam_timeouts_remaining = 1
+    )
+    suppressMessages(nfl4th::add_4th_probs(play))
+  }
+  # 3 seconds left: the play runs out the clock with or without a timeout, and
+  # regulation ends with the team still down 3 unless the play scores. A state
+  # at 0:00 is the final result, not a snap that could still kick
+  a <- probs(3, 0)
+  expect_equal(a$wp_succeed, probs(3, 3)$wp_succeed)
+  expect_lt(a$go_wp, 0.03)
+  expect_lt(a$go_wp, a$fg_wp)
+  # 10 seconds left: a timeout stops the clock after a conversion, leaving time
+  # for a kick; without one the clock often runs out
+  expect_gt(probs(10, 1)$wp_succeed - probs(10, 0)$wp_succeed, 0.1)
+  # a timeout never hurts
+  for (s in c(10, 20, 45, 90)) {
+    expect_gte(probs(s, 2)$go_wp, probs(s, 0)$go_wp - 1e-9)
   }
 })

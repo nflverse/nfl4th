@@ -568,9 +568,18 @@ calculate_win_probability <- function(pbp_data) {
 
   wp <- rep(NA_real_, nrow(x))
   ot <- x$qtr > 4
-  reg <- which(!ot)
+  # The clock ran out on the play: regulation is over. The team ahead wins and
+  # a tie goes to overtime, valued at the coin toss. (wpfd_predict() values a
+  # snap, which at 0:00 could still kick a field goal.)
+  over <- !ot & x$game_seconds_remaining <= 0
+  over[is.na(over)] <- FALSE
+  reg <- which(!ot & !over)
   if (length(reg) > 0) {
     wp[reg] <- wpfd_predict(x[reg, , drop = FALSE])
+  }
+  if (any(over)) {
+    xe <- x[over, , drop = FALSE]
+    wp[over] <- wpfd_end_value(xe$score_differential, wpfd_ot_start(xe))
   }
   if (any(ot)) {
     xo <- x[ot, , drop = FALSE]

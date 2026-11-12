@@ -272,14 +272,18 @@ kickoff_yardline <- function(season) {
 
 # Seconds from the snap of a successful 4th down conversion (not a touchdown) to
 # the offense's next snap, which is the clock of the 1st down state that is
-# valued. The clock doesn't stop for a first down, so away from the end of a
-# half the next snap comes about 37 seconds later. Late in a half teams hurry or
-# stop the clock (out of bounds, timeouts, the 2 minute warning, which is why
-# the gap dips for conversions just before it). These are the mean gaps after
-# 3rd and 4th down conversions in 2016-2026 regular and postseason games
-# (data-raw/_conversion_runoff.R), linear in the seconds left in the half
-# between the points measured. A later conversion never leads to an earlier
-# next snap. Overtime uses the 4th quarter's.
+# valued, when the offense doesn't call a timeout. The clock doesn't stop for a
+# first down, so away from the end of a half the next snap comes about 37
+# seconds later. Late in a half teams hurry or stop the clock (out of bounds,
+# spikes, the 2 minute warning, which is why the gap dips for conversions just
+# before it). These are the mean gaps after 3rd and 4th down conversions in
+# 2016-2026 regular and postseason games (data-raw/_conversion_runoff.R), linear
+# in the seconds left in the half between the points measured. In the last 2:00
+# of the 2nd and of the 4th quarter (behind or tied) they leave out conversions
+# followed by an offense timeout, which a team with one can take instead (see
+# conversion_play_time() and get_go_wp()); earlier, teams take one after at most
+# 3% of conversions. A later conversion never leads to an earlier next snap.
+# Overtime uses the 4th quarter's.
 conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
   n <- max(
     length(qtr),
@@ -292,11 +296,27 @@ conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
   at <- function(x, y) stats::approx(x, y, xout = h, rule = 2)$y
   q2 <- at(
     c(0, 22, 37, 52, 75, 105, 135, 165, 210, 900),
-    c(6, 7.5, 9, 12, 17, 21, 17, 36, 36.5, 36.6)
+    c(5.9, 8.9, 11.4, 14.6, 18.2, 21.1, 17, 36, 36.5, 36.6)
   )
   q4_behind <- at(
     c(0, 22, 37, 52, 75, 105, 135, 165, 210, 270, 330, 420, 540, 750, 900),
-    c(7, 11, 13, 14, 18, 20.5, 13, 23, 27, 25, 31, 32.3, 33.7, 34.4, 34.4)
+    c(
+      7.2,
+      12.1,
+      14.8,
+      15.5,
+      18.4,
+      20.4,
+      13,
+      23,
+      27,
+      25,
+      31,
+      32.3,
+      33.7,
+      34.4,
+      34.4
+    )
   )
   q4_ahead <- at(
     c(0, 75, 105, 135, 165, 210, 270, 330, 420, 900),
@@ -308,6 +328,30 @@ conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
     score_differential > 0 ~ q4_ahead,
     TRUE ~ q4_behind
   )
+}
+
+# Share of late conversions after which the clock runs out before another snap
+# when the offense doesn't call a timeout, by seconds left in the half (2nd
+# quarter, or 4th quarter behind or tied): 84% in the last 7 seconds, 65% at
+# 7-10, 44% at 10-15, 10% at 15-20 and about 1% from 20 to 45 (conversions by
+# teams without a timeout, 2016-2026, data-raw/_conversion_runoff.R). The gaps
+# in conversion_runoff() are those of the conversions that were followed by a
+# snap.
+conversion_clock_out <- function(half_seconds_remaining) {
+  stats::approx(
+    c(3.5, 8.5, 12.5, 17.5, 25, 37.5, 45),
+    c(0.84, 0.65, 0.44, 0.10, 0.012, 0.009, 0),
+    xout = half_seconds_remaining,
+    rule = 2
+  )$y
+}
+
+# Seconds a play that gains a first down takes when the offense stops the clock
+# with a timeout right after it: about 6 seconds plus 0.107 per yard gained
+# (plays stopped by an offense timeout in the last 2:00 of a half, 2016-2026,
+# data-raw/_conversion_runoff.R)
+conversion_play_time <- function(gain) {
+  5.99 + 0.107 * gain
 }
 
 # Era bucket for the field goal model. Kicking has improved steadily rather
