@@ -143,12 +143,31 @@ with_active <- function(set, code) {
 # 3. the decisions run once more on the plays stacked once per other draw,
 #    each copy with its draw's go for it tables and WP looked up from step 2.
 # The result is the same as running add_probs() under each draw in turn.
-# Returns add_probs(x) (`point`) and the bootstrap columns (`cols`).
-add_boot_probs <- function(x) {
+# Returns add_probs(x) (`point`) and the bootstrap columns (`cols`). Plays are
+# taken `chunk` at a time: step 3 holds every play once per draw, so a whole
+# season at once would need many GB. Each play's values don't depend on the
+# other plays in the chunk.
+add_boot_probs <- function(x, chunk = 50L) {
+  n <- nrow(x)
+  if (n > chunk) {
+    groups <- split(seq_len(n), ceiling(seq_len(n) / chunk))
+    bar <- cli::cli_progress_bar("Bootstrap", total = length(groups))
+    parts <- lapply(groups, function(i) {
+      r <- add_boot_probs(df_slice(x, i), chunk)
+      cli::cli_progress_update(id = bar)
+      r
+    })
+    cli::cli_progress_done(id = bar)
+    cols <- lapply(
+      stats::setNames(nm = names(parts[[1]]$cols)),
+      function(k) do.call(c, lapply(unname(parts), function(p) p$cols[[k]]))
+    )
+    point <- df_bind_rows(lapply(unname(parts), `[[`, "point"))
+    return(list(point = point, cols = cols))
+  }
   bm <- bootstrap_models()
   draws <- bm$draws
   n_draws <- length(draws)
-  n <- nrow(x)
   others <- seq_len(n_draws)[-1]
 
   # 1. the point estimate, recording the states
@@ -302,6 +321,9 @@ boot_worker_init <- function(idx, f) {
     booster <- wpfd_booster(draws[[b]]$wp)
     xgboost::xgb.model.parameters(booster) <- list(nthread = 1L)
   }
+  # keep only this worker's draws in memory
+  keep <- seq_along(draws) %in% idx
+  bootstrap_memo$models$draws[!keep] <- list(NULL)
   nfl4th_workers$idx <- idx
   TRUE
 }
