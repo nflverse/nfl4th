@@ -174,10 +174,20 @@ wpfd_offset <- function(x, beta, k) {
 
 wpfd_cache <- new.env(parent = emptyenv())
 
-wpfd_booster <- function(model = wp_first_down_model) {
-  if (is.null(wpfd_cache$booster)) {
-    tryCatch(
-      wpfd_cache$booster <- xgboost::xgb.load.raw(model$trees_raw),
+# The loaded xgboost model, kept for each model used (the shipped fit and the
+# bootstrap draws, see R/bootstrap.R), by a fingerprint of its bytes
+wpfd_booster <- function(model = active_wp_model()) {
+  raw <- model$trees_raw
+  key <- paste(
+    length(raw),
+    paste(
+      as.integer(raw[round(seq(1, length(raw), length.out = 64))]),
+      collapse = "."
+    )
+  )
+  if (is.null(wpfd_cache$boosters[[key]])) {
+    booster <- tryCatch(
+      xgboost::xgb.load.raw(raw),
       error = function(e) {
         cli::cli_abort(c(
           "Can't load the win probability model.",
@@ -189,15 +199,19 @@ wpfd_booster <- function(model = wp_first_down_model) {
         ))
       }
     )
+    if (is.null(wpfd_cache$boosters)) {
+      wpfd_cache$boosters <- list()
+    }
+    wpfd_cache$boosters[[key]] <- booster
   }
-  wpfd_cache$booster
+  wpfd_cache$boosters[[key]]
 }
 
 # xgboost changed `iterationrange` from a half open [start, end) range (1.x) to
 # an inclusive one (3.x). Find out which one the installed version uses by
 # comparing the first n_trees rounds with the full model (they are the same
 # model only if the range is inclusive).
-wpfd_inclusive_range <- function(booster, model = wp_first_down_model) {
+wpfd_inclusive_range <- function(booster, model = active_wp_model()) {
   if (is.null(wpfd_cache$inclusive)) {
     k <- model$constants
     x <- data.frame(
@@ -255,7 +269,7 @@ wpfd_tree_margin_unique <- function(booster, X, n, inclusive) {
 }
 
 # logit of the WP of the team with the ball: offset plus trees
-wpfd_logit <- function(x, model = wp_first_down_model) {
+wpfd_logit <- function(x, model = active_wp_model()) {
   k <- model$constants
   n <- nrow(x)
   if (n == 0) {
@@ -307,7 +321,7 @@ wpfd_end_v <- c(1, -2, 0, 2, -1, 0, 1, -2, 0, 2, -1) / 2
 
 # WP of the team with the ball, without the touchdown cap and the field goal
 # floor
-wpfd_raw <- function(x, model = wp_first_down_model) {
+wpfd_raw <- function(x, model = active_wp_model()) {
   if (nrow(x) == 0) {
     return(numeric(0))
   }
@@ -499,7 +513,7 @@ wpfd_fg_value <- function(x, model, p_fg, dt = 5) {
 # touchdown on this snap, except in the last five minutes (where not scoring
 # can be the better play) and in the last seconds of a half (where the next
 # possession is not a kickoff return).
-wpfd_predict <- function(x, model = wp_first_down_model, dt = 6) {
+wpfd_predict <- function(x, model = active_wp_model(), dt = 6) {
   x <- as.data.frame(x)
   w <- wpfd_raw(x, model)
   p_fg <- wpfd_fg_prob(x)

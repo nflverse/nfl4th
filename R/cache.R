@@ -36,9 +36,11 @@ nfl4th_games_memo <- new.env(parent = emptyenv())
 
 #' Reset nfl4th Package Cache
 #'
-#' @param type One of `"games"` (the default), `"fd_model"`, `"wp_model"`, or
-#'   `"all"`.
+#' @param type One of `"games"` (the default), `"fd_model"`, `"wp_model"`,
+#'   `"bootstrap"`, or `"all"`.
 #'   `"games"` will remove an internally used games file.
+#'   `"bootstrap"` will remove the bootstrap models downloaded by
+#'   `add_4th_probs(bootstrap = TRUE)`.
 #'   `"fd_model"` and `"wp_model"` will remove the go for it and win
 #'   probability models cached by earlier nfl4th versions (both models now ship
 #'   with the package).
@@ -50,7 +52,7 @@ nfl4th_games_memo <- new.env(parent = emptyenv())
 #' @examples
 #' nfl4th_clear_cache()
 nfl4th_clear_cache <- function(
-  type = c("games", "fd_model", "wp_model", "all")
+  type = c("games", "fd_model", "wp_model", "bootstrap", "all")
 ) {
   type <- match.arg(type)
   to_delete <- switch(
@@ -58,9 +60,16 @@ nfl4th_clear_cache <- function(
     "games" = nfl4th_games_path(),
     "fd_model" = nfl4th_fdmodel_path(),
     "wp_model" = nfl4th_wpmodel_path(),
-    "all" = c(nfl4th_games_path(), nfl4th_fdmodel_path(), nfl4th_wpmodel_path())
+    "bootstrap" = nfl4th_bootstrap_path(),
+    "all" = c(
+      nfl4th_games_path(),
+      nfl4th_fdmodel_path(),
+      nfl4th_wpmodel_path(),
+      nfl4th_bootstrap_path()
+    )
   )
   file.remove(to_delete[file.exists(to_delete)])
+  bootstrap_memo$models <- NULL
   invisible(TRUE)
 }
 

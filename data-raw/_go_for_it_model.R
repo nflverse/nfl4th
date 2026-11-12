@@ -431,45 +431,47 @@ fd_tabulate <- function(fit, all_eras = 0:1) {
   )
 }
 
+# play-by-play columns the training data needs
+fd_cols <- c(
+  "season",
+  "down",
+  "ydstogo",
+  "yardline_100",
+  "posteam",
+  "home_team",
+  "spread_line",
+  "total_line",
+  "qb_kneel",
+  "qb_spike",
+  "rush",
+  "pass",
+  "play_type_nfl",
+  "desc",
+  "first_down_penalty",
+  "penalty_type",
+  "penalty_yards",
+  "yards_gained",
+  "interception",
+  "fumble_lost",
+  "air_yards",
+  "return_yards",
+  # game situation, for the late terms (see fd_late_vars())
+  "qtr",
+  "game_seconds_remaining",
+  "score_differential",
+  "vegas_wp",
+  # to find games with a broken running score (see data-raw/repair_games.R)
+  "game_id",
+  "home_score",
+  "away_score",
+  "total_home_score",
+  "total_away_score"
+)
+
 if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
-  cols <- c(
-    "season",
-    "down",
-    "ydstogo",
-    "yardline_100",
-    "posteam",
-    "home_team",
-    "spread_line",
-    "total_line",
-    "qb_kneel",
-    "qb_spike",
-    "rush",
-    "pass",
-    "play_type_nfl",
-    "desc",
-    "first_down_penalty",
-    "penalty_type",
-    "penalty_yards",
-    "yards_gained",
-    "interception",
-    "fumble_lost",
-    "air_yards",
-    "return_yards",
-    # game situation, for the late terms (see fd_late_vars())
-    "qtr",
-    "game_seconds_remaining",
-    "score_differential",
-    "vegas_wp",
-    # to find games with a broken running score (see data-raw/repair_games.R)
-    "game_id",
-    "home_score",
-    "away_score",
-    "total_home_score",
-    "total_away_score"
-  )
   pbp <- purrr::map(
     2001:nflreadr::most_recent_season(),
-    \(s) nflreadr::load_pbp(s) |> select(all_of(cols))
+    \(s) nflreadr::load_pbp(s) |> select(all_of(fd_cols))
   ) |>
     bind_rows()
   # the 2001-2002 JAX home games and 2011_13_DET_NO have the wrong score (and

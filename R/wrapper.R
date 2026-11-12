@@ -10,6 +10,9 @@
 #' for it, kick field goal, punt).
 #'
 #' @param df A data frame of decisions to be computed for.
+#' @param bootstrap If `TRUE`, also value every play under 100 bootstrap
+#'   versions of nfl4th's win probability and go for it models (see Details).
+#'   The first use downloads them (about 35 MB) to the package cache.
 #' @details Overtime plays (`qtr > 4`) are valued with the overtime rules of
 #' the game (sudden death, modified sudden death, or both teams getting the
 #' ball) using nflfastR's overtime win probability model. `quarter_seconds_remaining`
@@ -24,6 +27,14 @@
 #' (about 37 seconds away from the end of a half, as little as 6 to 10 in the
 #' last seconds). Add `runoff` to set the seconds that run off after the 6 of
 #' the play instead.
+#'
+#' With `bootstrap = TRUE` each play is also valued under 100 bootstrap
+#' versions of the two models nfl4th fits itself, the 1st down win probability
+#' model and the go for it model, each refit on a history resampled by game.
+#' With the shipped fit that makes 101 draws, the shipped fit first. They show
+#' how much a recommendation depends on the particular games the models were
+#' fit on (sampling uncertainty, not every source of model error). The punt and
+#' field goal models are the same in every draw.
 #' @return Original data frame Data frame plus the following columns added:
 #' \describe{
 #' \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
@@ -36,6 +47,13 @@
 #' \item{make_fg_wp}{Win probability in the event of a made field goal.}
 #' \item{fg_wp}{Average win probability when attempting field goal.}
 #' \item{punt_wp}{Average win probability when punting.}
+#' }
+#' With `bootstrap = TRUE`, also:
+#' \describe{
+#' \item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+#' \item{go_boost_lo, go_boost_hi}{5th and 95th percentile of go_boost across the draws, a 90% interval.}
+#' \item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
+#' \item{go_wp_boot, fg_wp_boot, punt_wp_boot}{go_wp, fg_wp and punt_wp in each draw, likewise.}
 #' }
 #' @export
 #' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
@@ -66,7 +84,7 @@
 #' tibble::glimpse(probs)
 #' })
 #' }
-add_4th_probs <- function(df) {
+add_4th_probs <- function(df, bootstrap = FALSE) {
   original_df <- df_assign(df, list(index = seq_len(nrow(df))))
   modified_df <- original_df
 
@@ -87,6 +105,7 @@ add_4th_probs <- function(df) {
   }
 
   cli::cli_alert_info("Computing probabilities for {nrow(df)} plays. . .")
+  prepared <- df
   df <- add_probs(df)
   punt_prob <- if_else(is.na(df$punt_wp), 0, df$punt_wp)
   # the better kick (punt_prob is never NA)
@@ -105,6 +124,11 @@ add_4th_probs <- function(df) {
       "punt_wp"
     )]
   )
+
+  if (isTRUE(bootstrap) && nrow(df) > 0) {
+    boot <- add_boot_probs(prepared, df)
+    probs <- c(probs, boot[setdiff(names(boot), "index")])
+  }
 
   out <- df_left_join(original_df, probs, by = "index")
   df_select(out, setdiff(names(out), "index"))

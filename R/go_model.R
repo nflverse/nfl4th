@@ -53,7 +53,7 @@ fd_late <- function(pbp) {
 # own 1. `late` marks late and desperate plays (see fd_is_late()), recycled to
 # the rows of x. Returns columns row (index into x), gain and prob; the
 # probabilities of each row sum to 1.
-fd_gain_probs <- function(x, late = FALSE, tb = fd_tables) {
+fd_gain_probs <- function(x, late = FALSE, tb = active_fd_tables()) {
   n <- nrow(x)
   if (n == 0) {
     return(data.frame(row = integer(), gain = integer(), prob = numeric()))

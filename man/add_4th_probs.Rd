@@ -4,10 +4,14 @@
 \alias{add_4th_probs}
 \title{Get 4th down decision probabilities}
 \usage{
-add_4th_probs(df)
+add_4th_probs(df, bootstrap = FALSE)
 }
 \arguments{
 \item{df}{A data frame of decisions to be computed for.}
+
+\item{bootstrap}{If \code{TRUE}, also value every play under 100 bootstrap
+versions of nfl4th's win probability and go for it models (see Details).
+The first use downloads them (about 35 MB) to the package cache.}
 }
 \value{
 Original data frame Data frame plus the following columns added:
@@ -22,6 +26,13 @@ Original data frame Data frame plus the following columns added:
 \item{make_fg_wp}{Win probability in the event of a made field goal.}
 \item{fg_wp}{Average win probability when attempting field goal.}
 \item{punt_wp}{Average win probability when punting.}
+}
+With \code{bootstrap = TRUE}, also:
+\describe{
+\item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+\item{go_boost_lo, go_boost_hi}{5th and 95th percentile of go_boost across the draws, a 90\% interval.}
+\item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
+\item{go_wp_boot, fg_wp_boot, punt_wp_boot}{go_wp, fg_wp and punt_wp in each draw, likewise.}
 }
 }
 \description{
@@ -43,6 +54,14 @@ typical gap after a conversion for the quarter, the time left and the score
 (about 37 seconds away from the end of a half, as little as 6 to 10 in the
 last seconds). Add \code{runoff} to set the seconds that run off after the 6 of
 the play instead.
+
+With \code{bootstrap = TRUE} each play is also valued under 100 bootstrap
+versions of the two models nfl4th fits itself, the 1st down win probability
+model and the go for it model, each refit on a history resampled by game.
+With the shipped fit that makes 101 draws, the shipped fit first. They show
+how much a recommendation depends on the particular games the models were
+fit on (sampling uncertainty, not every source of model error). The punt and
+field goal models are the same in every draw.
 }
 \examples{
 \dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
