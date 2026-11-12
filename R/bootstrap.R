@@ -202,7 +202,7 @@ add_boot_probs <- function(x, chunk = 50L) {
   boost <- boot_go_boost(m$go_wp, m$fg_wp, m$punt_wp)
   dec <- boot_decision(m$go_wp, m$fg_wp, m$punt_wp)
   rows <- function(x) lapply(seq_len(n), function(i) x[i, ])
-  qs <- apply(boost, 1, stats::quantile, probs = c(0.05, 0.95), na.rm = TRUE)
+  qs <- apply(boost, 1, stats::quantile, probs = c(0.1, 0.9), na.rm = TRUE)
   cols <- c(
     list(
       boot_pct = 100 * rowMeans(dec == dec[, 1]),

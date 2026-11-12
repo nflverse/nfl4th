@@ -52,7 +52,7 @@
 #' \describe{
 #' \item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
 #' \item{boot_go_pct}{Percent of the draws in which going beats the better kick (go_boost > 0). The recommendation itself is the sign of go_boost; this says how often the draws agree that going is better.}
-#' \item{go_boost_lo, go_boost_hi}{5th and 95th percentile of go_boost across the draws, a 90% interval.}
+#' \item{go_boost_lo, go_boost_hi}{10th and 90th percentile of go_boost across the draws, an 80% interval.}
 #' \item{boot_median_draw}{The draw whose go_boost is the median of the play's draws (1 to 101; 1 is the shipped fit). Taking every number from that draw gives one coherent fit at the median, e.g. `go_wp_boot[[i]][boot_median_draw[i]]`.}
 #' \item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
 #' \item{go_wp_boot, fg_wp_boot, punt_wp_boot, first_down_prob_boot, wp_fail_boot, wp_succeed_boot, fg_make_prob_boot, miss_fg_wp_boot, make_fg_wp_boot}{Each of those columns in each draw, likewise. Within a draw they fit together: go_wp is first_down_prob x wp_succeed + (1 - first_down_prob) x wp_fail, and fg_wp likewise. fg_make_prob is the same in every draw (the field goal table isn't resampled).}
