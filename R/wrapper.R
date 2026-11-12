@@ -153,7 +153,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
       seasons,
       ~ {
         cli::cli_alert_info("Loading season {.x}")
-        nflfastR::load_pbp(.x) |>
+        nflreadr::load_pbp(.x) |>
           left_join(
             nflreadr::rds_from_url(paste0(
               "https://github.com/nflverse/nfl4th/releases/download/",

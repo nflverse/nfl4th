@@ -31,7 +31,6 @@ test_that("a missing overtime possession is guessed from the score", {
 })
 
 test_that("overtime field goals follow the rules", {
-  skip_if_not(nflfastr_has_ot())
   fg <- function(...) get_fg_wp(ot_play(...))
   # sudden death (third possession): a make wins
   expect_equal(fg(ot_possession = 3)$make_fg_wp, 1)
@@ -52,7 +51,6 @@ test_that("overtime field goals follow the rules", {
 })
 
 test_that("overtime punts follow the rules", {
-  skip_if_not(nflfastr_has_ot())
   punt <- function(...) get_punt_wp(ot_play(yardline_100 = 65, ...))$punt_wp
   # a team that trails in the second possession can't punt the game away
   # (only a muffed punt keeps it alive)
@@ -64,7 +62,6 @@ test_that("overtime punts follow the rules", {
 })
 
 test_that("overtime touchdowns follow the rules", {
-  skip_if_not(nflfastr_has_ot())
   td <- function(...) {
     ot_play(...) |>
       dplyr::mutate(score_differential = score_differential + 6) |>
@@ -85,7 +82,6 @@ test_that("overtime touchdowns follow the rules", {
 })
 
 test_that("a regular season overtime that runs out is a tie", {
-  skip_if_not(nflfastr_has_ot())
   # a miss with no time left: the game ends tied
   out <- get_fg_wp(ot_play(ot_possession = 3, quarter_seconds_remaining = 3))
   expect_equal(out$miss_fg_wp, 0.5)

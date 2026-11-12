@@ -30,26 +30,9 @@ ot_rule <- function(season, type) {
   )
 }
 
-# The overtime model is exported through nflfastR::calculate_win_probability()
-# from the nflfastR version that added the `ot_possession` column
-nflfastr_has_ot <- function() {
-  exists(
-    "calculate_ot_win_probability",
-    envir = asNamespace("nflfastR"),
-    inherits = FALSE
-  )
-}
-
 # WP of the team with the ball in overtime states. `w` is
-# nflfastR::calculate_win_probability()'s vegas_wp for these states
+# nflfastR's overtime model's vegas_wp for these states (fastr_wp())
 ot_win_probability <- function(x, w) {
-  if (!nflfastr_has_ot()) {
-    cli::cli_warn(c(
-      "Overtime win probability needs a newer version of nflfastR.",
-      "i" = "Overtime decisions are returned as {.val NA}."
-    ))
-    return(rep(NA_real_, nrow(x)))
-  }
   # a regular season game ends when the clock runs out, a tie is half a win
   over <- x$type %in% "reg" & x$game_seconds_remaining <= 0
   d <- x$score_differential[over]

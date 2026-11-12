@@ -19,12 +19,25 @@ wp_first_down_model <- readRDS("data-raw/wp_first_down_model.rds")
 # data-raw/_go_for_it_model.R
 fd_tables <- readRDS("data-raw/fd_tables.rds")
 
+# nflfastR's vegas_wp and overtime models and its field goal table, for the
+# code copied from nflfastR in R/nflfastr_models.R (nflverse/nflfastR#625 at
+# dc295839; nfl4th-checks/vendor/01_extract.R writes the .rds)
+nflfastr_models <- readRDS("data-raw/nflfastr_models.rds")
+wp_vegas_model <- nflfastr_models$wp_vegas_model
+ot_wp_dp <- nflfastr_models$ot_wp_dp
+ot_wp_models <- nflfastr_models$ot_wp_models
+fg_prob_table <- nflfastr_models$fg_prob_table
+
 usethis::use_data(
   fg_model,
   fg_prob_df,
   punt_df,
   wp_first_down_model,
   fd_tables,
+  wp_vegas_model,
+  ot_wp_dp,
+  ot_wp_models,
+  fg_prob_table,
   no_cache,
   internal = TRUE,
   overwrite = TRUE

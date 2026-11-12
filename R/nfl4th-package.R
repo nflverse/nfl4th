@@ -6,7 +6,6 @@
 ## usethis namespace: start
 #' @import dplyr
 #' @importFrom data.table getDTthreads
-#' @importFrom nflfastR calculate_win_probability
 #' @importFrom rlang arg_match
 #' @importFrom stringr str_replace_all
 #' @importFrom tidyr pivot_wider

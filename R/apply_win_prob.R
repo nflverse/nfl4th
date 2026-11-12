@@ -394,16 +394,12 @@ wpfd_end_value <- function(sd, tie = 0.5) {
 }
 
 # WP of the team with the ball at the start of overtime, before the coin toss,
-# from nflfastR's overtime model (0.5 with an nflfastR that doesn't have it)
+# from nflfastR's overtime model (R/nflfastr_models.R)
 wpfd_ot_start <- function(x) {
-  f <- get0("wp_ot_start", envir = asNamespace("nflfastR"), inherits = FALSE)
-  if (is.null(f)) {
-    return(rep(0.5, nrow(x)))
-  }
   n <- nrow(x)
   season <- if (is.null(x[["season"]])) rep(NA_real_, n) else x[["season"]]
   type <- if (is.null(x[["type"]])) rep("reg", n) else x[["type"]]
-  f(data.frame(
+  wp_ot_start(data.frame(
     season = season,
     season_type = ifelse(type %in% "post", "POST", "REG"),
     posteam_spread = x$posteam_spread
@@ -611,13 +607,42 @@ fastr_wp <- function(x) {
     stringsAsFactors = FALSE
   )
   if (nrow(d) < 2L) {
-    return(nflfastR::calculate_win_probability(d)$vegas_wp)
+    return(fastr_vegas_wp(d))
   }
   # each distinct state once: the states behind a set of decisions repeat, and
-  # nflfastR's overtime model is slow per row
+  # the overtime model is slow per row
   id <- vctrs::vec_group_id(d)
   first <- which(!duplicated(id))
-  nflfastR::calculate_win_probability(d[first, , drop = FALSE])$vegas_wp[id]
+  fastr_vegas_wp(d[first, , drop = FALSE])[id]
+}
+
+# What nflfastR::calculate_win_probability() returns as vegas_wp, with the code
+# copied from nflfastR (R/nflfastr_models.R): its regulation model, and its
+# overtime model for overtime rows. nflfastR also computes `wp` (an older
+# model without the spread), which nfl4th doesn't use.
+fastr_vegas_wp <- function(pbp_data) {
+  model_data <- pbp_data
+  model_data$home <- dplyr::if_else(
+    model_data$posteam == model_data$home_team,
+    1,
+    0
+  )
+  model_data$posteam_spread <- dplyr::if_else(
+    model_data$home == 1,
+    model_data$spread_line,
+    -1 * model_data$spread_line
+  )
+  model_data$elapsed_share <- (3600 - model_data$game_seconds_remaining) / 3600
+  model_data$spread_time <- model_data$posteam_spread *
+    exp(-4 * model_data$elapsed_share)
+  model_data$Diff_Time_Ratio <- model_data$score_differential /
+    (exp(-4 * model_data$elapsed_share))
+  w <- get_preds_wp_spread(model_data)
+  ot <- calculate_ot_win_probability(pbp_data, model_data, wp = FALSE)
+  if (!is.null(ot)) {
+    w[ot$i] <- ot$vegas_wp
+  }
+  w
 }
 
 # nflfastR's win probability of the states in `pbp_data` for the team with the
