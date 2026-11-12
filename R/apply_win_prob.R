@@ -239,6 +239,19 @@ wpfd_tree_margin <- function(booster, X, n, inclusive) {
   ))
 }
 
+# margins as wpfd_tree_margin(), evaluated once per distinct row: the states
+# behind a set of decisions repeat a lot (the kickoff after a made field goal
+# is the same for every outcome of a play, for example)
+wpfd_tree_margin_unique <- function(booster, X, n, inclusive) {
+  if (nrow(X) < 2L) {
+    return(wpfd_tree_margin(booster, X, n, inclusive))
+  }
+  # exact row matching, groups numbered in order of first appearance
+  id <- vctrs::vec_group_id(as.data.frame(X))
+  first <- which(!duplicated(id))
+  wpfd_tree_margin(booster, X[first, , drop = FALSE], n, inclusive)[id]
+}
+
 # logit of the WP of the team with the ball: offset plus trees
 wpfd_logit <- function(x, model = wp_first_down_model) {
   k <- model$constants
@@ -254,16 +267,21 @@ wpfd_logit <- function(x, model = wp_first_down_model) {
   j <- pmin(findInterval(g, sch$t), nrow(sch) - 1L)
   j[is.na(j)] <- 1L
   w <- (g - sch$t[j]) / (sch$t[j + 1L] - sch$t[j])
-  ns <- unique(sch$n)
-  F <- lapply(ns, function(nt) wpfd_tree_margin(booster, X, nt, inclusive))
-  names(F) <- as.character(ns)
-  tm <- numeric(n)
-  for (jj in seq_len(nrow(sch) - 1L)) {
-    i <- which(j == jj)
-    a <- F[[as.character(sch$n[jj])]][i]
-    b <- F[[as.character(sch$n[jj + 1L])]][i]
-    tm[i] <- (1 - w[i]) * a + w[i] * b
+  # Each row needs the margins at only the two tree counts around its clock
+  # (100 trees for most of the game, up to 1,500 at the end), so each count is
+  # evaluated on just the rows that need it, not every count on every row
+  n_lo <- sch$n[j]
+  n_hi <- sch$n[j + 1L]
+  a <- b <- numeric(n)
+  for (nt in unique(c(n_lo, n_hi))) {
+    i <- which(n_lo == nt | n_hi == nt)
+    m <- wpfd_tree_margin_unique(booster, X[i, , drop = FALSE], nt, inclusive)
+    lo <- n_lo[i] == nt
+    hi <- n_hi[i] == nt
+    a[i[lo]] <- m[lo]
+    b[i[hi]] <- m[hi]
   }
+  tm <- (1 - w) * a + w * b
   wpfd_offset(x, model$beta, k) + tm
 }
 
@@ -300,14 +318,21 @@ wpfd_raw <- function(x, model = wp_first_down_model) {
     yl <- xi$yardline_100
     ry <- pmin(wpfd_end_yards, yl - 1, 99 - yl)
     ry[is.na(ry)] <- 0
+    # the 11 shifted copies of these rows in one model call
+    K <- length(wpfd_end_u)
+    m <- length(i)
+    xs <- xi[rep(seq_len(m), K), , drop = FALSE]
+    ku <- rep(wpfd_end_u, each = m)
+    xs$game_seconds_remaining <- xs$half_seconds_remaining <- rep(t[i], K) +
+      ku * rep(r, K)
+    xs$yardline_100 <- rep(yl, K) +
+      round(rep(wpfd_end_v, each = m) * rep(ry, K))
+    ls <- wpfd_logit(xs, model)
     acc <- 0
-    for (k in seq_along(wpfd_end_u)) {
-      xi$game_seconds_remaining <- xi$half_seconds_remaining <- t[i] +
-        wpfd_end_u[k] * r
-      xi$yardline_100 <- yl + round(wpfd_end_v[k] * ry)
-      acc <- acc + wpfd_logit(xi, model)
+    for (k in seq_len(K)) {
+      acc <- acc + ls[(k - 1L) * m + seq_len(m)]
     }
-    l[i] <- acc / length(wpfd_end_u)
+    l[i] <- acc / K
   }
   p <- stats::plogis(l)
   # every state this model values is a 1st down
@@ -565,7 +590,7 @@ wp_inputs <- function(pbp_data) {
 # nflfastR's win probability for the team with the ball: vegas_wp in
 # regulation, the overtime model in overtime. `x` comes from wp_inputs()
 fastr_wp <- function(x) {
-  nflfastR::calculate_win_probability(data.frame(
+  d <- data.frame(
     receive_2h_ko = x$receive_2h_ko,
     home_team = x$home_team,
     posteam = x$posteam,
@@ -584,7 +609,15 @@ fastr_wp <- function(x) {
     ot_possession = x$ot_possession,
     roof = x$roof,
     stringsAsFactors = FALSE
-  ))$vegas_wp
+  )
+  if (nrow(d) < 2L) {
+    return(nflfastR::calculate_win_probability(d)$vegas_wp)
+  }
+  # each distinct state once: the states behind a set of decisions repeat, and
+  # nflfastR's overtime model is slow per row
+  id <- vctrs::vec_group_id(d)
+  first <- which(!duplicated(id))
+  nflfastR::calculate_win_probability(d[first, , drop = FALSE])$vegas_wp[id]
 }
 
 # nflfastR's win probability of the states in `pbp_data` for the team with the

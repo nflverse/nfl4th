@@ -13,14 +13,25 @@ nfl4th_wpmodel_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
 }
 
+# the games file in memory, read again only when the file changes
+nfl4th_games_memo <- new.env(parent = emptyenv())
+
 .games_nfl4th <- function() {
   if (probably_cran() && !force_cache()) {
     return(get_games_file())
   }
-  if (!file.exists(nfl4th_games_path())) {
-    saveRDS(get_games_file(), nfl4th_games_path())
+  f <- nfl4th_games_path()
+  if (!file.exists(f)) {
+    saveRDS(get_games_file(), f)
   }
-  readRDS(nfl4th_games_path())
+  info <- file.info(f)[c("mtime", "size")]
+  if (
+    is.null(nfl4th_games_memo$data) || !identical(nfl4th_games_memo$info, info)
+  ) {
+    nfl4th_games_memo$data <- readRDS(f)
+    nfl4th_games_memo$info <- info
+  }
+  nfl4th_games_memo$data
 }
 
 #' Reset nfl4th Package Cache

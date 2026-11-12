@@ -411,12 +411,90 @@ prepare_nflfastr_data <- function(pbp) {
   return(data)
 }
 
-# convenience function to add the probs from each model
+# Columns the decision functions and models read (a superset: every prepared
+# column the package code names)
+decision_cols <- c(
+  "play_id",
+  "home_team",
+  "away_team",
+  "season_type",
+  "posteam",
+  "defteam",
+  "yardline_100",
+  "quarter_seconds_remaining",
+  "half_seconds_remaining",
+  "game_seconds_remaining",
+  "qtr",
+  "down",
+  "time",
+  "ydstogo",
+  "desc",
+  "extra_point_result",
+  "two_point_conv_result",
+  "home_timeouts_remaining",
+  "away_timeouts_remaining",
+  "timeout_team",
+  "posteam_timeouts_remaining",
+  "defteam_timeouts_remaining",
+  "score_differential",
+  "fg_prob",
+  "ep",
+  "wp",
+  "vegas_wp",
+  "vegas_home_wp",
+  "season",
+  "play_type_nfl",
+  "away_score",
+  "home_score",
+  "aborted_play",
+  "pass",
+  "rush",
+  "id",
+  "home_opening_kickoff",
+  "index",
+  "type",
+  "ot_possession",
+  "game_id",
+  "week",
+  "espn",
+  "fg_model_roof",
+  "model_roof",
+  "roof",
+  "era0",
+  "era1",
+  "era2",
+  "era3",
+  "era4",
+  "home_total",
+  "away_total",
+  "total_line",
+  "spread_line",
+  "retractable",
+  "dome",
+  "outdoors",
+  "home_receive_2h_ko",
+  "elapsed_share",
+  "posteam_spread",
+  "posteam_total",
+  "original_posteam",
+  "ot_rule",
+  "ot_end",
+  "runoff"
+)
+
+# convenience function to add the probs from each model. The decision
+# functions expand every play into its outcomes, so they work on only the
+# columns they read (nflfastR play-by-play has hundreds more), and the results
+# are attached to the full rows at the end
 add_probs <- function(df) {
-  df |>
+  out <- df[, names(df) %in% decision_cols, drop = FALSE] |>
     get_go_wp() |>
     get_fg_wp() |>
     get_punt_wp()
+  for (n in names(out)) {
+    df[[n]] <- out[[n]]
+  }
+  df
 }
 
 # additional release issue bullets for usethis::use_release_issue()

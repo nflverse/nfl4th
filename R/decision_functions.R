@@ -264,10 +264,7 @@ get_go_wp <- function(pbp) {
   ) |>
     dplyr::left_join(pbp, by = "go_index") |>
 
-    # needed for the max() step later
-    group_by(go_index) |>
-
-    # update situation based on play result
+    # update situation based on play result (every step is row by row)
     mutate(
       yardline_100 = yardline_100 - gain,
       # for figuring out if it was a td later
@@ -338,8 +335,7 @@ get_go_wp <- function(pbp) {
       # if now goal to go for either team, use yardline for yards to go,
       # otherwise it's 1st and 10
       ydstogo = ifelse(yardline_100 < 10, yardline_100, 10)
-    ) |>
-    ungroup()
+    )
 
   # separate df of just the TDs to calculate WP after TD
   # this step is needed to deal with the option of 1pt or 2pt choice
