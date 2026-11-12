@@ -193,29 +193,58 @@ add_boot_probs <- function(x, chunk = 50L) {
   if (is.null(ev)) {
     ev <- boot_eval(xr, q, others)
   }
-  go <- cbind(point$go_wp, ev$go)
-  fg <- cbind(point$fg_wp, ev$fg)
-  punt <- cbind(point$punt_wp, ev$punt)
+  # plays x draws, the shipped fit first
+  m <- lapply(
+    stats::setNames(nm = boot_columns),
+    function(k) cbind(point[[k]], ev[[k]])
+  )
 
-  boost <- boot_go_boost(go, fg, punt)
-  dec <- boot_decision(go, fg, punt)
-  rows <- function(m) lapply(seq_len(n), function(i) m[i, ])
+  boost <- boot_go_boost(m$go_wp, m$fg_wp, m$punt_wp)
+  dec <- boot_decision(m$go_wp, m$fg_wp, m$punt_wp)
+  rows <- function(x) lapply(seq_len(n), function(i) x[i, ])
   qs <- apply(boost, 1, stats::quantile, probs = c(0.05, 0.95), na.rm = TRUE)
-  cols <- list(
-    boot_pct = 100 * rowMeans(dec == dec[, 1]),
-    boot_go_pct = 100 * rowMeans(boost > 0),
-    go_boost_lo = qs[1, ],
-    go_boost_hi = qs[2, ],
-    go_boost_boot = rows(boost),
-    go_wp_boot = rows(go),
-    fg_wp_boot = rows(fg),
-    punt_wp_boot = rows(punt)
+  cols <- c(
+    list(
+      boot_pct = 100 * rowMeans(dec == dec[, 1]),
+      boot_go_pct = 100 * rowMeans(boost > 0),
+      go_boost_lo = qs[1, ],
+      go_boost_hi = qs[2, ],
+      boot_median_draw = boot_median_draw(boost),
+      go_boost_boot = rows(boost)
+    ),
+    stats::setNames(lapply(m, rows), paste0(boot_columns, "_boot"))
   )
   list(point = point, cols = cols)
 }
 
+# the columns of add_probs() kept for every draw
+boot_columns <- c(
+  "go_wp",
+  "fg_wp",
+  "punt_wp",
+  "first_down_prob",
+  "wp_fail",
+  "wp_succeed",
+  "fg_make_prob",
+  "miss_fg_wp",
+  "make_fg_wp"
+)
+
+# the draw whose go_boost is the median of the play's draws (with 101 draws,
+# the 51st smallest; NA draws aside, the lower one of the middle two when
+# there is an even number)
+boot_median_draw <- function(boost) {
+  apply(boost, 1, function(v) {
+    ok <- which(!is.na(v))
+    if (length(ok) == 0L) {
+      return(NA_integer_)
+    }
+    ok[order(v[ok], method = "radix")][ceiling(length(ok) / 2)]
+  })
+}
+
 # Steps 2 and 3 of add_boot_probs() for draws `idx`: plays x draws matrices of
-# go_wp, fg_wp and punt_wp, the draws in the order of `idx`
+# the boot_columns, the draws in the order of `idx`
 boot_eval <- function(x, q, idx) {
   draws <- bootstrap_models()$draws
   n <- nrow(x)
@@ -246,10 +275,9 @@ boot_eval <- function(x, q, idx) {
     list(logit = lookup, fd_draws = lapply(draws, `[[`, "fd")),
     add_probs(xs)
   )
-  list(
-    go = matrix(r$go_wp, n),
-    fg = matrix(r$fg_wp, n),
-    punt = matrix(r$punt_wp, n)
+  lapply(
+    stats::setNames(nm = boot_columns),
+    function(k) matrix(r[[k]], n)
   )
 }
 
@@ -360,5 +388,5 @@ boot_eval_workers <- function(x, q) {
   idx <- unlist(nfl4th_workers$chunks, use.names = FALSE)
   o <- order(idx)
   pick <- function(k) do.call(cbind, lapply(parts, `[[`, k))[, o, drop = FALSE]
-  list(go = pick("go"), fg = pick("fg"), punt = pick("punt"))
+  lapply(stats::setNames(nm = boot_columns), pick)
 }
