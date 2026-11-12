@@ -109,11 +109,16 @@ fd_gain_probs <- function(x, late = FALSE, tb = fd_tables) {
     k <- pmax(k, yi - 99L)
     fail_prob <- (1 - pc[i]) * as.numeric(f) / sum(f)
     fail_prob <- tapply(fail_prob, k, sum)
-    data.frame(
-      row = i,
-      gain = c(succ_gain, as.integer(names(fail_prob))),
-      prob = c(succ_prob, as.numeric(fail_prob))
+    list(
+      c(succ_gain, as.integer(names(fail_prob))),
+      c(succ_prob, as.numeric(fail_prob))
     )
   })
-  do.call(rbind, out)
+  # one data frame at the end (binding one per play was slow)
+  gain <- lapply(out, `[[`, 1L)
+  data.frame(
+    row = rep(seq_len(n), lengths(gain)),
+    gain = unlist(gain),
+    prob = unlist(lapply(out, `[[`, 2L))
+  )
 }
