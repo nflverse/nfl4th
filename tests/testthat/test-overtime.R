@@ -23,9 +23,9 @@ test_that("overtime possessions are counted from play-by-play", {
 })
 
 test_that("a missing overtime possession is guessed from the score", {
-  x <- ot_play(score_differential = c(0, -3)) |>
-    dplyr::mutate(ot_possession = NA_real_) |>
-    dplyr::select(-"ot_rule", -"ot_end")
+  x <- ot_play(score_differential = c(0, -3))
+  x$ot_possession <- NA_real_
+  x <- x[setdiff(names(x), c("ot_rule", "ot_end"))]
   expect_warning(y <- prepare_ot(x), "ot_possession")
   expect_equal(y$ot_possession, c(1, 2))
 })
@@ -63,9 +63,9 @@ test_that("overtime punts follow the rules", {
 
 test_that("overtime touchdowns follow the rules", {
   td <- function(...) {
-    ot_play(...) |>
-      dplyr::mutate(score_differential = score_differential + 6) |>
-      get_2pt_wp()
+    p <- ot_play(...)
+    p$score_differential <- p$score_differential + 6
+    get_2pt_wp(p)
   }
   # modified sudden death: a first possession touchdown wins
   expect_equal(td(season = 2024, ot_possession = 1)$wp_td, 1)

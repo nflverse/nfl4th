@@ -70,7 +70,7 @@ play <-
 try({# to avoid cran issues
 probs <- nfl4th::add_4th_probs(play)
 
-dplyr::glimpse(probs)
+tibble::glimpse(probs)
 })
 }
 \dontshow{\}) # examplesIf}

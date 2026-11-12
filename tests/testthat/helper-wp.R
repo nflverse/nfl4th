@@ -71,17 +71,16 @@ ot_play <- function(
     outdoors = 0,
     retractable = 0,
     dome = 1,
-    runoff = 0
+    runoff = 0,
+    # and the columns prepare_df() would compute
+    down = 4,
+    half_seconds_remaining = quarter_seconds_remaining,
+    game_seconds_remaining = quarter_seconds_remaining,
+    home_timeouts_remaining = 2,
+    away_timeouts_remaining = 2,
+    home_receive_2h_ko = 0,
+    original_posteam = posteam,
+    posteam_spread = spread_line
   ) |>
-    dplyr::mutate(
-      down = 4,
-      half_seconds_remaining = quarter_seconds_remaining,
-      game_seconds_remaining = quarter_seconds_remaining,
-      home_timeouts_remaining = 2,
-      away_timeouts_remaining = 2,
-      home_receive_2h_ko = 0,
-      original_posteam = posteam,
-      posteam_spread = spread_line
-    ) |>
     prepare_ot()
 }

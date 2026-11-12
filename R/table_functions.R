@@ -33,46 +33,29 @@
 #' })
 #'}
 make_table_data <- function(probs) {
-  go <- tibble::tibble(
-    "choice_prob" = probs$go_wp,
-    "choice" = "Go for it",
-    "success_prob" = probs$first_down_prob,
-    "fail_wp" = probs$wp_fail,
-    "success_wp" = probs$wp_succeed
-  ) |>
-    select(choice, choice_prob, success_prob, fail_wp, success_wp)
-
-  fg <- tibble::tibble(
-    "choice_prob" = probs$fg_wp,
-    "choice" = "Field goal attempt",
-    "success_prob" = probs$fg_make_prob,
-    "fail_wp" = probs$miss_fg_wp,
-    "success_wp" = probs$make_fg_wp
-  ) |>
-    select(choice, choice_prob, success_prob, fail_wp, success_wp)
-
-  punt <- tibble::tibble(
-    "choice_prob" = if_else(is.na(probs$punt_wp), NA_real_, probs$punt_wp),
-    "choice" = "Punt",
-    "success_prob" = NA_real_,
-    "fail_wp" = NA_real_,
-    "success_wp" = NA_real_
-  ) |>
-    select(choice, choice_prob, success_prob, fail_wp, success_wp)
-
-  for_return <- bind_rows(
-    go,
-    fg,
-    punt
-  ) |>
-    mutate(
-      choice_prob = 100 * choice_prob,
-      success_prob = 100 * success_prob,
-      fail_wp = 100 * fail_wp,
-      success_wp = 100 * success_wp
+  choice_table(list(
+    choice_rows(
+      "Go for it",
+      probs$go_wp,
+      probs$first_down_prob,
+      probs$wp_fail,
+      probs$wp_succeed
+    ),
+    choice_rows(
+      "Field goal attempt",
+      probs$fg_wp,
+      probs$fg_make_prob,
+      probs$miss_fg_wp,
+      probs$make_fg_wp
+    ),
+    choice_rows(
+      "Punt",
+      if_else(is.na(probs$punt_wp), NA_real_, probs$punt_wp),
+      NA_real_,
+      NA_real_,
+      NA_real_
     )
-
-  return(for_return)
+  ))
 }
 
 
@@ -109,34 +92,44 @@ make_table_data <- function(probs) {
 #' })
 #' }
 make_2pt_table_data <- function(probs) {
-  go <- tibble::tibble(
-    "choice_prob" = probs$wp_go2,
-    "choice" = "Go for 2",
-    "success_prob" = probs$conv_2pt,
-    "fail_wp" = probs$wp_0,
-    "success_wp" = probs$wp_2
-  ) |>
-    select(choice, choice_prob, success_prob, fail_wp, success_wp)
-
-  pat <- tibble::tibble(
-    "choice_prob" = probs$wp_go1,
-    "choice" = "Kick XP",
-    "success_prob" = probs$conv_1pt,
-    "fail_wp" = probs$wp_0,
-    "success_wp" = probs$wp_1
-  ) |>
-    select(choice, choice_prob, success_prob, fail_wp, success_wp)
-
-  for_return <- bind_rows(
-    go,
-    pat
-  ) |>
-    mutate(
-      choice_prob = 100 * choice_prob,
-      success_prob = 100 * success_prob,
-      fail_wp = 100 * fail_wp,
-      success_wp = 100 * success_wp
+  choice_table(list(
+    choice_rows(
+      "Go for 2",
+      probs$wp_go2,
+      probs$conv_2pt,
+      probs$wp_0,
+      probs$wp_2
+    ),
+    choice_rows(
+      "Kick XP",
+      probs$wp_go1,
+      probs$conv_1pt,
+      probs$wp_0,
+      probs$wp_1
     )
+  ))
+}
 
-  return(for_return)
+# one choice's rows of the table
+choice_rows <- function(
+  choice,
+  choice_prob,
+  success_prob,
+  fail_wp,
+  success_wp
+) {
+  tibble::tibble(
+    choice = choice,
+    choice_prob = choice_prob,
+    success_prob = success_prob,
+    fail_wp = fail_wp,
+    success_wp = success_wp
+  )
+}
+
+# the choices stacked, probabilities in percent
+choice_table <- function(rows) {
+  out <- df_bind_rows(rows)
+  pct <- c("choice_prob", "success_prob", "fail_wp", "success_wp")
+  df_assign(out, lapply(df_cols(out)[pct], function(v) 100 * v))
 }

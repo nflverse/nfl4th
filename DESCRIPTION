@@ -19,11 +19,10 @@ Imports:
     cli,
     curl,
     data.table,
-    dplyr,
     jsonlite,
     nflreadr,
     tibble,
-    vctrs,
+    vctrs (>= 0.7.0),
     xgboost
 Suggests: 
     future,

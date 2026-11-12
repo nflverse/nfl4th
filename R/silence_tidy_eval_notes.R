@@ -16,6 +16,7 @@ utils::globalVariables(
     "conv_2pt",
     "defteam",
     "defteam_timeouts_remaining",
+    "desc",
     "dome",
     "down",
     "end_of_half",

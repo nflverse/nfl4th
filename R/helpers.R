@@ -59,128 +59,139 @@ drop.cols <- c(
 
 # loading and cleaning games file
 get_games_file <- function() {
-  nflreadr::load_schedules() |>
-    filter(season > 2013) |>
-    mutate(
-      type = if_else(game_type == "REG", "reg", "post"),
-      model_roof = case_when(
-        roof == "open" | roof == "closed" | is.na(roof) ~ "retractable",
-        roof == "retractable" ~ "retractable",
-        roof == "dome" ~ "dome",
-        TRUE ~ "outdoors"
-      ),
+  g <- nflreadr::load_schedules()
+  g <- df_filter(g, g$season > 2013)
+  season <- g$season
+  roof <- g$roof
+  model_roof <- case_when(
+    roof == "open" | roof == "closed" | is.na(roof) ~ "retractable",
+    roof == "retractable" ~ "retractable",
+    roof == "dome" ~ "dome",
+    TRUE ~ "outdoors"
+  )
+  # for field goal model
+  fg_roof <- case_when(roof == "outdoors" ~ 1, TRUE ~ 0)
+  fg_era <- get_fg_era(season)
+  g <- df_assign(
+    g,
+    list(
+      type = if_else(g$game_type == "REG", "reg", "post"),
+      model_roof = model_roof,
       # for EP model: don't use this for games earlier than 2014
       era0 = 0,
       era1 = 0,
       era2 = 0,
-      era3 = dplyr::if_else(season > 2013 & season <= 2017, 1, 0),
-      era4 = dplyr::if_else(season > 2017, 1, 0),
-
-      # for field goal model
-      fg_roof = case_when(roof == "outdoors" ~ 1, TRUE ~ 0),
-      fg_era = get_fg_era(season),
+      era3 = if_else(season > 2013 & season <= 2017, 1, 0),
+      era4 = if_else(season > 2017, 1, 0),
+      fg_roof = fg_roof,
+      fg_era = fg_era,
       fg_model_roof = paste0(fg_roof, fg_era) |> as.factor(),
-
-      home_total = (total_line + spread_line) / 2,
-      away_total = (total_line - spread_line) / 2,
-      retractable = dplyr::if_else(model_roof == 'retractable', 1, 0),
-      dome = dplyr::if_else(model_roof == 'dome', 1, 0),
-      outdoors = dplyr::if_else(model_roof == 'outdoors', 1, 0),
+      home_total = (g$total_line + g$spread_line) / 2,
+      away_total = (g$total_line - g$spread_line) / 2,
+      retractable = if_else(model_roof == 'retractable', 1, 0),
+      dome = if_else(model_roof == 'dome', 1, 0),
+      outdoors = if_else(model_roof == 'outdoors', 1, 0),
       roof = model_roof,
-      espn = dplyr::case_when(
-        game_id == "2025_20_BUF_DEN" ~ "401772982",
-        game_id == "2025_20_SF_SEA" ~ "401772984",
-        game_id == "2025_20_HOU_NE" ~ "401772983",
-        game_id == "2025_20_LA_CHI" ~ "401772985",
-        TRUE ~ espn
+      espn = case_when(
+        g$game_id == "2025_20_BUF_DEN" ~ "401772982",
+        g$game_id == "2025_20_SF_SEA" ~ "401772984",
+        g$game_id == "2025_20_HOU_NE" ~ "401772983",
+        g$game_id == "2025_20_LA_CHI" ~ "401772985",
+        TRUE ~ g$espn
       )
-    ) |>
-    dplyr::mutate_at(dplyr::vars("home_team", "away_team"), team_name_fn) |>
-    dplyr::select(
-      game_id,
-      season,
-      type,
-      week,
-      away_team,
-      home_team,
-      espn,
-      fg_model_roof,
-      model_roof,
-      roof,
-      era0,
-      era1,
-      era2,
-      era3,
-      era4,
-      home_total,
-      away_total,
-      total_line,
-      spread_line,
-      retractable,
-      dome,
-      outdoors
     )
+  )
+  g <- df_assign(
+    g,
+    list(
+      home_team = team_name_fn(g$home_team),
+      away_team = team_name_fn(g$away_team)
+    )
+  )
+  df_select(
+    g,
+    c(
+      "game_id",
+      "season",
+      "type",
+      "week",
+      "away_team",
+      "home_team",
+      "espn",
+      "fg_model_roof",
+      "model_roof",
+      "roof",
+      "era0",
+      "era1",
+      "era2",
+      "era3",
+      "era4",
+      "home_total",
+      "away_total",
+      "total_line",
+      "spread_line",
+      "retractable",
+      "dome",
+      "outdoors"
+    )
+  )
 }
 
 # data prep function
 prepare_df <- function(df) {
-  df |>
-    # if an nflfastR df is passed, need to drop all this so we don't get
-    # redundant cols
-    dplyr::select(-dplyr::any_of(drop.cols)) |>
-    left_join(
-      .games_nfl4th(),
-      by = c("home_team", "away_team", "type", "season")
-    ) |>
-    mutate(
-      home_receive_2h_ko = dplyr::case_when(
+  # if an nflfastR df is passed, need to drop all this so we don't get
+  # redundant cols
+  df <- df_select(df, setdiff(names(df), drop.cols))
+  df <- df_left_join(
+    df,
+    .games_nfl4th(),
+    by = c("home_team", "away_team", "type", "season")
+  )
+  qtr <- df$qtr
+  qsr <- df$quarter_seconds_remaining
+  # in overtime both are the time left in the overtime period
+  half <- case_when(
+    qtr > 4 ~ qsr,
+    qtr == 2 | qtr == 4 ~ qsr,
+    TRUE ~ qsr + 900
+  )
+  game <- if_else(qtr <= 2, half + 1800, half)
+  # added
+  elapsed_share <- (3600 - game) / 3600
+  # useful for lots of stuff later
+  home <- df$posteam == df$home_team
+  df <- df_assign(
+    df,
+    list(
+      home_receive_2h_ko = case_when(
         # home got it first
-        .data$qtr <= 2 & .data$home_opening_kickoff == 1 ~ -1,
+        qtr <= 2 & df$home_opening_kickoff == 1 ~ -1,
         # away got it first
-        .data$qtr <= 2 & .data$home_opening_kickoff == 0 ~ 1,
+        qtr <= 2 & df$home_opening_kickoff == 0 ~ 1,
         # it's the 2nd half
         TRUE ~ 0
       ),
       down = 4,
-      # in overtime both are the time left in the overtime period
-      half_seconds_remaining = dplyr::case_when(
-        qtr > 4 ~ quarter_seconds_remaining,
-        qtr == 2 | qtr == 4 ~ quarter_seconds_remaining,
-        TRUE ~ quarter_seconds_remaining + 900
-      ),
-      game_seconds_remaining = if_else(
-        qtr <= 2,
-        half_seconds_remaining + 1800,
-        half_seconds_remaining
-      ),
-
-      # added
-      elapsed_share = (3600 - .data$game_seconds_remaining) / 3600,
-      spread_time = .data$spread_line * exp(-4 * .data$elapsed_share),
-
-      # useful for lots of stuff later
-
-      posteam_spread = if_else(posteam == home_team, spread_line, -spread_line),
-      posteam_total = if_else(posteam == home_team, home_total, away_total),
-      posteam_spread = dplyr::if_else(
-        posteam == home_team,
-        spread_line,
-        -1 * spread_line
-      ),
-
+      half_seconds_remaining = half,
+      game_seconds_remaining = game,
+      elapsed_share = elapsed_share,
+      spread_time = df$spread_line * exp(-4 * elapsed_share),
+      posteam_spread = if_else(home, df$spread_line, -1 * df$spread_line),
+      posteam_total = if_else(home, df$home_total, df$away_total),
       home_timeouts_remaining = if_else(
-        posteam == home_team,
-        posteam_timeouts_remaining,
-        defteam_timeouts_remaining
+        home,
+        df$posteam_timeouts_remaining,
+        df$defteam_timeouts_remaining
       ),
       away_timeouts_remaining = if_else(
-        posteam == away_team,
-        posteam_timeouts_remaining,
-        defteam_timeouts_remaining
+        df$posteam == df$away_team,
+        df$posteam_timeouts_remaining,
+        df$defteam_timeouts_remaining
       ),
-      original_posteam = posteam
-    ) |>
-    prepare_ot()
+      original_posteam = df$posteam
+    )
+  )
+  prepare_ot(df)
 }
 
 # overtime columns: the rules in force, the possession number (see
@@ -204,17 +215,20 @@ prepare_ot <- function(df) {
       )
     ))
   }
-  df |>
-    mutate(
-      ot_rule = ot_rule(season, type),
-      ot_possession = dplyr::case_when(
-        qtr <= 4 ~ NA_real_,
-        !is.na(ot_possession) ~ pmin(pmax(as.numeric(ot_possession), 1), 3),
-        score_differential < 0 ~ 2,
+  df_assign(
+    df,
+    list(
+      ot_rule = ot_rule(df$season, df$type),
+      ot_possession = case_when(
+        df$qtr <= 4 ~ NA_real_,
+        !is.na(df$ot_possession) ~
+          pmin(pmax(as.numeric(df$ot_possession), 1), 3),
+        df$score_differential < 0 ~ 2,
         TRUE ~ 1
       ),
       ot_end = NA_real_
     )
+  )
 }
 
 # helper function for switching possession and running off 6 seconds. In
@@ -247,7 +261,7 @@ flip_team <- function(df, ot_stop = TRUE) {
 # at the 20, 2016-2023 touchbacks at the 25, the 2024 dynamic kickoff with
 # touchbacks at the 30 and 2025+ with touchbacks at the 35.
 kickoff_yardline <- function(season) {
-  dplyr::case_when(
+  case_when(
     season >= 2025 ~ 69L,
     season >= 2024 ~ 70L,
     season >= 2016 ~ 75L,
@@ -288,7 +302,7 @@ conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
     c(0, 75, 105, 135, 165, 210, 270, 330, 420, 900),
     c(35, 37.5, 31.8, 15, 25, 29, 32, 40, 39.5, 39)
   )
-  dplyr::case_when(
+  case_when(
     qtr %in% c(1, 3) ~ 36.6,
     qtr == 2 ~ q2,
     score_differential > 0 ~ q4_ahead,
@@ -310,7 +324,7 @@ get_fg_era <- function(season) {
   if (anyNA(season)) {
     cli::cli_abort("{.arg season} must not contain missing values.")
   }
-  dplyr::if_else(season >= 2023, 1L, 0L)
+  if_else(season >= 2023, 1L, 0L)
 }
 
 # Era for the go for it model's conversion probability: 2001-2019 and 2020 on.
@@ -326,7 +340,7 @@ get_fd_era <- function(season) {
   if (anyNA(season)) {
     cli::cli_abort("{.arg season} must not contain missing values.")
   }
-  dplyr::if_else(season >= 2020, 1L, 0L)
+  if_else(season >= 2020, 1L, 0L)
 }
 
 # helper function to move the game to start of 3rd Q on an end-of-half play
@@ -396,19 +410,18 @@ end_game_fn <- function(pbp) {
 prepare_nflfastr_data <- function(pbp) {
   # some prep. The possession number in overtime has to be counted before the
   # plays are filtered down to 4th downs
-  data <- pbp |>
-    dplyr::mutate(
-      type = ifelse(tolower(season_type) == "reg", "reg", "post")
-    ) |>
-    ot_possession_from_pbp() |>
-    filter(
-      game_seconds_remaining > 15 | qtr > 4,
-      !is.na(half_seconds_remaining),
-      !is.na(qtr),
-      !is.na(posteam)
-    )
-
-  return(data)
+  data <- df_assign(
+    pbp,
+    list(type = ifelse(tolower(pbp$season_type) == "reg", "reg", "post"))
+  )
+  data <- ot_possession_from_pbp(data)
+  df_filter(
+    data,
+    (data$game_seconds_remaining > 15 | data$qtr > 4) &
+      !is.na(data$half_seconds_remaining) &
+      !is.na(data$qtr) &
+      !is.na(data$posteam)
+  )
 }
 
 # Columns the decision functions and models read (a superset: every prepared

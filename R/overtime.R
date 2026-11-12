@@ -21,7 +21,7 @@
 
 ot_rule <- function(season, type) {
   post <- type %in% "post"
-  dplyr::case_when(
+  case_when(
     post & season >= 2022 ~ "BOTH",
     !post & season >= 2025 ~ "BOTH",
     post & season >= 2010 ~ "MSD",
@@ -45,7 +45,7 @@ ot_win_probability <- function(x, w) {
 # trails in the second possession loses, and the other team's possession
 # number goes up.
 ot_change_possession <- function(df) {
-  df$ot_end <- dplyr::if_else(
+  df$ot_end <- if_else(
     df$qtr > 4 &
       df$ot_rule != "SD" &
       df$ot_possession == 2 &
@@ -53,7 +53,7 @@ ot_change_possession <- function(df) {
     0,
     df$ot_end
   )
-  df$ot_possession <- dplyr::case_when(
+  df$ot_possession <- case_when(
     df$qtr <= 4 ~ df$ot_possession,
     df$ot_rule == "SD" ~ 3,
     TRUE ~ pmin(df$ot_possession + 1, 3)
@@ -65,7 +65,7 @@ ot_change_possession <- function(df) {
 # flipped (`score_differential` is still the kicking team's, before the kick).
 ot_field_goal <- function(df) {
   d2 <- df$score_differential + 3
-  df$ot_end <- dplyr::case_when(
+  df$ot_end <- case_when(
     df$qtr <= 4 ~ df$ot_end,
     df$ot_rule == "SD" | df$ot_possession >= 3 ~ 1,
     df$ot_possession == 2 & d2 > 0 ~ 1,
@@ -74,7 +74,7 @@ ot_field_goal <- function(df) {
   )
   # the other team receives: the second possession after a first possession
   # score, sudden death after a tying score
-  df$ot_possession <- dplyr::case_when(
+  df$ot_possession <- case_when(
     df$qtr <= 4 ~ df$ot_possession,
     df$ot_possession == 1 ~ 2,
     TRUE ~ 3
@@ -88,7 +88,7 @@ ot_field_goal <- function(df) {
 # under modified sudden death and on any later possession if it takes the lead.
 ot_touchdown <- function(df, pts) {
   final <- df$score_differential + pts
-  df$ot_end <- dplyr::case_when(
+  df$ot_end <- case_when(
     df$qtr <= 4 ~ df$ot_end,
     df$ot_rule == "SD" | df$ot_possession >= 3 ~ 1,
     df$ot_rule == "MSD" & df$ot_possession == 1 ~ 1,
@@ -97,7 +97,7 @@ ot_touchdown <- function(df, pts) {
     df$ot_possession == 2 & final < 0 ~ 0,
     TRUE ~ df$ot_end
   )
-  df$ot_possession <- dplyr::case_when(
+  df$ot_possession <- case_when(
     df$qtr <= 4 ~ df$ot_possession,
     df$ot_possession == 1 ~ 2,
     TRUE ~ 3

@@ -23,7 +23,7 @@
 # data-raw/_go_for_it_model.R uses this function too. Missing values count as
 # not late.
 fd_is_late <- function(qtr, score_differential, game_seconds_remaining, wp) {
-  dplyr::coalesce(
+  coalesce(
     (qtr >= 4 & score_differential < 0 & game_seconds_remaining <= 600) |
       (!is.na(wp) & wp < 0.15),
     FALSE
@@ -66,9 +66,9 @@ fd_gain_probs <- function(x, late = FALSE, tb = fd_tables) {
   t_raw <- pmin(t_raw, y)
   t <- pmin(t_raw, t_max)
   era <- match(as.character(get_fd_era(x$season)), colnames(tb$conv_era))
-  spread <- dplyr::coalesce(as.numeric(x$posteam_spread), 0)
-  ztot <- dplyr::coalesce(as.numeric(x$total_line), tb$ref_total) - tb$ref_total
-  late <- rep_len(dplyr::coalesce(as.numeric(late), 0), n)
+  spread <- coalesce(as.numeric(x$posteam_spread), 0)
+  ztot <- coalesce(as.numeric(x$total_line), tb$ref_total) - tb$ref_total
+  late <- rep_len(coalesce(as.numeric(late), 0), n)
   # conversion and touchdown: logits at spread 0 and total 45 in the current
   # era in a normal situation, shifted by the game's spread, total, era and
   # situation. Distances beyond the table use its longest distance

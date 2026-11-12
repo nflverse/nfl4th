@@ -22,12 +22,12 @@ get_punt_wp <- function(pbp) {
 
   # overtime: a muffed punt recovered by the punting team keeps its
   # possession going, a return touchdown ends the game
-  probs$ot_possession <- dplyr::if_else(
+  probs$ot_possession <- if_else(
     probs$muff %in% 1,
     probs$.ot_possession,
     probs$ot_possession
   )
-  probs$ot_end <- dplyr::case_when(
+  probs$ot_end <- case_when(
     probs$qtr > 4 & probs$yardline_after %in% 100 ~ 0,
     probs$muff %in% 1 ~ NA_real_,
     TRUE ~ probs$ot_end
@@ -229,7 +229,7 @@ get_go_wp <- function(pbp) {
 
   # overtime: a team that trails in the second possession loses when it
   # turns the ball over, otherwise the other team's possession starts
-  p$ot_end <- dplyr::if_else(
+  p$ot_end <- if_else(
     p$turnover == 1 &
       p$qtr > 4 &
       p$ot_rule != "SD" &
@@ -238,7 +238,7 @@ get_go_wp <- function(pbp) {
     0,
     p$ot_end
   )
-  p$ot_possession <- dplyr::case_when(
+  p$ot_possession <- case_when(
     p$turnover == 0 | p$qtr <= 4 ~ p$ot_possession,
     p$ot_rule == "SD" ~ 3,
     TRUE ~ pmin(p$ot_possession + 1, 3)
@@ -275,7 +275,7 @@ get_go_wp <- function(pbp) {
   # conversion that doesn't score the clock keeps running: the typical gap to
   # the offense's next snap (conversion_runoff()), or 6 seconds plus `runoff`
   # when it is supplied
-  elapsed <- dplyr::case_when(
+  elapsed <- case_when(
     p$turnover == 1 | p$yardline_100 <= 0 ~ 6,
     is.na(p$runoff) ~ conversion_runoff(
       p$qtr,

@@ -339,7 +339,7 @@ wpfd_raw <- function(x, model = wp_first_down_model) {
   down <- if (is.null(x[["down"]])) {
     1
   } else {
-    dplyr::coalesce(as.numeric(x$down), 1)
+    coalesce(as.numeric(x$down), 1)
   }
   # A team ahead with the ball wins if it can kneel out the clock, and nearly
   # always if it is a few seconds short
@@ -438,7 +438,7 @@ wpfd_fg_prob <- function(x) {
     paste(as.integer(x$yardline_100), as.character(key)),
     paste(fg_prob_df$yardline_100, as.character(fg_prob_df$fg_model_roof))
   )
-  dplyr::coalesce(fg_prob_df$fg_make_prob[i], 0)
+  coalesce(fg_prob_df$fg_make_prob[i], 0)
 }
 
 # probability that the PAT after a touchdown is good: a field goal from the 15
@@ -564,20 +564,20 @@ calculate_win_probability <- function(pbp_data) {
 wp_inputs <- function(pbp_data) {
   x <- pbp_data
   x$home <- as.numeric(x$posteam == x$home_team)
-  x$posteam_spread <- dplyr::if_else(x$home == 1, x$spread_line, -x$spread_line)
-  x$receive_2h_ko <- dplyr::case_when(
+  x$posteam_spread <- if_else(x$home == 1, x$spread_line, -x$spread_line)
+  x$receive_2h_ko <- case_when(
     # 1st half, home team opened game with kickoff, away team has ball
     x$qtr <= 2 & x$home_opening_kickoff == 1 & x$posteam == x$away_team ~ 1,
     # 1st half, away team opened game with kickoff, home team has ball
     x$qtr <= 2 & x$home_opening_kickoff == 0 & x$posteam == x$home_team ~ 1,
     TRUE ~ 0
   )
-  x$posteam_timeouts_remaining <- dplyr::if_else(
+  x$posteam_timeouts_remaining <- if_else(
     x$home == 1,
     x$home_timeouts_remaining,
     x$away_timeouts_remaining
   )
-  x$defteam_timeouts_remaining <- dplyr::if_else(
+  x$defteam_timeouts_remaining <- if_else(
     x$home == 1,
     x$away_timeouts_remaining,
     x$home_timeouts_remaining
@@ -624,12 +624,12 @@ fastr_wp <- function(x) {
 # model without the spread), which nfl4th doesn't use.
 fastr_vegas_wp <- function(pbp_data) {
   model_data <- pbp_data
-  model_data$home <- dplyr::if_else(
+  model_data$home <- if_else(
     model_data$posteam == model_data$home_team,
     1,
     0
   )
-  model_data$posteam_spread <- dplyr::if_else(
+  model_data$posteam_spread <- if_else(
     model_data$home == 1,
     model_data$spread_line,
     -1 * model_data$spread_line

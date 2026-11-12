@@ -86,10 +86,8 @@ test_that("a conversion is valued at the next snap, and runoff moves it", {
     defteam_timeouts_remaining = 3
   )
   go <- function(runoff) {
-    suppressMessages(nfl4th::add_4th_probs(dplyr::mutate(
-      play,
-      runoff = runoff
-    )))$go_wp
+    play$runoff <- runoff
+    suppressMessages(nfl4th::add_4th_probs(play))$go_wp
   }
   typical <- suppressMessages(nfl4th::add_4th_probs(play))$go_wp
   # runoff moves the clock (before, the clock was clamped per play with max(),
