@@ -203,30 +203,20 @@ flip_team <- function(df, ot_stop = TRUE) {
   if (ot_stop) {
     df <- ot_change_possession(df)
   }
-  df |>
-    mutate(
-      # switch posteam
-      posteam = if_else(home_team == posteam, away_team, home_team),
-      # swap score
-      score_differential = -score_differential,
-      # 1st and 10
-      down = 1,
-      ydstogo = 10,
-      # run off 6 seconds
-      half_seconds_remaining = half_seconds_remaining - 6,
-      game_seconds_remaining = game_seconds_remaining - 6,
-      # don't let seconds go negative
-      half_seconds_remaining = if_else(
-        half_seconds_remaining < 0,
-        0,
-        half_seconds_remaining
-      ),
-      game_seconds_remaining = if_else(
-        game_seconds_remaining < 0,
-        0,
-        game_seconds_remaining
-      )
-    )
+  n <- nrow(df)
+  # switch posteam
+  df$posteam <- if_else(df$home_team == df$posteam, df$away_team, df$home_team)
+  # swap score
+  df$score_differential <- -df$score_differential
+  # 1st and 10
+  df$down <- rep(1, n)
+  df$ydstogo <- rep(10, n)
+  # run off 6 seconds, but don't let seconds go negative
+  h <- df$half_seconds_remaining - 6
+  g <- df$game_seconds_remaining - 6
+  df$half_seconds_remaining <- if_else(h < 0, 0, h)
+  df$game_seconds_remaining <- if_else(g < 0, 0, g)
+  df
 }
 
 # yardline_100 of the receiving team's first snap after a kickoff, by kickoff
@@ -320,71 +310,59 @@ get_fd_era <- function(season) {
 # helper function to move the game to start of 3rd Q on an end-of-half play
 # on the plays where we find that the half has ended
 flip_half <- function(df) {
-  df |>
-    mutate(
-      prior_posteam = posteam,
-      end_of_half = ifelse(
-        qtr == 2 & half_seconds_remaining == 0,
-        1,
-        0
-      ),
-      posteam = case_when(
-        home_opening_kickoff == 1 & end_of_half == 1 ~ away_team,
-        home_opening_kickoff == 0 & end_of_half == 1 ~ home_team,
-        TRUE ~ posteam
-      ),
-      qtr = ifelse(end_of_half == 1, 3L, qtr),
-      down = ifelse(end_of_half == 1, 1, down),
-      ydstogo = ifelse(end_of_half == 1, 10L, ydstogo),
-      yardline_100 = ifelse(
-        end_of_half == 1,
-        kickoff_yardline(season),
-        yardline_100
-      ),
-      half_seconds_remaining = ifelse(
-        end_of_half == 1,
-        1800,
-        half_seconds_remaining
-      ),
-      game_seconds_remaining = ifelse(
-        end_of_half == 1,
-        1800,
-        game_seconds_remaining
-      ),
-      score_differential = ifelse(
-        posteam != prior_posteam & end_of_half == 1,
-        -score_differential,
-        score_differential
-      ),
-      home_receive_2h_ko = ifelse(end_of_half == 1, 0, home_receive_2h_ko)
-    ) |>
-    select(-prior_posteam, -end_of_half)
+  prior_posteam <- df$posteam
+  end_of_half <- ifelse(df$qtr == 2 & df$half_seconds_remaining == 0, 1, 0)
+  df$posteam <- case_when(
+    df$home_opening_kickoff == 1 & end_of_half == 1 ~ df$away_team,
+    df$home_opening_kickoff == 0 & end_of_half == 1 ~ df$home_team,
+    TRUE ~ df$posteam
+  )
+  df$qtr <- ifelse(end_of_half == 1, 3L, df$qtr)
+  df$down <- ifelse(end_of_half == 1, 1, df$down)
+  df$ydstogo <- ifelse(end_of_half == 1, 10L, df$ydstogo)
+  df$yardline_100 <- ifelse(
+    end_of_half == 1,
+    kickoff_yardline(df$season),
+    df$yardline_100
+  )
+  df$half_seconds_remaining <- ifelse(
+    end_of_half == 1,
+    1800,
+    df$half_seconds_remaining
+  )
+  df$game_seconds_remaining <- ifelse(
+    end_of_half == 1,
+    1800,
+    df$game_seconds_remaining
+  )
+  df$score_differential <- ifelse(
+    df$posteam != prior_posteam & end_of_half == 1,
+    -df$score_differential,
+    df$score_differential
+  )
+  df$home_receive_2h_ko <- ifelse(end_of_half == 1, 0, df$home_receive_2h_ko)
+  df
 }
 
 # fill in end of game situation when team can kneel out clock
 # discourages punting or fg when the other team can end the game
 end_game_fn <- function(pbp) {
-  pbp |>
-    mutate(
-      defteam_timeouts_remaining = ifelse(
-        posteam == home_team,
-        away_timeouts_remaining,
-        home_timeouts_remaining
-      ),
-      vegas_wp = case_when(
-        qtr > 4 ~ vegas_wp,
-        score_differential > 0 &
-          game_seconds_remaining < 120 &
-          defteam_timeouts_remaining == 0 ~ 0,
-        score_differential > 0 &
-          game_seconds_remaining < 80 &
-          defteam_timeouts_remaining == 1 ~ 0,
-        score_differential > 0 &
-          game_seconds_remaining < 40 &
-          defteam_timeouts_remaining == 2 ~ 0,
-        TRUE ~ vegas_wp
-      )
-    )
+  pbp$defteam_timeouts_remaining <- ifelse(
+    pbp$posteam == pbp$home_team,
+    pbp$away_timeouts_remaining,
+    pbp$home_timeouts_remaining
+  )
+  sd <- pbp$score_differential
+  g <- pbp$game_seconds_remaining
+  dto <- pbp$defteam_timeouts_remaining
+  pbp$vegas_wp <- case_when(
+    pbp$qtr > 4 ~ pbp$vegas_wp,
+    sd > 0 & g < 120 & dto == 0 ~ 0,
+    sd > 0 & g < 80 & dto == 1 ~ 0,
+    sd > 0 & g < 40 & dto == 2 ~ 0,
+    TRUE ~ pbp$vegas_wp
+  )
+  pbp
 }
 
 
@@ -487,7 +465,8 @@ decision_cols <- c(
 # columns they read (nflfastR play-by-play has hundreds more), and the results
 # are attached to the full rows at the end
 add_probs <- function(df) {
-  out <- df[, names(df) %in% decision_cols, drop = FALSE] |>
+  # a plain data.frame: tibble's checks on every column assignment add up
+  out <- as.data.frame(df[, names(df) %in% decision_cols, drop = FALSE]) |>
     get_go_wp() |>
     get_fg_wp() |>
     get_punt_wp()

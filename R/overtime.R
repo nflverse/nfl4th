@@ -45,46 +45,41 @@ ot_win_probability <- function(x, w) {
 # trails in the second possession loses, and the other team's possession
 # number goes up.
 ot_change_possession <- function(df) {
-  df |>
-    mutate(
-      ot_end = dplyr::if_else(
-        qtr > 4 &
-          ot_rule != "SD" &
-          ot_possession == 2 &
-          score_differential < 0,
-        0,
-        ot_end
-      ),
-      ot_possession = dplyr::case_when(
-        qtr <= 4 ~ ot_possession,
-        ot_rule == "SD" ~ 3,
-        TRUE ~ pmin(ot_possession + 1, 3)
-      )
-    )
+  df$ot_end <- dplyr::if_else(
+    df$qtr > 4 &
+      df$ot_rule != "SD" &
+      df$ot_possession == 2 &
+      df$score_differential < 0,
+    0,
+    df$ot_end
+  )
+  df$ot_possession <- dplyr::case_when(
+    df$qtr <= 4 ~ df$ot_possession,
+    df$ot_rule == "SD" ~ 3,
+    TRUE ~ pmin(df$ot_possession + 1, 3)
+  )
+  df
 }
 
 # The team with the ball makes a field goal. Call this before the possession is
 # flipped (`score_differential` is still the kicking team's, before the kick).
 ot_field_goal <- function(df) {
-  df |>
-    mutate(
-      .d2 = score_differential + 3,
-      ot_end = dplyr::case_when(
-        qtr <= 4 ~ ot_end,
-        ot_rule == "SD" | ot_possession >= 3 ~ 1,
-        ot_possession == 2 & .d2 > 0 ~ 1,
-        ot_possession == 2 & .d2 < 0 ~ 0,
-        TRUE ~ ot_end
-      ),
-      # the other team receives: the second possession after a first
-      # possession score, sudden death after a tying score
-      ot_possession = dplyr::case_when(
-        qtr <= 4 ~ ot_possession,
-        ot_possession == 1 ~ 2,
-        TRUE ~ 3
-      )
-    ) |>
-    select(-".d2")
+  d2 <- df$score_differential + 3
+  df$ot_end <- dplyr::case_when(
+    df$qtr <= 4 ~ df$ot_end,
+    df$ot_rule == "SD" | df$ot_possession >= 3 ~ 1,
+    df$ot_possession == 2 & d2 > 0 ~ 1,
+    df$ot_possession == 2 & d2 < 0 ~ 0,
+    TRUE ~ df$ot_end
+  )
+  # the other team receives: the second possession after a first possession
+  # score, sudden death after a tying score
+  df$ot_possession <- dplyr::case_when(
+    df$qtr <= 4 ~ df$ot_possession,
+    df$ot_possession == 1 ~ 2,
+    TRUE ~ 3
+  )
+  df
 }
 
 # The team with the ball scored a touchdown (`score_differential` includes the
@@ -92,25 +87,22 @@ ot_field_goal <- function(df) {
 # flipped. A touchdown ends the game in sudden death, on the first possession
 # under modified sudden death and on any later possession if it takes the lead.
 ot_touchdown <- function(df, pts) {
-  df |>
-    mutate(
-      .final = score_differential + pts,
-      ot_end = dplyr::case_when(
-        qtr <= 4 ~ ot_end,
-        ot_rule == "SD" | ot_possession >= 3 ~ 1,
-        ot_rule == "MSD" & ot_possession == 1 ~ 1,
-        ot_possession == 2 & score_differential > 0 ~ 1,
-        ot_possession == 2 & .final > 0 ~ 1,
-        ot_possession == 2 & .final < 0 ~ 0,
-        TRUE ~ ot_end
-      ),
-      ot_possession = dplyr::case_when(
-        qtr <= 4 ~ ot_possession,
-        ot_possession == 1 ~ 2,
-        TRUE ~ 3
-      )
-    ) |>
-    select(-dplyr::starts_with("."))
+  final <- df$score_differential + pts
+  df$ot_end <- dplyr::case_when(
+    df$qtr <= 4 ~ df$ot_end,
+    df$ot_rule == "SD" | df$ot_possession >= 3 ~ 1,
+    df$ot_rule == "MSD" & df$ot_possession == 1 ~ 1,
+    df$ot_possession == 2 & df$score_differential > 0 ~ 1,
+    df$ot_possession == 2 & final > 0 ~ 1,
+    df$ot_possession == 2 & final < 0 ~ 0,
+    TRUE ~ df$ot_end
+  )
+  df$ot_possession <- dplyr::case_when(
+    df$qtr <= 4 ~ df$ot_possession,
+    df$ot_possession == 1 ~ 2,
+    TRUE ~ 3
+  )
+  df
 }
 
 # Possession number in overtime from play-by-play data (sorted by game and

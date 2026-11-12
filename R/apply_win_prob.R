@@ -527,8 +527,11 @@ drop.me <- c("vegas_wp", "vegas_home_wp", "ep")
 # WP (again for `original_posteam`) of states where the overtime rules end the
 # game.
 calculate_win_probability <- function(pbp_data) {
-  pbp_data <- pbp_data |> dplyr::select(-dplyr::any_of(drop.me))
-  pbp_data <- pbp_data |> dplyr::select(-ends_with("_prob"))
+  # (tidyselect's ends_with() ignores case)
+  drop <- names(pbp_data) %in%
+    drop.me |
+    grepl("_prob$", names(pbp_data), ignore.case = TRUE)
+  pbp_data <- pbp_data[, !drop, drop = FALSE]
   if (nrow(pbp_data) == 0) {
     pbp_data$vegas_wp <- numeric(0)
     return(pbp_data)
@@ -559,28 +562,27 @@ calculate_win_probability <- function(pbp_data) {
 # columns the win probability models need, from the point of view of the team
 # with the ball
 wp_inputs <- function(pbp_data) {
-  pbp_data |>
-    dplyr::mutate(
-      home = as.numeric(posteam == home_team),
-      posteam_spread = dplyr::if_else(home == 1, spread_line, -spread_line),
-      receive_2h_ko = dplyr::case_when(
-        # 1st half, home team opened game with kickoff, away team has ball
-        qtr <= 2 & home_opening_kickoff == 1 & posteam == away_team ~ 1,
-        # 1st half, away team opened game with kickoff, home team has ball
-        qtr <= 2 & home_opening_kickoff == 0 & posteam == home_team ~ 1,
-        TRUE ~ 0
-      ),
-      posteam_timeouts_remaining = dplyr::if_else(
-        home == 1,
-        home_timeouts_remaining,
-        away_timeouts_remaining
-      ),
-      defteam_timeouts_remaining = dplyr::if_else(
-        home == 1,
-        away_timeouts_remaining,
-        home_timeouts_remaining
-      )
-    )
+  x <- pbp_data
+  x$home <- as.numeric(x$posteam == x$home_team)
+  x$posteam_spread <- dplyr::if_else(x$home == 1, x$spread_line, -x$spread_line)
+  x$receive_2h_ko <- dplyr::case_when(
+    # 1st half, home team opened game with kickoff, away team has ball
+    x$qtr <= 2 & x$home_opening_kickoff == 1 & x$posteam == x$away_team ~ 1,
+    # 1st half, away team opened game with kickoff, home team has ball
+    x$qtr <= 2 & x$home_opening_kickoff == 0 & x$posteam == x$home_team ~ 1,
+    TRUE ~ 0
+  )
+  x$posteam_timeouts_remaining <- dplyr::if_else(
+    x$home == 1,
+    x$home_timeouts_remaining,
+    x$away_timeouts_remaining
+  )
+  x$defteam_timeouts_remaining <- dplyr::if_else(
+    x$home == 1,
+    x$away_timeouts_remaining,
+    x$home_timeouts_remaining
+  )
+  x
 }
 
 # nflfastR's win probability for the team with the ball: vegas_wp in
