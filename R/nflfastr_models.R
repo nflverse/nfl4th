@@ -1,4 +1,4 @@
-# Copied from nflfastR (nflverse/nflfastR#625 at 1b2d772e, MIT license, the same authors):
+# Copied from nflfastR (nflverse/nflfastR#625 at 856232ab, MIT license, the same authors):
 # the parts nfl4th uses, so nfl4th doesn't depend on nflfastR.
 #   - vegas_wp (regulation): the go for it model's late flag uses the WP of the
 #     4th down state
@@ -1189,6 +1189,13 @@ wp_ot_start <- function(x) {
 }
 
 # ---- from nflfastR helper_add_vegas_wp.R
+# seconds before the end of regulation over which a tied game's WP moves to its
+# value at 0:00. In season grouped CV (tied, last 2:00 of Q4, out of fold) this
+# lowers log loss by 0.0006 (se 0.0005), 0.004 in the last 5 seconds; 20
+# seconds was level with 10, 30 worse (the team can still score).
+wp_tie_t <- 10
+
+# ---- from nflfastR helper_add_vegas_wp.R
 # seconds left after a kick at the end of the game below which the field goal
 # value moves toward the final result (the model gets the last seconds of a
 # game wrong: it gives a team down 1-3 in its own half 7% with 5 seconds left,
@@ -1264,8 +1271,23 @@ wp_vegas_predict <- function(x, model = wp_vegas_model, dt = 6) {
     model
   )
   w <- r[[1]]
+  fgv <- if (length(fl) > 0) wp_fg_combine(xf, r[[2]], r[[3]]) else numeric(0)
+  # Tied at the end of regulation, WP moves over the last wp_tie_t seconds to
+  # the value of the best option left at 0:00: a field goal in range (a miss
+  # goes to overtime), otherwise the overtime kickoff before the coin toss.
+  # There the line counts again, which the trees don't see (its weight fades
+  # to 0 at 0:00).
+  tie <- which(ok & x$score_differential %in% 0 & g >= 0 & g < wp_tie_t)
+  if (length(tie) > 0) {
+    end <- wp_ot_start(x[tie, , drop = FALSE])
+    k <- match(tie, fl)
+    kick <- which(!is.na(k))
+    end[kick] <- pmax(end[kick], fgv[k[kick]], na.rm = TRUE)
+    a <- g[tie] / wp_tie_t
+    w[tie] <- a * w[tie] + (1 - a) * end
+  }
   if (length(fl) > 0) {
-    w[fl] <- pmax(w[fl], wp_fg_combine(xf, r[[2]], r[[3]]), na.rm = TRUE)
+    w[fl] <- pmax(w[fl], fgv, na.rm = TRUE)
   }
   if (length(lc) > 0) {
     wt <- pmin(pmax((30 - g[lc]) / 20, 0), 1) *
