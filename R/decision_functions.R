@@ -4,82 +4,82 @@
 # punts
 get_punt_wp <- function(pbp) {
   # to join later
-  pbp <- pbp |> mutate(punt_index = 1:n())
+  pbp$punt_index <- seq_len(nrow(pbp))
 
   # get wp associated with punt: punt_df (data-raw/_punt_model.R) has the
   # probability of each outcome by line of scrimmage. Spots at the opponent's
-  # 30 or closer aren't in it and get no punt WP
-  probs <- pbp |>
-    inner_join(punt_df, by = "yardline_100") |>
-    mutate(.ot_possession = ot_possession) |>
-    flip_team() |>
-    mutate(
-      # overtime: a muffed punt recovered by the punting team keeps its
-      # possession going, a return touchdown ends the game
-      ot_possession = dplyr::if_else(
-        muff %in% 1,
-        .ot_possession,
-        ot_possession
-      ),
-      ot_end = dplyr::case_when(
-        qtr > 4 & yardline_after %in% 100 ~ 0,
-        muff %in% 1 ~ NA_real_,
-        TRUE ~ ot_end
-      ),
+  # 30 or closer aren't in it and get no punt WP. Every outcome of a play is a
+  # row (an inner join on the line of scrimmage)
+  key <- vctrs::vec_cast_common(pbp$yardline_100, punt_df$yardline_100)
+  m <- vctrs::vec_locate_matches(key[[1]], key[[2]], no_match = "drop")
+  probs <- pbp[m$needles, , drop = FALSE]
+  probs$yardline_100 <- key[[1]][m$needles]
+  for (n in setdiff(names(punt_df), "yardline_100")) {
+    probs[[n]] <- punt_df[[n]][m$haystack]
+  }
+  probs$.ot_possession <- probs$ot_possession
+  probs <- flip_team(probs)
 
-      yardline_100 = 100 - yardline_after,
+  # overtime: a muffed punt recovered by the punting team keeps its
+  # possession going, a return touchdown ends the game
+  probs$ot_possession <- dplyr::if_else(
+    probs$muff %in% 1,
+    probs$.ot_possession,
+    probs$ot_possession
+  )
+  probs$ot_end <- dplyr::case_when(
+    probs$qtr > 4 & probs$yardline_after %in% 100 ~ 0,
+    probs$muff %in% 1 ~ NA_real_,
+    TRUE ~ probs$ot_end
+  )
+  probs$yardline_100 <- 100 - probs$yardline_after
 
-      # deal with punt return TD (yardline_after == 100) or muff (muff == 1)
-      # we want punting team to be receiving a kickoff so have to flip
-      # everything back
-      posteam = case_when(
-        (yardline_after == 100 | muff == 1) &
-          original_posteam == away_team ~ away_team,
-        (yardline_after == 100 | muff == 1) &
-          original_posteam == home_team ~ home_team,
-        TRUE ~ posteam
-      ),
+  # deal with punt return TD (yardline_after == 100) or muff (muff == 1)
+  # we want punting team to be receiving a kickoff so have to flip
+  # everything back
+  td_or_muff <- probs$yardline_after == 100 | probs$muff == 1
+  probs$posteam <- case_when(
+    td_or_muff & probs$original_posteam == probs$away_team ~ probs$away_team,
+    td_or_muff & probs$original_posteam == probs$home_team ~ probs$home_team,
+    TRUE ~ probs$posteam
+  )
 
-      # muff / return TD stuff
-      yardline_100 = ifelse(
-        muff == 1,
-        as.integer(100 - yardline_100),
-        yardline_100
-      ),
-      yardline_100 = ifelse(
-        yardline_after == 100,
-        kickoff_yardline(season),
-        as.integer(yardline_100)
-      ),
+  # muff / return TD stuff
+  probs$yardline_100 <- ifelse(
+    probs$muff == 1,
+    as.integer(100 - probs$yardline_100),
+    probs$yardline_100
+  )
+  probs$yardline_100 <- ifelse(
+    probs$yardline_after == 100,
+    kickoff_yardline(probs$season),
+    as.integer(probs$yardline_100)
+  )
+  probs$score_differential <- if_else(
+    probs$yardline_after == 100,
+    as.integer(-probs$score_differential - 7),
+    as.integer(probs$score_differential)
+  )
+  probs$score_differential <- if_else(
+    probs$muff == 1,
+    as.integer(-probs$score_differential),
+    as.integer(probs$score_differential)
+  )
+  probs$ydstogo <- ifelse(
+    probs$yardline_100 < 10,
+    probs$yardline_100,
+    as.integer(probs$ydstogo)
+  )
+  probs$.ot_possession <- NULL
 
-      # muff / return TD stuff
-      score_differential = if_else(
-        yardline_after == 100,
-        as.integer(-score_differential - 7),
-        as.integer(score_differential)
-      ),
-      score_differential = if_else(
-        muff == 1,
-        as.integer(-score_differential),
-        as.integer(score_differential)
-      ),
-
-      ydstogo = ifelse(yardline_100 < 10, yardline_100, as.integer(ydstogo))
-    ) |>
-    select(-".ot_possession") |>
-    flip_half() |>
-    calculate_win_probability() |>
-    end_game_fn() |>
-    mutate(
-      wt_wp = pct * vegas_wp
-    ) |>
-    group_by(punt_index) |>
-    summarize(punt_wp = sum(wt_wp)) |>
-    ungroup()
-
-  pbp |>
-    left_join(probs, by = "punt_index") |>
-    select(-punt_index)
+  probs <- end_game_fn(calculate_win_probability(flip_half(probs)))
+  # the outcomes' WP weighted by their probability, summed by play in row
+  # order (as summarize() does)
+  wt_wp <- probs$pct * probs$vegas_wp
+  s <- vapply(split(wt_wp, probs$punt_index), sum, numeric(1))
+  pbp$punt_wp <- unname(s[match(pbp$punt_index, as.integer(names(s)))])
+  pbp$punt_index <- NULL
+  pbp
 }
 
 # field goals
@@ -89,66 +89,42 @@ get_fg_wp <- function(pbp) {
   # that only teams who trust their kicker attempt long field goals, so the
   # raw model curve is too generous past about 52 yards. It also fades to zero
   # from 65 to 75 yards. There is therefore no decay to apply here.
-  fg_prob <- pbp |>
-    dplyr::transmute(
-      yardline_100 = as.integer(yardline_100),
-      fg_model_roof = as.character(fg_model_roof)
-    ) |>
-    dplyr::left_join(
-      fg_prob_df |> dplyr::mutate(fg_model_roof = as.character(fg_model_roof)),
-      by = c("yardline_100", "fg_model_roof")
-    ) |>
-    dplyr::select(fg_make_prob)
-
-  dat <- bind_cols(
-    pbp,
-    fg_prob
-  ) |>
-    mutate(
-      fg_index = 1:n()
+  i <- vctrs::vec_match(
+    data.frame(
+      yardline_100 = as.integer(pbp$yardline_100),
+      fg_model_roof = as.character(pbp$fg_model_roof)
+    ),
+    data.frame(
+      yardline_100 = fg_prob_df$yardline_100,
+      fg_model_roof = as.character(fg_prob_df$fg_model_roof)
     )
+  )
+  dat <- pbp
+  dat$fg_make_prob <- fg_prob_df$fg_make_prob[i]
 
   # win prob after receiving kickoff for touchback and other team has 3 more
-  # points
-  make_df <- dat |>
-
-    # win prob after receiving kickoff for touchback and other team has 3 more
-    # points. In overtime the rules decide whether the game goes on
-    ot_field_goal() |>
-    flip_team(ot_stop = FALSE) |>
-    mutate(
-      yardline_100 = kickoff_yardline(season),
-      score_differential = score_differential - 3
-    ) |>
-
-    # for end of 1st half stuff
-    flip_half() |>
-    calculate_win_probability() |>
-    end_game_fn() |>
-    select(fg_index, make_fg_wp = vegas_wp)
+  # points. In overtime the rules decide whether the game goes on
+  make <- flip_team(ot_field_goal(dat), ot_stop = FALSE)
+  make$yardline_100 <- kickoff_yardline(make$season)
+  make$score_differential <- make$score_differential - 3
+  # (flip_half() for end of 1st half stuff)
+  make <- end_game_fn(calculate_win_probability(flip_half(make)))
 
   # win prob after missed FG
-  miss_df <- dat |>
-    flip_team() |>
-    mutate(
-      yardline_100 = (100 - yardline_100) - 8,
-      # yardline_100 can't be bigger than 80 due to some weird nfl rule
-      yardline_100 = if_else(yardline_100 > 80, 80, yardline_100),
-      yardline_100 = ifelse(yardline_100 < 1, 1, yardline_100)
-    ) |>
-    # for end of 1st half stuff
-    flip_half() |>
-    calculate_win_probability() |>
-    end_game_fn() |>
-    select(fg_index, miss_fg_wp = vegas_wp)
+  miss <- flip_team(dat)
+  yl <- (100 - miss$yardline_100) - 8
+  # yardline_100 can't be bigger than 80 due to some weird nfl rule
+  yl <- if_else(yl > 80, 80, yl)
+  miss$yardline_100 <- ifelse(yl < 1, 1, yl)
+  miss <- end_game_fn(calculate_win_probability(flip_half(miss)))
 
-  dat |>
-    left_join(make_df, by = "fg_index") |>
-    left_join(miss_df, by = "fg_index") |>
-    mutate(
-      fg_wp = fg_make_prob * make_fg_wp + (1 - fg_make_prob) * miss_fg_wp
-    ) |>
-    select(-fg_index)
+  # both keep the rows of dat in order
+  dat$make_fg_wp <- make$vegas_wp
+  dat$miss_fg_wp <- miss$vegas_wp
+  dat$fg_wp <- dat$fg_make_prob *
+    dat$make_fg_wp +
+    (1 - dat$fg_make_prob) * dat$miss_fg_wp
+  dat
 }
 
 # function to get WPs for go for 1 or go for 2
