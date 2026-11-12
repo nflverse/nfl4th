@@ -34,12 +34,17 @@ fd_is_late <- function(qtr, score_differential, game_seconds_remaining, wp) {
 # the 4th down state (the model is fit with vegas_wp; nfl4th's own WP model
 # only values 1st downs)
 fd_late <- function(pbp) {
-  fd_is_late(
-    pbp$qtr,
-    pbp$score_differential,
-    pbp$game_seconds_remaining,
-    fastr_win_probability(pbp)
-  )
+  # a play trailing in the last 10 minutes is late whatever its win
+  # probability, so the WP is only computed for the others
+  trailing_late <- pbp$qtr >= 4 &
+    pbp$score_differential < 0 &
+    pbp$game_seconds_remaining <= 600
+  wp <- rep(NA_real_, nrow(pbp))
+  need <- which(!(trailing_late %in% TRUE))
+  if (length(need) > 0) {
+    wp[need] <- fastr_win_probability(pbp[need, , drop = FALSE])
+  }
+  fd_is_late(pbp$qtr, pbp$score_differential, pbp$game_seconds_remaining, wp)
 }
 
 # Long data frame of gain probabilities for the plays in `x` (needs ydstogo,
