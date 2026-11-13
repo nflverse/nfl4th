@@ -216,10 +216,14 @@ wpfd_load_booster <- function(model) {
   )
 }
 
-# xgboost changed `iterationrange` from a half open [start, end) range (1.x) to
-# an inclusive one (3.x). Find out which one the installed version uses by
-# comparing the first n_trees rounds with the full model (they are the same
-# model only if the range is inclusive).
+# xgboost's `iterationrange` is a half open range, [start, end), in 1.x and an
+# inclusive one in 3.x. On CRAN the switch falls between 1.7.11.1 and 3.1.2.1
+# (2.x was only released on GitHub, and xgboost's changelogs don't mention
+# it), and nfl4th works with both: xgboost 3.x needs R 4.3, nfl4th R 4.1.
+# Rather than guess from the version, ask the installed xgboost, once per
+# session. 1.x reads c(1, 1) as every tree and 3.x as the first tree only, so
+# predicting with c(1, 1) reproduces the full model (1,500 trees) only under
+# 1.x.
 wpfd_inclusive_range <- function(booster, model = active_wp_model()) {
   if (is.null(wpfd_cache$inclusive)) {
     k <- model$constants
@@ -236,15 +240,15 @@ wpfd_inclusive_range <- function(booster, model = active_wp_model()) {
     )
     dm <- xgboost::xgb.DMatrix(wpfd_tree_matrix(x, k))
     full <- stats::predict(booster, dm, outputmargin = TRUE)
-    upto <- stats::predict(
+    first <- stats::predict(
       booster,
       dm,
       outputmargin = TRUE,
-      iterationrange = c(1L, k$n_trees)
+      iterationrange = c(1L, 1L)
     )
-    wpfd_cache$inclusive <- isTRUE(all.equal(
+    wpfd_cache$inclusive <- !isTRUE(all.equal(
       as.numeric(full),
-      as.numeric(upto)
+      as.numeric(first)
     ))
   }
   wpfd_cache$inclusive

@@ -178,6 +178,11 @@ test_that("win probability is at least the value of kicking a field goal", {
 test_that("the xgboost iteration range convention is detected", {
   b <- wpfd_booster()
   expect_type(wpfd_inclusive_range(b), "logical")
+  # CRAN releases: half open through 1.7.11.1, inclusive from 3.1.2.1
+  expect_identical(
+    wpfd_inclusive_range(b),
+    utils::packageVersion("xgboost") >= "3.0.0"
+  )
   # with the detected convention, all trees reproduce the full model
   X <- wpfd_tree_matrix(wp_state(), wp_first_down_model$constants)
   n <- wp_first_down_model$constants$n_trees
