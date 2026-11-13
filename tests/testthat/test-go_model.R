@@ -94,14 +94,15 @@ test_that("the spread matters less on 4th and long", {
 })
 
 test_that("late and desperate 4th and long converts more often than normal", {
-  # 2001-2026 4th and 8-10: 38.2% late or desperate, 28.7% otherwise
+  # 2001-2026, not goal to go: 4th and 8-10 36.1% late or desperate, 27.8%
+  # otherwise; 4th and 1 64.2% and 70.7%
   x <- fd_play(ydstogo = c(1, 10), yardline_100 = 50)
   normal <- gp_summary(x)$conv
   late <- gp_summary(x, late = TRUE)$conv
   expect_gt(normal[1], 0.65)
   expect_lt(normal[2], 0.33)
   expect_gt(late[2], normal[2] + 0.07)
-  expect_lt(abs(late[1] - normal[1]), 0.05)
+  expect_lt(abs(late[1] - normal[1]), 0.07)
 })
 
 test_that("late means trailing late in the game or a low WP", {
@@ -113,6 +114,24 @@ test_that("late means trailing late in the game or a low WP", {
     wp = c(0.4, 0.9, 0.4, 0.6, 0.5, 0.4, 0.1, NA)
   )
   expect_equal(late, c(TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE))
+})
+
+test_that("the late flag's WP comes from nfl4th's WP model", {
+  skip_on_cran()
+  skip_if_offline()
+  # the 3rd quarter, down 21 or tied: only the WP can make it late
+  s <- prepare_df(play)[c(1, 1), ]
+  s$qtr <- 3
+  s$game_seconds_remaining <- s$half_seconds_remaining <- 1500
+  s$score_differential <- c(-21, 0)
+  w <- wpfd_predict(wp_inputs(s))
+  expect_true(w[1] < fd_late_wp && w[2] > fd_late_wp)
+  expect_identical(fd_late(s), c(TRUE, FALSE))
+  # in overtime only the clock part applies: trailing is late, tied isn't
+  s$qtr <- 5
+  s$game_seconds_remaining <- s$half_seconds_remaining <- 400
+  s$score_differential <- c(-3, 0)
+  expect_identical(fd_late(s), c(TRUE, FALSE))
 })
 
 test_that("2 point tries are a 4th and goal from the 2 in the latest era", {

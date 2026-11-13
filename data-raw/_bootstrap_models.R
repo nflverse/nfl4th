@@ -21,7 +21,7 @@
 # checks that draw 1 is the shipped fit, so rebuilding the models means
 # rebuilding the draws under a new name. Needs the nflfastR that repairs the
 # broken games (see data-raw/repair_games.R). Run from the package root; about
-# 25 seconds per draw.
+# 35 seconds per draw.
 
 library(dplyr)
 library(mgcv)
@@ -81,7 +81,11 @@ for (b in 2:n_draws) {
   drawn <- sample(games, length(games), replace = TRUE)
   t0 <- proc.time()[["elapsed"]]
   wp <- wp_fit(take(wp_rows, idx_wp, drawn))
-  fd <- fd_tabulate(fd_fit(take(go_rows, idx_go, drawn)))
+  # the go for it model's late flag uses this draw's WP model, as the shipped
+  # fit uses the shipped one
+  go_b <- take(go_rows, idx_go, drawn)
+  go_b$late_wp <- fd_state_wp(go_b, wp)
+  fd <- fd_tabulate(fd_fit(go_b))
   saveRDS(list(wp = wp, fd = fd, games = drawn), f)
   cat(sprintf(
     "draw %d: %d distinct games, %.0f s\n",

@@ -40,9 +40,9 @@
 
 library(dplyr)
 library(mgcv)
-# get_fd_era() is shared with the prediction code
-source("R/helpers.R")
-source("R/go_model.R")
+# get_fd_era(), fd_is_late() and nfl4th's WP model (for the late flag) are
+# shared with the prediction code
+pkgload::load_all(".", quiet = TRUE)
 
 fd_t_max <- 30L # distances beyond this use 30
 fd_r_max <- 40L # room past the line to gain beyond this uses 40
@@ -182,15 +182,15 @@ fd_spread_vars <- function(d) {
   d
 }
 
-# Late and desperate situations (see fd_is_late() in R/go_model.R; here with the
-# play's vegas_wp). Most 4th and long attempts come late in a game the offense
+# Late and desperate situations (see fd_is_late() in R/go_model.R; here with
+# nfl4th's WP of the play's state, column late_wp, see fd_state_wp()). Most 4th and long attempts come late in a game the offense
 # is losing (2015-2026, 4th and 8-10: 527 of 665 in the last 10 minutes of the
 # 4th quarter while trailing), against defenses that give up more underneath,
 # and they convert more often than 4th and long in a normal situation
-# (2001-2026: 36.1% vs 27.6% at 8-10 yards, 23.3% vs 17.5% at 11+). With one
+# (2001-2026: 36.1% vs 27.8% at 8-10 yards, 23.0% vs 20.8% at 11+). With one
 # curve for both, normal 4th and long was predicted at the late rate (season
-# grouped CV, not goal to go: 8-10 35.8% vs 27.6% actual, z -2.5; 11+ 23.3% vs
-# 17.5%, z -1.8). Late 3rd downs get a constant and late 4th downs a smooth in
+# grouped CV, not goal to go, with the earlier flag from nflfastR's WP: 8-10
+# 35.8% vs 27.6% actual, z -2.5; 11+ 23.3% vs 17.5%, z -1.8). Late 3rd downs get a constant and late 4th downs a smooth in
 # distance, and the tables carry the late 4th down shift by distance, which
 # predictions add for late plays. In the same CV both normal and late 4th downs
 # are then calibrated at every distance (|z| <= 1.0) and log loss on 4th downs
@@ -202,11 +202,38 @@ fd_late_vars <- function(d) {
     d$qtr,
     d$score_differential,
     d$game_seconds_remaining,
-    d$vegas_wp
+    d$late_wp
   )
   d$late3 <- as.numeric(late & d$f4 == "0")
   d$late4 <- as.numeric(late & d$f4 == "1")
   d
+}
+
+# nfl4th's WP model's value of each play's state, for the late flag: the same
+# inputs as the prediction code's wp_inputs(), regulation only (in overtime
+# only the clock part of the flag applies). `model` is the WP model, the
+# shipped fit or a bootstrap draw's.
+fd_state_wp <- function(d, model = wp_first_down_model) {
+  x <- as.data.frame(d)
+  x$home <- as.numeric(x$posteam == x$home_team)
+  x$type <- if_else(tolower(x$season_type) == "reg", "reg", "post")
+  x$posteam_spread <- if_else(x$home == 1, x$spread_line, -x$spread_line)
+  x$receive_2h_ko <- case_when(
+    x$qtr <= 2 & x$home_opening_kickoff == 1 & x$posteam == x$away_team ~ 1,
+    x$qtr <= 2 & x$home_opening_kickoff == 0 & x$posteam == x$home_team ~ 1,
+    TRUE ~ 0
+  )
+  wp <- rep(NA_real_, nrow(x))
+  reg <- which(
+    x$qtr <= 4 &
+      !is.na(x$posteam_timeouts_remaining) &
+      !is.na(x$defteam_timeouts_remaining) &
+      !is.na(x$game_seconds_remaining)
+  )
+  if (length(reg) > 0) {
+    wp[reg] <- wpfd_predict(x[reg, , drop = FALSE], wpfd_cached(model))
+  }
+  wp
 }
 
 fd_fit <- function(tr, nthreads = parallel::detectCores()) {
@@ -455,11 +482,17 @@ fd_cols <- c(
   "fumble_lost",
   "air_yards",
   "return_yards",
-  # game situation, for the late terms (see fd_late_vars())
+  # game situation, for the late terms (see fd_late_vars() and fd_state_wp())
   "qtr",
   "game_seconds_remaining",
+  "half_seconds_remaining",
   "score_differential",
-  "vegas_wp",
+  "away_team",
+  "home_opening_kickoff",
+  "season_type",
+  "posteam_timeouts_remaining",
+  "defteam_timeouts_remaining",
+  "roof",
   # to find games with a broken running score (see data-raw/repair_games.R)
   "game_id",
   "home_score",
@@ -474,11 +507,12 @@ if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
     \(s) nflreadr::load_pbp(s) |> select(all_of(fd_cols))
   ) |>
     bind_rows()
-  # the 2001-2002 JAX home games and 2011_13_DET_NO have the wrong score (and
-  # vegas_wp) in the released data, which the late terms use
+  # the 2001-2002 JAX home games and 2011_13_DET_NO have the wrong score in
+  # the released data, which the late terms use
   source("data-raw/repair_games.R")
   pbp <- repair_broken_games(pbp)
   model_data <- fd_model_data(pbp)
+  model_data$late_wp <- fd_state_wp(model_data)
   cat(
     "training rows:",
     nrow(model_data),
@@ -501,7 +535,7 @@ if (!isTRUE(get0("FD_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
     list = ls(e),
     file = "R/sysdata.rda",
     envir = e,
-    compress = "bzip2",
+    compress = "xz",
     version = 2
   )
   e2 <- new.env()

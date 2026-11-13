@@ -614,7 +614,7 @@ decision_state_wp <- function(pbp_data) {
   }
   if (any(ot)) {
     xo <- x[ot, , drop = FALSE]
-    wp[ot] <- ot_win_probability(xo, fastr_wp(xo))
+    wp[ot] <- ot_win_probability(xo, fastr_ot_wp(xo))
   }
 
   # from the point of view of the team with the 4th down decision
@@ -644,9 +644,9 @@ wp_inputs <- function(pbp_data) {
   x
 }
 
-# nflfastR's win probability for the team with the ball: vegas_wp in
-# regulation, the overtime model in overtime. `x` comes from wp_inputs()
-fastr_wp <- function(x) {
+# nflfastR's overtime model's win probability for the team with the ball, for
+# overtime states. `x` comes from wp_inputs()
+fastr_ot_wp <- function(x) {
   d <- data.frame(
     receive_2h_ko = x$receive_2h_ko,
     home_team = x$home_team,
@@ -668,20 +668,20 @@ fastr_wp <- function(x) {
     stringsAsFactors = FALSE
   )
   if (nrow(d) < 2L) {
-    return(fastr_vegas_wp(d))
+    return(fastr_ot_vegas_wp(d))
   }
   # each distinct state once: the states behind a set of decisions repeat, and
   # the overtime model is slow per row
   id <- vctrs::vec_group_id(d)
   first <- which(!duplicated(id))
-  fastr_vegas_wp(d[first, , drop = FALSE])[id]
+  fastr_ot_vegas_wp(d[first, , drop = FALSE])[id]
 }
 
-# What nflfastR::calculate_win_probability() returns as vegas_wp, with the code
-# copied from nflfastR (R/nflfastr_models.R): its regulation model, and its
-# overtime model for overtime rows. nflfastR also computes `wp` (an older
-# model without the spread), which nfl4th doesn't use.
-fastr_vegas_wp <- function(pbp_data) {
+# What nflfastR::calculate_win_probability() returns as vegas_wp for overtime
+# rows, with the code copied from nflfastR (R/nflfastr_models.R). nflfastR also
+# computes `wp` (an older model without the spread), which nfl4th doesn't use.
+# Regulation rows are NA: nfl4th values them with its own model.
+fastr_ot_vegas_wp <- function(pbp_data) {
   model_data <- pbp_data
   model_data$home <- if_else(
     model_data$posteam == model_data$home_team,
@@ -698,20 +698,10 @@ fastr_vegas_wp <- function(pbp_data) {
     exp(-4 * model_data$elapsed_share)
   model_data$Diff_Time_Ratio <- model_data$score_differential /
     (exp(-4 * model_data$elapsed_share))
-  w <- get_preds_wp_spread(model_data)
+  w <- rep(NA_real_, nrow(pbp_data))
   ot <- calculate_ot_win_probability(pbp_data, model_data, wp = FALSE)
   if (!is.null(ot)) {
     w[ot$i] <- ot$vegas_wp
   }
   w
-}
-
-# nflfastR's win probability of the states in `pbp_data` for the team with the
-# ball (vegas_wp in regulation), for the late flag of the go for it model (see
-# fd_late())
-fastr_win_probability <- function(pbp_data) {
-  if (nrow(pbp_data) == 0) {
-    return(numeric(0))
-  }
-  fastr_wp(wp_inputs(pbp_data))
 }

@@ -31,7 +31,7 @@ ot_rule <- function(season, type) {
 }
 
 # WP of the team with the ball in overtime states. `w` is
-# nflfastR's overtime model's vegas_wp for these states (fastr_wp())
+# nflfastR's overtime model's vegas_wp for these states (fastr_ot_wp())
 ot_win_probability <- function(x, w) {
   # a regular season game ends when the clock runs out, a tie is half a win
   over <- x$type %in% "reg" & x$game_seconds_remaining <= 0

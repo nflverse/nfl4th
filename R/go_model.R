@@ -13,26 +13,35 @@
 # distance.
 
 # Late and desperate plays: the last 10 minutes of the 4th quarter (or
-# overtime) while trailing, or a win probability below 15% for the team with the
-# ball. Late 4th and long attempts convert more often than normal ones
-# (2001-2026, not goal to go, 4th and 8-10: 36.1% vs 27.6%; 11+: 23.3% vs
-# 17.5%), against defenses that give up more underneath. The last 2 minutes of
-# the 1st half aren't late: those 4th downs convert like normal ones or worse
-# (4-5 yards: 38.2% vs 46.8% normal and 49.1% late; 8-10: 25.7% vs 27.6% and
-# 36.1%). The go for it model is fit with this flag and
-# data-raw/_go_for_it_model.R uses this function too. Missing values count as
-# not late.
+# overtime) while trailing, or a win probability below fd_late_wp for the team
+# with the ball (nfl4th's WP model, regulation only). Late 4th and long
+# attempts convert more often than normal ones (2001-2026, not goal to go, 4th
+# and 8-10: 36.1% vs 27.8%; 11+: 23.0% vs 20.8%), against defenses that give
+# up more underneath. The last 2 minutes of the 1st half aren't late: those
+# 4th downs convert like normal ones or worse (4-5 yards: 38.6% vs 46.5%
+# normal and 49.6% late; 8-10: 24.3% vs 27.8% and 36.1%). The go for it model
+# is fit with this flag and data-raw/_go_for_it_model.R uses this function
+# too. Missing values count as not late.
 fd_is_late <- function(qtr, score_differential, game_seconds_remaining, wp) {
   coalesce(
     (qtr >= 4 & score_differential < 0 & game_seconds_remaining <= 600) |
-      (!is.na(wp) & wp < 0.15),
+      (!is.na(wp) & wp < fd_late_wp),
     FALSE
   )
 }
 
-# fd_is_late() for prepared 4th down plays, with nflfastR's win probability of
-# the 4th down state (the model is fit with vegas_wp; nfl4th's own WP model
-# only values 1st downs)
+# The WP below which a play is late. nfl4th's WP model has no down or
+# distance, so it values a 4th down state like a 1st down at the same spot,
+# about 4.5 points above nflfastR's WP of the 4th down state, which the flag
+# used before. In season grouped CV of the go for it model's conversion part
+# (2001-2026), thresholds from 0.15 to 0.19 do equally well on 4th downs (log
+# loss within 0.0001), 0.15 the best, and all slightly better than the old flag
+# (nflfastR's WP below 0.15: -0.0002, se 0.00015).
+fd_late_wp <- 0.15
+
+# fd_is_late() for prepared 4th down plays, with nfl4th's WP model's value of
+# the play's state (fd_state_wp(), as in data-raw/_go_for_it_model.R). In a
+# bootstrap draw it is that draw's WP model, as in the draw's fit.
 fd_late <- function(pbp) {
   # a play trailing in the last 10 minutes is late whatever its win
   # probability, so the WP is only computed for the others
@@ -40,9 +49,9 @@ fd_late <- function(pbp) {
     pbp$score_differential < 0 &
     pbp$game_seconds_remaining <= 600
   wp <- rep(NA_real_, nrow(pbp))
-  need <- which(!(trailing_late %in% TRUE))
+  need <- which(!(trailing_late %in% TRUE) & !((pbp$qtr > 4) %in% TRUE))
   if (length(need) > 0) {
-    wp[need] <- fastr_win_probability(pbp[need, , drop = FALSE])
+    wp[need] <- wpfd_predict(wp_inputs(pbp[need, , drop = FALSE]))
   }
   fd_is_late(pbp$qtr, pbp$score_differential, pbp$game_seconds_remaining, wp)
 }
