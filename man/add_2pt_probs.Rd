@@ -10,7 +10,7 @@ add_2pt_probs(df)
 \item{df}{A data frame of decisions to be computed for.}
 }
 \value{
-Original data frame Data frame plus the following columns added:
+The original data frame plus the following columns:
 \describe{
 first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
 \item{wp_0}{Win probability when scoring 0 points on PAT.}

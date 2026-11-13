@@ -11,10 +11,10 @@ add_4th_probs(df, bootstrap = FALSE)
 
 \item{bootstrap}{If \code{TRUE}, also value every play under 100 bootstrap
 versions of nfl4th's win probability and go for it models (see Details).
-The first use downloads them (about 35 MB) to the package cache.}
+The first use downloads them (about 38 MB) to the package cache.}
 }
 \value{
-Original data frame Data frame plus the following columns added:
+The original data frame plus the following columns:
 \describe{
 \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
 \item{first_down_prob}{Probability of earning a first down if going for it on 4th down.}

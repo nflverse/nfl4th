@@ -12,7 +12,7 @@
 #' @param df A data frame of decisions to be computed for.
 #' @param bootstrap If `TRUE`, also value every play under 100 bootstrap
 #'   versions of nfl4th's win probability and go for it models (see Details).
-#'   The first use downloads them (about 35 MB) to the package cache.
+#'   The first use downloads them (about 38 MB) to the package cache.
 #' @details Overtime plays (`qtr > 4`) are valued with the overtime rules of
 #' the game (sudden death, modified sudden death, or both teams getting the
 #' ball) using nflfastR's overtime win probability model. `quarter_seconds_remaining`
@@ -35,7 +35,7 @@
 #' how much a recommendation depends on the particular games the models were
 #' fit on (sampling uncertainty, not every source of model error). The punt and
 #' field goal models are the same in every draw.
-#' @return Original data frame Data frame plus the following columns added:
+#' @return The original data frame plus the following columns:
 #' \describe{
 #' \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
 #' \item{first_down_prob}{Probability of earning a first down if going for it on 4th down.}
@@ -238,7 +238,7 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' to tell which possession it is. Without it, a tied game is assumed to be in
 #' the first possession and a team that trails in the second. `nflfastR` data
 #' doesn't need it, the possessions are counted from the plays.
-#' @return Original data frame Data frame plus the following columns added:
+#' @return The original data frame plus the following columns:
 #' \describe{
 #'  first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
 #' \item{wp_0}{Win probability when scoring 0 points on PAT.}
