@@ -188,6 +188,7 @@ ggplot(fg, aes(distance, 100 * fg_make_prob, color = roof)) +
     "text", x = 62.5, y = 95, hjust = 0, size = 3.5, color = "#52514e",
     label = "Too few kicks to fit:\nthe curve continues,\nthen fades to 0"
   ) +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.8) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Outdoors" = col_1, "Indoors" = col_2)) +
   scale_x_continuous(breaks = seq(20, 75, 5), limits = c(18, 75)) +
