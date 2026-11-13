@@ -24,8 +24,6 @@ knitr::opts_chunk$set(
 library(nfl4th)
 library(ggplot2)
 
-pct <- function(x) sprintf("%.1f%%", 100 * x)
-
 # categorical colors, in a fixed order
 col_1 <- "#2a78d6"
 col_2 <- "#eb6834"
@@ -45,92 +43,82 @@ theme_article <- theme_minimal(base_size = 13) +
 
 ## The short version
 
-On every 4th down, nfl4th estimates the offense's win probability (WP) if it goes for it, kicks a field goal, or punts, and recommends the option with the highest. This page explains how each of those numbers is built. It replaces the [2020 article in The Athletic](https://www.nytimes.com/athletic/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/) that introduced the 4th down bot: every model it describes has since been rebuilt.
+It's 4th & 2 at midfield. Do you go for it, punt, or kick a field goal? nfl4th answers that question the same way every time: it asks which choice gives the offense the best chance to win the game.
 
-The idea hasn't changed. Each option leads to a handful of possible outcomes: a conversion, a failed attempt, a made or missed kick, a punt that lands somewhere. Each outcome is a new game state, and a win probability model says how often teams win from that state. The value of an option is the WP of its outcomes, weighted by how likely each one is.
+Every choice can play out a few different ways. Go for it, and you convert or you don't. Kick, and you make it or miss it. Punt, and the other team gets the ball somewhere, usually deep in its own end. For each of those outcomes, we know roughly how often teams go on to win, because we've watched what happened next in more than 7,000 NFL games. Weight each outcome by how likely it is, add them up, and you have each choice's win probability. The recommendation is whichever is highest.
 
-- **`go_boost`** is the WP of going for it minus the WP of the better kick, in percentage points. Positive means go.
-- **The models** that supply the outcome probabilities are fit on public nflverse play-by-play: the WP model on every 1st down since 1999, the go for it model on 3rd and 4th downs since 2001, and the kicking models on recent seasons.
-- **The bootstrap** refits the two models that drive most calls on 100 resampled histories and reports how often the call holds. It answers "how sure is the model?", which a single WP number can't.
+This page walks through every piece of that. It replaces the [2020 article in The Athletic](https://www.nytimes.com/athletic/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/) that introduced the 4th down bot. The idea is the same, but every model behind it has since been rebuilt.
 
-## Win probability
+Two terms come up a lot:
 
-Every state that follows a 4th down decision is a 1st down: the offense's after a conversion, the other team's after a turnover on downs, a punt or a missed field goal, and the receiving team's after the kickoff that follows a score. So nfl4th's WP model is trained only on 1st downs: every regulation 1st & 10 and 1st & goal since 1999, 416,372 snaps from 7,393 games. Games that went to overtime are included, since a tie at the end of regulation is a real state. Ties are dropped.
+- **Win probability (WP)** is the offense's chance of winning the game, from 0 to 100%.
+- **The go boost** is how much going for it adds to the offense's win probability compared with the better kick, in percentage points. A go boost of +2 means going for it raises the chance of winning by 2 points; −2 means kicking is better by 2.
 
-**What it uses**, all from the offense's point of view:
+## Win probability: what is a game situation worth?
 
-- score differential
-- time left in the game and in the half
-- field position (yards to the end zone)
-- both teams' timeouts
+Everything rests on one question: with this score, this much time left and the ball at this spot, how often does a team win?
+
+After any 4th down decision, the next snap is a 1st down. It's the offense's after a conversion, the other team's after a punt, a missed field goal or a turnover on downs, and the receiving team's after the kickoff that follows a score. So our win probability model is built on 1st downs only: every regulation 1st down since 1999, about 416,000 snaps from 7,393 games.
+
+It knows:
+
+- the score
+- how much time is left in the game and in the half
+- where the ball is
+- how many timeouts each team has
 - the point spread
-- whether the offense is the home team
-- in the 1st half, whether the offense receives the 2nd half kickoff
+- which team is at home
+- in the 1st half, which team gets the ball to start the 2nd half
 
-It doesn't use the over/under, weather, the roof, or anything about the teams beyond the spread. The spread is its only measure of how good the two teams are.
+It doesn't know the weather, whether there's a roof, or anything about the two teams except the point spread. The spread does a lot of work: it's the betting market's estimate of how much better one team is than the other.
 
-**How it's built.** The model follows the recipe of nflfastR's `vegas_wp` model, retuned for 1st downs.
+**How it's built.** The model follows the same recipe as nflfastR's win probability model, retuned for 1st downs.
 
-1. **A baseline from the final margin.** A probit model treats the final margin as the current score plus the spread's share of the time left, plus noise that shrinks as the clock runs, as in Hal Stern's 1994 model of the progress of sports scores. This is where most of the WP comes from early in a game. At the end of a half, possessing the ball is worth only the field goals still in play, so the possession terms fade toward the value of a field goal from the current spot.
-2. **Tree corrections.** xgboost trees are trained on top of the baseline. They are constrained so that more points, a better spread, being closer to the end zone and having more timeouts never lower WP, and the opponent having more timeouts never raises it.
-3. **More trees late.** Early in a game the labels are noisy, so few trees are used (100); in the last minutes the score and clock interact sharply, so many are (1,500). The count changes smoothly with the clock, so WP doesn't jump from one second to the next.
+1. **A starting point from the score and the spread.** Early in a game a 7 point lead isn't worth much, because there's so much football left. With two minutes left it's nearly decisive. A simple statistical model of how scores drift over a game, going back to Hal Stern in 1994, captures most of this. Near the end of a half, having the ball is worth only the field goal it might lead to, and the model accounts for that too.
+2. **Machine learning on top.** A machine learning model (xgboost) learns what the simple model misses. It has guardrails: more points, a better spread, being closer to the end zone and having more timeouts can never lower a team's win probability, and the other team having more timeouts can never raise it. It leans on more detail in the last few minutes, when every second and every yard matter.
+3. **Common sense where the data is thin.**
+    - A team can't be worth more than if it scored a touchdown on this snap, or less than if it kicked a field goal.
+    - A team that's ahead and can kneel out the clock wins.
+    - A team that's behind, deep in its own end, with a few seconds left, loses.
+    - In a tie game at the very end, the team is worth whatever its best last option is: a field goal try, or overtime.
+    - In the last four minutes, win probability is smoothed over a few seconds and a couple of yards, so it doesn't jump around from one snap to the next.
 
-**Rules on top of the model.** A model fit to data can still say impossible things, so a few rules apply:
+**Overtime** uses nflfastR's overtime model, along with whatever overtime rules were in force that season: sudden death, the old rule where a field goal on the first drive gives the other team a chance, or today's rule where both teams get the ball (playoffs since 2022, regular season since 2025). A regular-season overtime that runs out of time ends in a tie, which counts as half a win.
 
-- **Touchdown cap:** with more than 5 minutes left, WP can't be higher than the WP after scoring a touchdown and kicking the PAT on this snap.
-- **Field goal floor:** WP can't be lower than the value of kicking a field goal on this snap.
-- **Kneeling out the clock:** a team ahead that can kneel out the clock wins. The kneel time counts 3 seconds per kneel plus 40 seconds between kneels that the trailing team can't stop with a timeout or the 2 minute warning. WP moves back toward the model 10 to 40 seconds short of that.
-- **Behind late:** a team behind deep in its own half moves to WP 0 over the last 20 seconds.
-- **Tied at the end:** WP moves over the last 10 seconds to the value of the best option left at 0:00, a field goal from this spot or overtime.
-- **Smoothing:** in the last 4 minutes WP is averaged over 16 seconds and 2 yards either side, which removes the trees' steps between consecutive seconds and yard lines.
-
-**Overtime** states are valued with nflfastR's overtime model, plus the overtime rules in force that season: sudden death, the modified rule where a first-possession field goal lets the other team answer, and the current rule where both teams get the ball (postseason since 2022, regular season since 2025). A regular-season overtime that runs out ends tied and is worth half a win.
-
-**How good is it?** On 2022–2026 1st downs (70,262 snaps), which none of these models were trained on, the new model scores better than what nfl4th used before and better than nflfastR's new `vegas_wp` model trained on the same seasons.
+**How good is it?** We trained it on games through 2021 and tested it on the 2022–2026 seasons, which it had never seen. It did better than what nfl4th used before, and better than nflfastR's new model trained on the same seasons. Lower is better in all three columns: log loss and the Brier score measure how far the predictions are from what actually happened, and calibration error measures whether a team given a 60% chance really wins about 60% of the time.
 
 | Model | Log Loss | Brier Score | Calibration Error (WP Points) |
 |---|---|---|---|
-| nfl4th Before (Old Model Averaged With nflfastR's Old `vegas_wp`) | 0.46511 | 0.15397 | 1.37 |
+| nfl4th Before (Old Model Averaged With nflfastR's Old Model) | 0.46511 | 0.15397 | 1.37 |
 | nfl4th's Old Model Alone | 0.46599 | 0.15426 | 1.45 |
-| nflfastR's New `vegas_wp` (All Downs, Through 2021) | 0.46457 | 0.15406 | 1.25 |
+| nflfastR's New Model (All Downs, Through 2021) | 0.46457 | 0.15406 | 1.25 |
 | **nfl4th's New Model (Through 2021)** | **0.46390** | **0.15386** | **1.22** |
 
-The old models are as shipped: nfl4th's was trained on 2001–2021 and nflfastR's through 2020. Against what nfl4th returned before, the log loss gain is small (−0.0012, 95% CI −0.0026 to +0.0003). Against nfl4th's old model alone it is −0.0021 (CI −0.0037 to −0.0005).
+The gain over what nfl4th used before is small, and within the margin of error. The bigger improvement is that the new model behaves sensibly. The old one sometimes valued 1st & goal at the 2 more highly than the touchdown itself: on a test grid of tied games in the first three quarters, a quarter of the time, by as much as 5.6 points. It also wobbled from one second and one yard line to the next. The new one never values 1st & goal above the touchdown, and it's about 5 times smoother across the field and 20 times smoother across the clock.
 
-The bigger change is in the model's shape. On a grid of tied states in the first three quarters, nfl4th's old WP valued 1st & goal at the 2 more than half a point above the touchdown itself 25% of the time, by up to 5.6 points. Its WP also wobbled from one second and one yard line to the next. The new model never values 1st & goal above the touchdown, and it is about 5 times smoother along the field and 20 times smoother along the clock.
+## Going for it: will it work, and where does the play end?
 
-<!-- TODO figure: calibration of the WP model on 2022-2026 1st downs, by quarter (fit through 2021). Needs the holdout
-predictions saved from nfl4th-checks/wp_root/work/14_holdout.R as a small summary table. -->
+Converting is only part of the story. A 4th & 2 that gains 40 yards is worth a lot more than one that gains exactly 2, and a failed attempt at the opponent's 30 hands over the ball in a very different spot than one at your own 30.
 
-## Going for it
+So the go for it model doesn't just predict whether a team converts. It predicts where the play ends: how likely a conversion is, how likely it goes all the way for a touchdown, how far past the line to gain it goes, and where a failed attempt leaves the ball. Each of those spots gets its own win probability, so a long touchdown counts as a touchdown rather than getting lost in an average.
 
-The go for it model gives the full distribution of where a 4th down attempt ends, not just the chance of converting. It is fit on every 3rd and 4th down attempt since 2001 (200,544 plays, 14,835 of them on 4th down) and has four smooth parts:
+It's built from every 3rd and 4th down attempt since 2001: about 200,000 plays, about 15,000 of them on 4th down.
 
-1. **Conversion:** a logistic generalized additive model (GAM).
-2. **Touchdown given a conversion,** by the room between the line to gain and the end zone, and the distance.
-3. **Where a conversion that doesn't score ends,** in yards past the line to gain.
-4. **Where a failed attempt ends,** at most 10 yards behind the line and never behind the offense's own 1.
+**What it pays attention to:**
 
-The value of going is the WP of every one of those spots, weighted by its probability. A long touchdown is valued as a touchdown, not folded into an average gain.
+- **How far to go, and where on the field.** Goal line situations get their own treatment, and a conversion on 4th & goal is always a touchdown.
+- **The down.** 4th downs convert a little differently from 3rd downs at the same distance. 3rd downs are included because they make the 4th down predictions better; there just aren't that many 4th downs.
+- **How good the teams are,** through the point spread and the over/under. Favorites convert more often, though the spread matters less on 4th and long.
+- **The era.** Since 2020, teams convert short and medium 4th downs more often than they used to, and long ones slightly less often.
+- **Desperation** (below).
 
-**What the conversion model uses:**
+**Desperation.** When a team is trailing late, or its chances are already slim, 4th and long works more often than you might think: since 2001, these attempts converted 36% of the time at 4th & 8–10, against 28% in ordinary situations. And most 4th and long attempts happen in exactly these spots: 599 of the 664 attempts at 4th & 8–10 since 2015. If the model lumped them together, it would think 4th & 9 in the 2nd quarter is easier than it is, and tell teams to go for it too often. So desperate situations get their own conversion rates. "Desperate" here means the last 10 minutes of the 4th quarter or overtime while trailing, or a win probability below 15%. The end of the 1st half doesn't count: those attempts convert like ordinary ones, or worse.
 
-- **Distance and field position**, and how they interact. Goal to go has its own field position curve, and every 4th & goal conversion is a touchdown.
-- **The down.** 4th downs convert differently from 3rd downs at the same distance, with their own distance curve. 3rd downs stay in because they make the 4th down predictions better (fit on 4th downs alone, out of sample log loss on 4th downs is worse).
-- **The spread and the total.** A favorite converts more often. The spread matters less on 4th and long: about 0.017 on the logit per point of spread at 4th & 1 and 0.008 at 4th & 10.
-- **Era.** Since 2020, 4th downs convert more often at short and medium distances and slightly less at long ones, so the 2020+ shift depends on distance. Future seasons use the latest era.
-- **Late and desperate situations** (below).
+**What counts as going for it.** Runs, passes and sacks count, and so do interceptions and fumbles lost, as failed attempts. Defensive penalties that give a first down count as conversions, even ones where no play is run, like offside. Encroachment and neutral zone infractions don't count: that's usually a defense jumping on a hard count, and the offense may never have meant to run a play. Neither do false starts and delays of game, fake punts and field goals, or kneels.
 
-**Late and desperate.** A play is late in the last 10 minutes of the 4th quarter or overtime while the offense trails, or when nfl4th's WP is below 15%. Late attempts convert more often at long distances: 36% against 28% at 4th & 8–10 since 2001. Most 4th and long attempts are late (599 of 664 at 4th & 8–10 since 2015), so a model with one curve would predict ordinary 4th and long at the late rate and tell teams to go too often. Late plays get their own conversion curve. The last 2 minutes of the 1st half aren't late: those 4th downs convert like ordinary ones or worse.
+**Pick sixes.** Sometimes a failed attempt is returned for a touchdown. That happens on 0.3% to 2.8% of failed 4th downs, most often when the offense is deep in its own end, since the return is shorter. The model counts those as the defense scoring.
 
-**What counts as an attempt:**
-
-- **In:** runs, passes and sacks; interceptions and lost fumbles, as failures; defensive penalties that give a first down, including ones where no play is run (offside).
-- **Out:** encroachment and neutral zone infractions (the offense may only have been trying to draw the defense offside), offensive fouls before the snap (the down is replayed), fake punts and field goals, kneels and spikes.
-
-**Defensive touchdowns.** The yards distribution puts a pick six where the defense takes over. A separate model gives the chance that a failed attempt is returned for a touchdown: a logistic GAM on every failed 3rd and 4th down since 2001 (670 defensive touchdowns). It's 0.3% to 2.8% of failed 4th downs today, highest when the offense is near its own goal line, since the return is shorter. That share of failures is valued as the defense scoring, taking the better try and kicking off.
-
-**How good is it?** Fit through 2019 and tested on 2020–2026 4th downs (5,156 plays), conversion log loss is 0.6417, against 0.6453 for the previous model. In sample over 2015–2026, predicted conversion is within 1.7 standard errors of actual at every distance in both eras, and within 1.4 for ordinary and late plays separately.
+**How good is it?** We fit it on games through 2019 and tested it on 2020–2026, and it predicted those seasons better than the model it replaced. Across 2015–2026, predicted conversion rates track actual ones at every distance, in ordinary and desperate situations alike:
 
 ```{r fig-conversion, fig.height = 5.5, fig.alt = "4th down conversion rate by distance, actual and predicted, for ordinary and late plays, 2015-2026"}
 # 4th down attempts 2015-2026, as labeled in training (data-raw/_go_for_it_model.R, fd_model_data()), with the
@@ -168,13 +156,13 @@ ggplot(calib, aes(x = distance)) +
 
 ## Field goals
 
-A field goal has two outcomes. A make is worth 3 points and a kickoff; a miss gives the other team the ball at the spot of the kick, 8 yards behind the line of scrimmage, or at its own 20 if that's better for it.
+A field goal has two outcomes. Make it, and it's 3 points and a kickoff. Miss it, and the other team gets the ball where the kick was taken, 8 yards behind the line of scrimmage (or at its own 20, if that's better for it).
 
-**The make probability** is a GAM in distance, fit on field goal attempts since 2014, with separate curves for outdoor and indoor stadiums and for 2014–2022 and 2023 on. The kick distance is the line of scrimmage plus 18 yards: 10 yards of end zone and the hold 8 yards back.
+The chance of making it depends on the distance, whether the game is indoors or outdoors, and the era. Kickers have gotten better: outdoors, the model gives a 50 yarder a 68% chance in 2014–2022 and 73% since 2023. The kick distance is the line of scrimmage plus 18 yards, 10 for the end zone and 8 for the hold.
 
-**Long kicks need a correction.** Only teams that trust their kicker try very long field goals, so the make rate past about 52 yards describes good kickers, not the average one. At 57 yards only about 9% of teams facing 4th & 5 or longer try one. So nfl4th measures how often teams attempt a kick at each distance and, where few do, leans on the curve fit at distances where nearly everyone kicks. The correction can only lower the make probability.
+**Long kicks need a correction.** Only teams that trust their kicker try 57 yarders: at that distance, only about 9% of teams facing 4th & 5 or longer even try one. So the kicks we see from that far out were made by the best kickers, and taking their make rate at face value would overrate the average kicker. We measure how often teams attempt a kick from each distance, and where few do, we lean on how kickers do at distances where nearly everyone kicks. The correction can only lower the make probability.
 
-Past 62 yards there are too few attempts to fit. The make probability continues along the curve and fades to zero between 65 and 75 yards. Since 2023, kicks of 64 yards or more have gone 7 for 19.
+Past 62 yards there are too few attempts to learn much from. The make probability keeps falling along the same curve, then fades to zero between 65 and 75 yards. For what it's worth, kicks of 64 yards or more went 7 for 19 from 2023 to 2026.
 
 ```{r fig-fg, fig.alt = "Field goal make probability by kick distance, outdoors and indoors, 2023 on"}
 fg <- nfl4th:::fg_prob_df
@@ -201,21 +189,17 @@ ggplot(fg, aes(distance, 100 * fg_make_prob, color = roof)) +
   theme_article
 ```
 
-**Compared with before.** Up to 63 yards the table is the same as the one nfl4th used before: log loss on every attempt since 2014 is 0.3647 for both. The change is past 63 yards, where the old table fell to zero at 72 yards. Since 2023, kicks of 64 yards or more went 7 for 19 (37%). The old table gave those kicks 27% on average, the new one 30%.
+**Compared with before.** Up to 63 yards, almost nothing changed. Past that, the old model dropped to zero at 72 yards. On those 19 kicks of 64+ yards, the old model expected a 27% make rate and the new one 30%; kickers made 37%. At 55–59 yards, both models sit about 4 points below how often kickers actually made those kicks (61% against 66% since 2023). That's the long kick correction doing its job: the model describes the average kicker, not the ones trusted to try.
 
-At 55–59 yards both tables are about 4 points below the make rate of the kicks teams actually tried (61% predicted, 66% made since 2023). That is the long kick correction working as intended: the table describes the average kicker, not the ones trusted to try.
-
-**After a kickoff,** the receiving team's first snap is at the average start for that era's kickoff rules: its own 22 (2011–2015), 25 (2016–2023), 30 (2024) or 31 (2025 on).
+**After any kickoff,** the receiving team starts at the average spot for that era's kickoff rules: its own 22 (2011–2015), 25 (2016–2023), 30 (2024) or 31 (2025 on).
 
 ## Punts
 
-The punt model gives, for every line of scrimmage from the opponent's 31 back to the punting team's own 1, the probability of each outcome: where the receiving team's first snap is (touchbacks included), a return touchdown, or a muff the punting team recovers. The value of punting is the WP of each outcome, weighted by its probability.
+When a team punts, the model asks where the other team's first snap will be. It covers every spot from the opponent's 31 back to the punting team's own 1: touchbacks, punts downed inside the 10, long returns, return touchdowns (including blocked punts), and muffs the punting team recovers. Each outcome gets its win probability, weighted by how likely it is.
 
-It has three smooth parts, fit on the punts of the last 8 seasons (16,217 since 2019). Net punts have gained about 3 yards since 2010–2013, so older seasons would undervalue punting today.
+It's built from the punts of the last 8 seasons, about 16,000 of them. Punters have gotten better: net punts are about 3 yards longer than in 2010–2013, so older seasons would undersell punting today. The model looks at the next snap rather than the punt itself, so blocked punts and penalties on the return are already baked in.
 
-1. **Where the receiving team's first snap is:** a smooth model of its yard line that changes smoothly with the line of scrimmage, with its own term for touchbacks at the 20. It uses the next snap rather than the kick and return yards, so blocked punts and penalties on the return are in it.
-2. **A return touchdown,** including blocked punts returned for a touchdown, by line of scrimmage.
-3. **A muff the punting team recovers,** by line of scrimmage. The punting team gets the ball at the receiving team's average start.
+Here's what a punt looks like from a few spots:
 
 | Punting From | Touchback | Start Inside the 10 | Return TD | Muff Recovered | Average Start |
 |---|---|---|---|---|---|
@@ -226,36 +210,34 @@ It has three smooth parts, fit on the punts of the last 8 seasons (16,217 since 
 | Own 20 | 1% | 1% | 0.8% | 1.3% | Own 36 |
 | Own 5 | 0% | 0% | 1.3% | 1.1% | Midfield |
 
-The average start counts touchbacks at the 20 and leaves out return touchdowns and muffs.
+The average start counts touchbacks as the 20 and leaves out return touchdowns and muffs. Nothing in the punt model depends on the teams, the weather or the score, and punts from inside the opponent's 31 aren't considered.
 
-Nothing in the punt model depends on the teams, the weather or the score. A punt from inside the opponent's 31 isn't valued.
+**Compared with before.** The old punt model was built from 2010–2019 punts. To compare them fairly, we rebuilt the new one using only 2018–2025 and tested both on 2026 punts, which neither had seen:
 
-**Compared with before.** The previous punt model was built from 2010–2019 punts. To compare them fairly, the new recipe was refit on 2018–2025 and both were tested on 2026 punts (1,028), which neither had seen:
-
-| Measure | Old Model (2010–2019) | New Recipe (2018–2025) | Actual 2026 |
+| Measure | Old Model (2010–2019) | New Model (2018–2025) | Actual 2026 |
 |---|---|---|---|
 | Receiving Team's Average Start | Own 25.3 | Own 24.5 | Own 23.6 |
 | Start at the 20 (Mostly Touchbacks), Punting From the Opponent's 31 to Midfield | 4.9% | 16.2% | 16.9% |
-| 2026 Punts Given Zero Chance | 2 | 0 | — |
-| Log Loss (Start in 5 Yard Bins, Return TD or Muff) | 1.947 | **1.872** | — |
+| 2026 Punts the Model Called Impossible | 2 | 0 | — |
+| Log Loss (Lower Is Better) | 1.947 | **1.872** | — |
 
-The log loss gain is 0.075 per punt (SE 0.012), on the 1,026 punts both models give a chance. Both expect the receiving team to start a little further up the field than it has in 2026: punting keeps getting better.
+The new model is clearly better, and the old one badly underrated touchbacks on short punts. Both still expect the receiving team to start a bit further upfield than it has in 2026: punting keeps getting better.
 
 ## The try after a touchdown
 
-After a touchdown, nfl4th values both tries and takes the better one, for the scoring team. Each try is followed by a kickoff. `add_2pt_probs()` returns the same comparison as a recommendation.
+After a touchdown, the scoring team is assumed to make whichever choice is better, the extra point or going for 2. Then it kicks off.
 
-- **Going for 2** is a 4th and goal from the 2, so its conversion probability comes from the go for it model, with the game's spread and total. 2 point tries convert about as often in every era (48.1% in 2001–2019, 49.1% since 2020), so every season uses the model's latest era. The go for it model never sees a 2 point try, but on 2,125 tries from the 2 since 2001 it predicts 48.9% against 48.5% actual. The spread moves a try from 45.6% for a 10 point underdog to 52.8% for a 10 point favorite.
-- **The PAT** uses the field goal model at the 15: 94.9% outdoors and 95.2% indoors since 2023.
+- **Going for 2** is basically a 4th & goal from the 2, so the go for it model handles it, using the game's point spread and over/under. 2 point tries have converted about as often in every era (48% before 2020, 49% since). The go for it model never sees a 2 point try while it's being built, and it still gets them right: 48.9% predicted against 48.5% actual on 2,125 tries since 2001. A 10 point favorite converts about 53% of the time, a 10 point underdog about 46%.
+- **The extra point** uses the field goal model from the 15: about 95% since 2023.
 
-**Compared with before.** The old model was a separate xgboost model fit on about 800 tries from 2010–2019. On 2020–2026 tries (768), which it never saw, log loss is 0.6916 with the go for it model, 0.6955 with the old model, and 0.6932 for simply predicting the 2001–2019 average. The old model did worse than that average. A model of the try in the point spread alone didn't hold up either, because the point spread mattered much less after 2019 than before.
+**Compared with before.** The old 2 point model was a separate machine learning model built from about 800 tries from 2010–2019. On the 768 tries since 2020, the new approach predicts better, and the old model actually did worse than just guessing the historical average every time.
 
 ## The clock
 
-Late in a half, how much time each option uses can matter as much as where the ball ends up.
+Late in a half, the time a choice burns can matter as much as where the ball ends up.
 
-- **Punts, field goals, failed attempts and touchdowns** stop the clock with a change of possession, so the next state comes 6 seconds after the snap.
-- **A conversion that doesn't score keeps the clock running.** It is valued at the offense's next snap: the average gap after 3rd and 4th down conversions in 2016–2026, by quarter, time left in the half and score.
+- **A punt, a field goal, a failed attempt or a touchdown** stops the clock when the ball changes hands, so the next snap comes 6 seconds later.
+- **A conversion that doesn't score keeps the clock running.** We value it at the offense's next snap, using how long teams have actually taken to get the next play off after converting on 3rd or 4th down, from 2016 to 2026:
 
 | Situation | Seconds to the Next Snap |
 |---|---|
@@ -264,113 +246,77 @@ Late in a half, how much time each option uses can matter as much as where the b
 | 2nd Quarter: 1:00–2:00 / 0:30–1:00 / Last 0:30 | 20 / 13 / 7 |
 | 4th Quarter, Ahead: 2:00–5:00 / Inside 2:00 | 27 / 35 |
 
-**In the last 2 minutes of a half,** timeouts change this:
+**In the last two minutes of a half,** timeouts change things:
 
-- **A team with a timeout** can stop the clock right after the play, so each conversion is also valued with only the play's own time run off (6 seconds plus 0.1 per yard gained) and a timeout spent. The team takes the better of the two.
-- **A team without one** often can't get another snap off. After conversions in the last 7 seconds the clock ran out first 84% of the time, 65% at 7–10 seconds and 44% at 10–15. Those conversions are valued as that mix.
-- **0:00 ends the game.** A conversion that runs out the clock at the end of regulation is the final result: the team ahead wins and a tie goes to overtime. At the end of the 1st half it becomes the 2nd half kickoff.
-
-`add_4th_probs()` takes a `runoff` column for anyone who wants to set the time between the conversion and the next snap themselves.
+- **A team with a timeout** can stop the clock right after the play. Only the play itself runs off (about 6 seconds, a bit more for a long gain), and a timeout is used. The model takes whichever is better: calling it or not.
+- **A team without one** often can't get another play off. In the last 7 seconds, the clock ran out before the next snap after 84% of conversions; with 7–10 seconds left it was 65%, and with 10–15 seconds left, 44%. The model weighs the outcomes accordingly.
+- **Running out the clock ends the game.** If a conversion runs out the clock at the end of regulation, the team that's ahead wins and a tie goes to overtime. At the end of the 1st half, it's on to the 2nd half kickoff.
 
 ## Putting it together
 
-For each 4th down, nfl4th builds every state each option can lead to, runs the clock, values each state with the WP model, and averages by the outcome probabilities. The option with the highest WP is the recommendation.
+For every 4th down, nfl4th lays out where each choice can lead, runs the clock forward, asks the win probability model what each of those situations is worth, and weights them by how likely each one is. The choice with the highest number is the recommendation.
 
 ```{r fig-tree, out.width = "100%", fig.alt = "Diagram: a 4th down leads to three options (go for it, field goal, punt), each with its own outcomes, and the same WP model values every outcome"}
 knitr::include_graphics("decision_tree.svg")
 ```
 
-The options differ only in their outcomes and the model that gives their chances. The same WP model values every state they lead to.
+The three choices differ only in what can happen next and how likely each outcome is. The same win probability model judges all of them, so they're compared on equal terms.
 
-**What each model uses:**
+Here's what each piece pays attention to:
 
 | Input | Win Probability | Going for It | Field Goal | Punt |
 |---|---|---|---|---|
-| Score, Clock, Timeouts | Yes | Through the Late Flag | — | — |
+| Score, Clock, Timeouts | Yes | Through Desperation | — | — |
 | Field Position | Yes | Yes | Yes (Kick Distance) | Yes |
 | Yards to Go | Always a 1st Down | Yes | — | — |
 | Point Spread | Yes | Yes | — | — |
 | Over/Under | — | Yes | — | — |
 | Home Team | Yes | — | — | — |
-| Receiving the 2nd Half Kickoff | Yes | — | — | — |
-| Roof | — | — | Outdoors or Not | — |
+| Who Gets the 2nd Half Kickoff | Yes | — | — | — |
+| Indoors or Outdoors | — | — | Yes | — |
 | Era | — | 4th Downs: 2001–2019, 2020 On | 2014–2022, 2023 On | Last 8 Seasons Only |
-
-**An example.** Week 5 of 2026, Buffalo at the Rams, 5:40 left in the 1st quarter. The Rams are 3.5 point favorites, trail by 3, and face 4th & 5 at the Buffalo 32. They tried a 50 yard field goal and missed. nfl4th looks up the spread, the total and the roof from the game:
-
-```{r example, echo = TRUE}
-one_play <- tibble::tibble(
-  home_team = "LA",
-  away_team = "BUF",
-  posteam = "LA",
-  type = "reg",
-  season = 2026,
-  qtr = 1,
-  quarter_seconds_remaining = 340,
-  ydstogo = 5,
-  yardline_100 = 32,
-  score_differential = -3,
-  home_opening_kickoff = 0,
-  posteam_timeouts_remaining = 3,
-  defteam_timeouts_remaining = 3
-)
-
-probs <- add_4th_probs(one_play)
-```
-
-| Option | What Can Happen | Rams' WP |
-|---|---|---|
-| Go for It | Converts `r pct(probs$first_down_prob)` of the time (WP `r pct(probs$wp_succeed)` after, averaged over where the play ends); fails `r pct(1 - probs$first_down_prob)` (WP `r pct(probs$wp_fail)`) | **`r pct(probs$go_wp)`** |
-| Field Goal | A 50 yard try: made `r pct(probs$fg_make_prob)` of the time (WP `r pct(probs$make_fg_wp)`); missed, Buffalo's ball at its 40 (WP `r pct(probs$miss_fg_wp)`) | `r pct(probs$fg_wp)` |
-| Punt | Buffalo's ball deep in its own end: a touchback or a start inside its 20, by the punt model | `r pct(probs$punt_wp)` |
-
-Going for it is worth `r sprintf("%.1f", probs$go_boost)` WP points more than the field goal, so `go_boost` is +`r sprintf("%.1f", probs$go_boost)`: a lean, not a clear call. In the bootstrap (next section), 82 of the 101 fits agree that going is best, and the 80% interval on `go_boost` is −0.3 to +1.5.
 
 ## How sure is the model? The bootstrap
 
-The models are fit on a finite history, so a different history would give slightly different models and sometimes a different call. `add_4th_probs(bootstrap = TRUE)` measures that. It refits nfl4th's two main models on 100 resampled histories and values every play under each one. On 2026 weeks 1–9, 83% of go recommendations held in at least 83% of the refits, and all the uncertain ones were within a point of a toss-up.
+A model built from history inherits that history's luck. If a handful of 4th & 3s had bounced the other way, the model would come out a little different, and every once in a while, so would its recommendation. A single win probability number can't tell you how much that matters, so we check.
 
-**What is refit.** Each draw resamples whole games with replacement, as many as there are, and refits the WP model and the go for it model on the same games. The go for it fit builds its late flag with that draw's WP model. The punt, field goal and defensive touchdown models and nflfastR's overtime model are the same in every draw: their sampling error is small next to the two models that drive the calls. With the shipped fit, that makes 101 draws.
+**How.** We rebuild the two models that drive most decisions, win probability and going for it, 100 times. Each time, we build them from a reshuffled version of history: we draw 7,409 games at random from the real ones, so some games appear twice and some not at all. Then we ask each version, and the real one, what it recommends. If 98 of the 101 versions say go, it's a clear call. If 55 say go and 46 say kick, it's close to a coin flip. This technique is called the bootstrap.
 
-**Why whole games.** Every snap of a game shares one label, who won, so the snaps of a game aren't independent. Resampling snaps one at a time would act as if there were far more information than there is. The game is the unit.
+The punt, field goal and pick six models stay the same in every version. Reshuffling moves them very little compared with the two models that drive the calls.
 
-**Why all the games (φ = 1) and not half.** In [*Analytics, have some humility*](https://arxiv.org/abs/2311.03490), Brill, Yurko and Wyner argue that 4th down recommendations should come with this kind of uncertainty, and nfl4th's bootstrap follows their approach. They draw half the games in each refit (a fractional bootstrap, φ = 0.5). They chose 0.5 in a simulated toy game, where the plain bootstrap was too narrow, partly because a bootstrap can't see a model's bias. Drawing half the games widens the intervals to make up for that, by an amount specific to that simulation and that model.
+**Why whole games.** Every play in a game shares the same final result. If we reshuffled individual plays instead of games, we'd be pretending to have far more independent information than we do, and the model would look more certain than it is.
 
-We checked φ directly on nfl4th's models and real games. The question is how much a play's `go_boost` changes only because the models were trained on a different set of games. Call that the noise.
+**Why all the games, and not half.** In [*Analytics, have some humility*](https://arxiv.org/abs/2311.03490), Ryan Brill, Ron Yurko and Abraham Wyner argued that 4th down recommendations should come with exactly this kind of uncertainty, and our bootstrap follows their approach. One difference: they draw only half the games each time (a "fractional" bootstrap, with φ = 0.5). Each rebuild then sees less data, so the rebuilt models vary more and the uncertainty looks bigger. They picked that in a simulated toy version of football, where the ordinary bootstrap turned out too confident. Halving the games is an adjustment tuned to that simulation and that model, so we checked whether it fits ours.
 
-1. **Measure the noise directly.** Split the games at random into two halves and train both models on each half. The halves share no games, so the two sets of models differ only because they saw different games. On every 2026 4th down (weeks 1–9), the gap between their two `go_boost`s is pure noise. We did this for 10 different splits.
-2. **Ask the bootstrap.** Take one half, resample its games and retrain many times, with φ = 1 (as many games as the half has) and with φ = 0.5 (half as many). How much `go_boost` moves across those refits is the bootstrap's estimate of the same noise.
-3. **Compare.** If the bootstrap is right, its estimate matches the measured noise. We compare on `go_boost` and on field goal minus punt, since every decision is a comparison between options.
+We wanted to know how much a play's go boost changes just because the models were built on a different set of games. Call that the noise.
 
-| Measured Noise ÷ Bootstrap's Estimate (Variance; 1 Is Right) | φ = 1 | φ = 0.5 |
+1. **Measure the noise directly.** Split the games at random into two halves and build the models twice, once from each half. The halves share no games, so any difference between the two sets of models comes purely from which games they saw. On every 2026 4th down (weeks 1–9), the gap between their two go boosts is pure noise. We did this with 10 different random splits.
+2. **Ask the bootstrap.** Take one half, and run the bootstrap on it alone, with all its games and with half of them. How much the go boost moves across those rebuilds is the bootstrap's estimate of the same noise.
+3. **Compare.** If the bootstrap works, its estimate should match the noise we measured. We compare on the go boost and on field goal versus punt, because every decision is a comparison between choices.
+
+| Measured Noise ÷ Bootstrap's Estimate (1 Is Right) | All the Games (φ = 1) | Half the Games (φ = 0.5) |
 |---|---|---|
-| `go_boost` | **0.88** (SE 0.04); 80% intervals held 82% of the time | 0.54 (SE 0.02); 90% intervals held 97% |
-| Field Goal − Punt | **0.97** (SE 0.07) | 0.60 (SE 0.04) |
-| WP of a Single Option | 1.02–1.08 | 0.58–0.59 |
+| Go Boost | **0.88** | 0.54 |
+| Field Goal vs Punt | **0.97** | 0.60 |
+| Win Probability of One Choice | 1.02–1.08 | 0.58–0.59 |
 
-With φ = 1 the bootstrap gets the noise about right, slightly high. With φ = 0.5 it says the noise is about 1.8 times bigger than it really is, so its intervals are too wide.
+A 1 would mean the bootstrap gets the noise exactly right, and anything below 1 means it thinks there's more noise than there really is. The ordinary bootstrap gets it about right, if anything a touch high. Using half the games makes the noise look about 1.8 times bigger than it really is.
 
-This isn't circular. The measured noise involves no resampling: it is the gap between two models trained on different games. The bootstrap sees only one half, so it has to guess that gap from one set of games, by assuming that resampling your own games behaves like getting new ones. That assumption can fail, and the check can catch it: φ = 0.5 fails it, and in the paper's simulation the plain bootstrap failed in the other direction.
+The ranges tell the same story. When the ordinary bootstrap drew an 80% range for the gap between the two halves' go boosts, the real gap landed inside it 82% of the time, about what an honest 80% range should do. With half the games, a 90% range caught it 97% of the time: too wide.
 
-**The gap between options is less uncertain than either option.** Every option is valued with the same WP model at states of the same game, so most of the WP model's error is shared: the half fits' errors correlate 0.86–0.91 across options. Shared error cancels in a comparison. The standard deviation is 1.55 WP points for one option's WP, but 0.82 for going minus a field goal.
+This isn't circular. The measured noise doesn't use the bootstrap at all: it's the gap between two models built from different games. The bootstrap only ever sees one half, so it has to guess that gap from a single set of games, by assuming that reshuffling the games you have behaves like getting new ones. That assumption can fail, and this check would catch it. Halving the games fails it here, and in the paper's simulation the ordinary bootstrap failed in the other direction.
 
-**Why these intervals are narrower than the paper's.** Their highlighted example is a 1.1 point edge with an interval of about −4 to +5.
+**The difference between choices is less uncertain than either choice.** Going, kicking and punting are all judged by the same win probability model, in the same game, so most of that model's error is shared by all three, and shared error cancels out when you compare them. The uncertainty in one choice's win probability is about 1.5 points; in going for it minus a field goal, about 0.8.
 
-- **More data in every refit.** nfl4th's models use 1999–2026 (the go for it model 2001–2026), 7,409 games, and each refit draws all of them. The paper's use 2006–2021, 4,101 games, and each refit draws about 2,050. That's about 3.6 times as many games, which alone makes the noise about 1.9 times smaller.
-- **φ = 1,** as above.
-- **Both models on the same games.** The paper also resamples drives within games, and fits its conversion, punt and field goal models on plays resampled one at a time.
+**Why our ranges are narrower than the paper's.** Their headline example is a 1.1 point edge with a range from about −4 to +5. Three reasons we're tighter:
 
-**What you get:**
+- **More data.** Our models use 1999–2026, about 7,400 games, and each rebuild draws all of them. The paper used 2006–2021, about 4,100 games, and each rebuild drew about 2,050. That's about 3.6 times as many games per rebuild, which by itself shrinks the noise by about half.
+- **All the games, not half**, as above. Because games are drawn with replacement, each of our rebuilds ends up with about 4,700 different games in it. Each of theirs had about 1,600.
+- **Fewer moving parts.** The paper also reshuffles drives within each game and rebuilds its punt and field goal models every time, which adds a bit more noise. We keep those models fixed, because reshuffling barely moves them.
 
-- `boot_pct`: the share of draws whose best option is the shipped fit's.
-- `boot_go_pct`: the share of draws in which going beats the better kick.
-- `go_boost_lo` and `go_boost_hi`: the 10th and 90th percentiles of `go_boost`, an 80% interval.
-- `boot_median_draw`: the draw with the median `go_boost`, for one coherent set of numbers at the median.
-- each draw's `go_boost` and every probability `add_4th_probs()` returns, as list columns.
+**How sure are the calls?** Here's every regulation 4th down from weeks 1–9 of 2026, grouped by go boost. Going was recommended on 995 of them and kicking on 1,073. The "80% range" is where the middle 80% of the 101 versions land.
 
-**How wide are the intervals?** All 2,068 regulation 4th downs of 2026 weeks 1–9: going is recommended on 995 (positive `go_boost`) and kicking on 1,073. Confident means at least 83% of draws agree on go vs kick, and uncertain under 67%, the paper's tiers.
-
-| `go_boost` | Plays | Median `go_boost` | Median Width of the 80% Interval | Interval on the Recommended Side | Teams Went |
+| Go Boost | Plays | Median Go Boost | Median Width of the 80% Range | Range Entirely on the Recommended Side | Teams Went |
 |---|---|---|---|---|---|
 | −5 or Less | 99 | −6.18 | 1.6 | 100% | 0% |
 | −5 to −3 | 199 | −3.80 | 1.3 | 100% | 0% |
@@ -382,34 +328,31 @@ This isn't circular. The measured noise involves no resampling: it is the gap be
 | 3 to 5 | 145 | 3.76 | 1.9 | 99% | 67% |
 | 5 or More | 68 | 6.22 | 3.1 | 100% | 72% |
 
-The typical go recommendation (`go_boost` +1.4) has an 80% interval about 1.5 WP points wide. 4th & 7–10 is where calls are thinnest: median `go_boost` +0.38, and 33% of those go calls are uncertain. Kick calls look the same as go calls: once a call is more than a point from a toss-up, the draws almost never disagree. Teams went for it on 19% of these plays. They almost never go when the model says kick, but even on calls that are clear in every draw (go by 1 to 3 points) they go only about a third of the time.
+Once a call is more than a point from a toss-up, the versions almost never disagree, for go calls and kick calls alike. The typical go recommendation (a go boost of +1.4) has an 80% range about 1.5 points wide. The thinnest calls are at 4th & 7–10, where the typical go boost is +0.4 and a third of the go calls are genuine toss-ups.
 
-**What the intervals leave out.** They measure sampling uncertainty only: how much the fit would move with a different history. Bias that every fit of the same recipe shares isn't in them, and neither is anything the models don't see. The known example is late 4th & 8–10, where predicted conversion runs about 3.5 points high out of sample (see the limitations below).
+And look at the last column. Teams almost never go for it when the model says kick. But even when the model says go by 1 to 3 points, and essentially every version agrees, teams go for it only about a third of the time.
+
+**What the bootstrap can't tell you.** It measures one kind of uncertainty: how much the models would change with a different slice of history. A mistake that every version of the model makes in the same way doesn't show up, and neither does anything the models don't know about. The one we know of is below.
 
 ## What the models don't know
 
-- **Late 4th and long.** Since 2020, late 4th & 8–10 attempts are predicted to convert about 3.5 points more often than they did out of sample (36.5% vs 32.9%; z −1.5). In a related cut, when trailing on 4th & 4+ and the model says go by 1–3 points, teams that went did 4.5 points worse than predicted relative to teams that kicked (SE 2.7). This is the place to be most careful with a go call.
-- **The teams.** Beyond the spread, nothing about the two teams is used: not the kicker, the punter, the offense's short-yardage strength, injuries or the weather.
-- **Eras move only with a retrain.** If a rule change shifts conversion or kicking rates, the models won't see it until they are rebuilt with a new era.
-- **Punting** is fit on the last 8 seasons with no era term, so older seasons are valued with today's punting.
-- **The clock after a conversion** is the average gap to the next snap, or the play's own time when a team stops the clock. Real plays vary by a few seconds, which matters only in the last seconds of a half.
-- **Hard counts.** Encroachment and neutral zone infractions are left out of the conversion data, so the value of trying to draw the defense offside isn't priced.
-- **End of the 1st half.** In the last 30 seconds, WP for a team at its own 11–29 is about 2 points too low.
-- **Overtime timeouts** aren't used, as in nflfastR's overtime model.
+- **Late 4th and long.** Since 2020, desperate 4th & 8–10 attempts have converted about 3.5 points less often than the model predicts (33% against 36.5%), in tests on seasons it hadn't seen. And when trailing on 4th & 4 or longer, where the model says go by 1 to 3 points, teams that went did about 4.5 points worse than expected relative to teams that kicked (give or take 2.7). Take go calls in this spot with a grain of salt.
+- **The teams.** Beyond the point spread, the models know nothing about the two teams: not the kicker, the punter, how good the offense is in short yardage, injuries, or the weather.
+- **Changes in the game.** If a rule change makes 4th downs or kicks easier or harder, the models won't notice until they're rebuilt.
+- **Old punts.** The punt model is built from recent seasons, so older seasons are judged by today's punting.
+- **The clock after a conversion** uses the typical time to the next snap. Real plays vary by a few seconds, which only matters in the last few seconds of a half.
+- **Hard counts.** Since jumping offside on a hard count isn't counted as an attempt, the value of trying to draw the defense offside isn't part of the calculation.
+- **The end of the 1st half.** In the last 30 seconds, win probability for a team between its own 11 and 29 is about 2 points too low.
+- **Overtime timeouts** aren't taken into account, just as in nflfastR's overtime model.
 
-**Checked against results.** Every regulation 4th down from 2016–2025 was scored, and each team's result compared with the model's WP for the option it chose. Where the model said go by at least a point, teams that went did about as well as predicted relative to teams that kicked: 0.3 points worse late in games (SE 1.3) and 0.1 points worse otherwise (SE 1.1).
+**Checked against what actually happened.** We took every regulation 4th down from 2016–2025 and compared what happened with what the model expected for the choice each team made. When the model said go by at least a point, teams that went did about as well as predicted, relative to teams that kicked: 0.3 points worse late in games (give or take 1.3) and 0.1 points worse otherwise (give or take 1.1). In other words, the edge the model sees for going for it shows up in real games.
 
-## Using it
+## Data and code
 
-- **`add_4th_probs()`** values 4th downs in nflfastR play-by-play or hand-built plays and returns the WP of each option, the outcome probabilities and `go_boost`. A play takes about 0.1 seconds.
-- **`add_4th_probs(bootstrap = TRUE)`** adds the bootstrap columns. The 101 draws (38 MB) download once and are cached. A play takes 0.3–0.85 seconds, or 0.2–0.4 with `nfl4th_start_workers()`, which spreads the draws over worker processes.
-- **`add_2pt_probs()`** does the same for the try after a touchdown.
-- **`load_4th_pbp()`** returns every 4th down of a season with the probabilities already added.
-
-The models are built by the scripts in `data-raw/` of the [nfl4th repository](https://github.com/nflverse/nfl4th), most in a few minutes from public nflverse play-by-play. The [getting started article](nfl4th.html) has examples, and [4th down research](4th-down-research.html) collects work on 4th down decisions.
+Everything here is built from public nflverse play-by-play data, and the models are in the nfl4th R package. If you use R, the [getting started article](nfl4th.html) shows how to get 4th down recommendations for any play, and the code that builds every model is in the [nfl4th repository](https://github.com/nflverse/nfl4th).
 
 **References**
 
-- Brill, Yurko and Wyner (2023), [*Analytics, have some humility: a statistical view of fourth-down decision making*](https://arxiv.org/abs/2311.03490).
-- Stern (1994), "A Brownian motion model for the progress of sports scores," *Journal of the American Statistical Association* 89(427).
-- [nflfastR](https://www.nflfastr.com/), whose `vegas_wp` recipe the WP model follows and whose overtime model nfl4th uses.
+- Ryan Brill, Ronald Yurko and Abraham Wyner (2023), [*Analytics, have some humility: a statistical view of fourth-down decision making*](https://arxiv.org/abs/2311.03490).
+- Hal Stern (1994), "A Brownian motion model for the progress of sports scores," *Journal of the American Statistical Association* 89(427).
+- [nflfastR](https://www.nflfastr.com/), whose win probability recipe our model follows and whose overtime model nfl4th uses.
