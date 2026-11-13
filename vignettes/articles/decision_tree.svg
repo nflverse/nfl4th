@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 512" width="760" height="512" role="img" aria-label="Every option is valued the same way: the WP of its outcomes, weighted by their chances" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#8f8e89"/>
+    </marker>
+  </defs>
+  <rect width="760" height="512" fill="#ffffff"/>
+  <text x="24" y="34" font-size="15" font-weight="600" fill="#0b0b0b">Every option is valued the same way: its outcomes’ WP, weighted by their chances</text>
+
+  <g font-size="11.5" fill="#52514e">
+    <text x="80" y="66" text-anchor="middle">Now</text>
+    <text x="230" y="66" text-anchor="middle">Option and its model</text>
+    <text x="336" y="66">Outcomes it can lead to</text>
+    <text x="674" y="66" text-anchor="middle">Valued by</text>
+  </g>
+
+  <g fill="none" stroke="#8f8e89" stroke-width="1.25">
+    <path d="M136 306H150"/>
+    <path d="M150 160V452"/>
+    <path d="M150 160H164" marker-end="url(#arrow)"/>
+    <path d="M150 328H164" marker-end="url(#arrow)"/>
+    <path d="M150 452H164" marker-end="url(#arrow)"/>
+    <path d="M296 160H310"/>
+    <path d="M310 116V204"/>
+    <path d="M310 116H324" marker-end="url(#arrow)"/>
+    <path d="M310 204H324" marker-end="url(#arrow)"/>
+    <path d="M296 328H310"/>
+    <path d="M310 292V364"/>
+    <path d="M310 292H324" marker-end="url(#arrow)"/>
+    <path d="M310 364H324" marker-end="url(#arrow)"/>
+    <path d="M296 452H324" marker-end="url(#arrow)"/>
+    <path d="M580 116H612" marker-end="url(#arrow)"/>
+    <path d="M580 204H612" marker-end="url(#arrow)"/>
+    <path d="M580 292H612" marker-end="url(#arrow)"/>
+    <path d="M580 364H612" marker-end="url(#arrow)"/>
+    <path d="M580 452H612" marker-end="url(#arrow)"/>
+  </g>
+
+  <g fill="none" stroke="#8f8e89" stroke-width="1.25">
+    <rect x="24" y="270" width="112" height="72" rx="8"/>
+    <rect x="164" y="132" width="132" height="56" rx="8"/>
+    <rect x="164" y="300" width="132" height="56" rx="8"/>
+    <rect x="164" y="424" width="132" height="56" rx="8"/>
+    <rect x="324" y="80" width="256" height="72" rx="8"/>
+    <rect x="324" y="168" width="256" height="72" rx="8"/>
+    <rect x="324" y="264" width="256" height="56" rx="8"/>
+    <rect x="324" y="336" width="256" height="56" rx="8"/>
+    <rect x="324" y="416" width="256" height="72" rx="8"/>
+  </g>
+  <rect x="612" y="80" width="124" height="408" rx="8" fill="#2a78d6" fill-opacity="0.12" stroke="#2a78d6" stroke-width="2"/>
+
+  <g text-anchor="middle">
+    <text x="80" y="294" font-weight="600" fill="#0b0b0b">4th down</text>
+    <text x="80" y="310" font-size="11.5" fill="#52514e">score, clock,</text>
+    <text x="80" y="326" font-size="11.5" fill="#52514e">spot, distance</text>
+
+    <text x="230" y="156" font-weight="600" fill="#0b0b0b">Go for it</text>
+    <text x="230" y="172" font-size="11.5" fill="#52514e">go for it model</text>
+    <text x="230" y="324" font-weight="600" fill="#0b0b0b">Field goal</text>
+    <text x="230" y="340" font-size="11.5" fill="#52514e">field goal model</text>
+    <text x="230" y="448" font-weight="600" fill="#0b0b0b">Punt</text>
+    <text x="230" y="464" font-size="11.5" fill="#52514e">punt model</text>
+
+    <text x="674" y="268" font-weight="600" fill="#0b0b0b">WP model</text>
+    <text x="674" y="288" font-size="11.5" fill="#0b0b0b">values every</text>
+    <text x="674" y="304" font-size="11.5" fill="#0b0b0b">1st down state</text>
+  </g>
+
+  <g fill="#0b0b0b">
+    <text x="336" y="104" font-weight="600">Converts</text>
+    <text x="336" y="120" font-size="11.5">a 1st down where the play ends,</text>
+    <text x="336" y="136" font-size="11.5">or a touchdown and the better try</text>
+    <text x="336" y="192" font-weight="600">Fails</text>
+    <text x="336" y="208" font-size="11.5">the other team’s ball where it</text>
+    <text x="336" y="224" font-size="11.5">ends, or a defensive touchdown</text>
+    <text x="336" y="288" font-weight="600">Makes</text>
+    <text x="336" y="304" font-size="11.5">3 points, then a kickoff</text>
+    <text x="336" y="360" font-weight="600">Misses</text>
+    <text x="336" y="376" font-size="11.5">the other team’s ball at the kick</text>
+    <text x="336" y="440" font-weight="600">Each punt outcome</text>
+    <text x="336" y="456" font-size="11.5">the other team’s ball at each spot,</text>
+    <text x="336" y="472" font-size="11.5">a return touchdown, or a muff</text>
+  </g>
+</svg>

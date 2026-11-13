@@ -16,12 +16,15 @@ authors:
 
 navbar:
   structure:
-    left:  [home, intro, reference, research, news, tutorials]
+    left:  [home, intro, methods, reference, research, news, tutorials]
     right: [search, lightswitch, discord, twitter, github]
   components:
     reference:
       text: "Functions"
       href: reference/index.html
+    methods:
+      text: "How It Works"
+      href: articles/articles/how-nfl4th-works.html
     research:
       text: "4th Down Research"
       href: articles/articles/4th-down-research.html
