@@ -1,5 +1,6 @@
 ---
 title: "How nfl4th makes 4th down recommendations"
+author: "nfl4th"
 resource_files:
   - decision_tree.svg
 ---
