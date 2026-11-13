@@ -44,7 +44,7 @@ theme_article <- theme_minimal(base_size = 13) +
 
 ## The short version
 
-On every 4th down, nfl4th estimates the offense's win probability (WP) if it goes for it, kicks a field goal, or punts, and recommends the option with the highest. This page explains how each of those numbers is built. It replaces the 2020 article in The Athletic that introduced the 4th down bot: every model it describes has since been rebuilt.
+On every 4th down, nfl4th estimates the offense's win probability (WP) if it goes for it, kicks a field goal, or punts, and recommends the option with the highest. This page explains how each of those numbers is built. It replaces the [2020 article in The Athletic](https://www.nytimes.com/athletic/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/) that introduced the 4th down bot: every model it describes has since been rebuilt.
 
 The idea hasn't changed. Each option leads to a handful of possible outcomes: a conversion, a failed attempt, a made or missed kick, a punt that lands somewhere. Each outcome is a new game state, and a win probability model says how often teams win from that state. The value of an option is the WP of its outcomes, weighted by how likely each one is.
 
