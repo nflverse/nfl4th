@@ -132,3 +132,24 @@ test_that("2 point tries are a 4th and goal from the 2 in the latest era", {
   expect_gt(p[4], p[2])
   expect_length(two_pt_conversion_prob(x[0, ]), 0)
 })
+
+test_that("a failed attempt can be returned for a touchdown", {
+  # about 1 failed attempt in 100, more from the offense's own end
+  own <- fd_def_td_prob(data.frame(
+    ydstogo = 4,
+    yardline_100 = 80,
+    season = 2026
+  ))
+  opp <- fd_def_td_prob(data.frame(
+    ydstogo = 4,
+    yardline_100 = 20,
+    season = 2026
+  ))
+  expect_gt(own, opp)
+  expect_true(all(def_td_prob > 0 & def_td_prob < 0.05))
+  # long distances use the longest in the table; future seasons the latest era
+  expect_identical(
+    fd_def_td_prob(data.frame(ydstogo = 99, yardline_100 = 60, season = 2030)),
+    def_td_prob[dim(def_td_prob)[1], 60, 2]
+  )
+})

@@ -189,6 +189,28 @@ get_2pt_wp <- function(pbp) {
   pbp
 }
 
+# The offense's WP when its failed 4th down attempt is returned for a
+# touchdown: the defense scores 6 (the play takes 6 seconds), takes the try that
+# is better for it and kicks off. In overtime the defense wins.
+defensive_td_wp <- function(pbp) {
+  wp <- rep(0, nrow(pbp))
+  reg <- which(!((pbp$qtr > 4) %in% TRUE))
+  if (length(reg) == 0) {
+    return(wp)
+  }
+  x <- pbp[reg, , drop = FALSE]
+  d <- x
+  d$posteam <- other_team(x$posteam, x$home_team, x$away_team)
+  d$posteam_spread <- -x$posteam_spread
+  d$score_differential <- 6 - x$score_differential
+  d$half_seconds_remaining <- pmax(x$half_seconds_remaining - 6, 0)
+  d$game_seconds_remaining <- pmax(x$game_seconds_remaining - 6, 0)
+  # get_2pt_wp() values the tries for original_posteam, the offense
+  tries <- get_2pt_wp(d)
+  wp[reg] <- pmin(tries$wp_go1, tries$wp_go2)
+  wp
+}
+
 # go for it on 4th down WP
 get_go_wp <- function(pbp) {
   pbp$go_index <- seq_len(nrow(pbp))
@@ -335,5 +357,15 @@ get_go_wp <- function(pbp) {
   go <- tapply(preds$prob * preds$state_wp, preds$go_index, sum)
   pbp$go_wp <- as.vector(go)[match(pbp$go_index, as.integer(names(go)))]
   pbp$go_index <- NULL
+
+  # A failed attempt can also be returned for a touchdown, which the yards
+  # gained leave out (a failed attempt ends at most 10 yards behind the line).
+  # That share of the failures (fd_def_td_prob()) is valued as a defensive
+  # touchdown (defensive_td_wp()), the rest as above.
+  q <- fd_def_td_prob(pbp)
+  fail <- pbp$wp_fail
+  pbp$wp_fail <- (1 - q) * fail + q * defensive_td_wp(pbp)
+  shift <- (1 - pbp$first_down_prob) * (pbp$wp_fail - fail)
+  pbp$go_wp <- pbp$go_wp + if_else(is.na(shift), 0, shift)
   pbp
 }

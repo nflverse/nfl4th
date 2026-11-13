@@ -45,9 +45,14 @@ fg_prob_table <- nflfastr_models$fg_prob_table
 # data-raw/_conversion_runoff.R
 conversion_clock <- readRDS("data-raw/conversion_clock.rds")
 
+# the probability that a failed 4th down attempt is returned for a touchdown,
+# written by data-raw/_defensive_td_model.R
+def_td_prob <- readRDS("data-raw/def_td_prob.rds")
+
 usethis::use_data(
   pat_make_prob,
   conversion_clock,
+  def_td_prob,
   fg_prob_df,
   punt_df,
   wp_first_down_model,

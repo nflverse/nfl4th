@@ -47,6 +47,17 @@ fd_late <- function(pbp) {
   fd_is_late(pbp$qtr, pbp$score_differential, pbp$game_seconds_remaining, wp)
 }
 
+# Probability that a failed 4th down attempt is returned for a touchdown, by
+# distance, field position and era (def_td_prob in R/sysdata.rda, from
+# data-raw/_defensive_td_model.R). The same in every bootstrap draw, like the
+# punt and field goal tables.
+fd_def_td_prob <- function(x) {
+  d <- dim(def_td_prob)
+  t <- pmin(pmax(as.integer(x$ydstogo), 1L), d[1])
+  yl <- pmin(pmax(as.integer(x$yardline_100), 1L), d[2])
+  def_td_prob[cbind(t, yl, get_fd_era(x$season) + 1L)]
+}
+
 # Long data frame of gain probabilities for the plays in `x` (needs ydstogo,
 # yardline_100, posteam_spread, total_line and season). A gain equal to
 # yardline_100 is a touchdown. Failed attempts never end behind the offense's
