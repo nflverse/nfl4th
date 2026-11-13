@@ -45,7 +45,7 @@ with_active <- function(set, code) {
 
 # The draws for this version of the models, on the nfl4th_infrastructure
 # release. Rebuilding the models means rebuilding the draws under a new name.
-bootstrap_file <- "bootstrap_models_20261112.rds"
+bootstrap_file <- "bootstrap_models_20261113.rds"
 
 nfl4th_bootstrap_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), bootstrap_file)
