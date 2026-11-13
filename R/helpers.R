@@ -4,6 +4,8 @@
 team_name_fn <- function(var) {
   # each replacement in turn, as stringr::str_replace_all() with a named vector
   fix <- c(
+    "WSH" = "WAS",
+    "LAR" = "LA",
     "JAC" = "JAX",
     "STL" = "LA",
     "SL" = "LA",
@@ -178,15 +180,10 @@ prepare_df <- function(df) {
       spread_time = df$spread_line * exp(-4 * elapsed_share),
       posteam_spread = if_else(home, df$spread_line, -1 * df$spread_line),
       posteam_total = if_else(home, df$home_total, df$away_total),
-      home_timeouts_remaining = if_else(
-        home,
-        df$posteam_timeouts_remaining,
-        df$defteam_timeouts_remaining
-      ),
-      away_timeouts_remaining = if_else(
-        df$posteam == df$away_team,
-        df$posteam_timeouts_remaining,
-        df$defteam_timeouts_remaining
+      home_timeouts_remaining = timeouts_pos_def(df, home),
+      away_timeouts_remaining = timeouts_pos_def(
+        df,
+        df$posteam == df$away_team
       ),
       original_posteam = df$posteam
     )
@@ -231,6 +228,27 @@ prepare_ot <- function(df) {
   )
 }
 
+# the other team: the away team where `team` is the home team, the home team
+# otherwise
+other_team <- function(team, home_team, away_team) {
+  if_else(team == home_team, away_team, home_team)
+}
+
+# Timeouts are carried two ways: by home and away team
+# (home_/away_timeouts_remaining, which the decision functions update as the
+# ball changes hands) and by the team with the ball and the other team
+# (posteam_/defteam_timeouts_remaining, which the models read).
+# The home team's timeouts where `home` is TRUE, the away team's elsewhere
+timeouts_home_away <- function(df, home) {
+  if_else(home, df$home_timeouts_remaining, df$away_timeouts_remaining)
+}
+
+# The timeouts of the team with the ball where `pos` is TRUE, the other team's
+# elsewhere
+timeouts_pos_def <- function(df, pos) {
+  if_else(pos, df$posteam_timeouts_remaining, df$defteam_timeouts_remaining)
+}
+
 # helper function for switching possession and running off 6 seconds. In
 # overtime a change of possession without a score also moves the possession
 # number on (see R/overtime.R). After a score the caller does that instead
@@ -241,7 +259,7 @@ flip_team <- function(df, ot_stop = TRUE) {
   }
   n <- nrow(df)
   # switch posteam
-  df$posteam <- if_else(df$home_team == df$posteam, df$away_team, df$home_team)
+  df$posteam <- other_team(df$posteam, df$home_team, df$away_team)
   # swap score
   df$score_differential <- -df$score_differential
   # 1st and 10
@@ -277,13 +295,14 @@ kickoff_yardline <- function(season) {
 # seconds later. Late in a half teams hurry or stop the clock (out of bounds,
 # spikes, the 2 minute warning, which is why the gap dips for conversions just
 # before it). These are the mean gaps after 3rd and 4th down conversions in
-# 2016-2026 regular and postseason games (data-raw/_conversion_runoff.R), linear
-# in the seconds left in the half between the points measured. In the last 2:00
-# of the 2nd and of the 4th quarter (behind or tied) they leave out conversions
-# followed by an offense timeout, which a team with one can take instead (see
-# conversion_play_time() and get_go_wp()); earlier, teams take one after at most
-# 3% of conversions. A later conversion never leads to an earlier next snap.
-# Overtime uses the 4th quarter's.
+# 2016-2026 regular and postseason games, in bins of seconds left in the half,
+# taken at the middle of each bin and linear in between. They leave out
+# conversions followed by an offense timeout, which a team with one can take
+# instead late in a half (see conversion_play_time() and get_go_wp()); earlier,
+# teams take one after at most 3% of conversions. A later conversion never
+# leads to an earlier next snap. Overtime uses the 4th quarter's. The tables of
+# these three functions are `conversion_clock` (R/sysdata.rda), written by
+# data-raw/_conversion_runoff.R.
 conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
   n <- max(
     length(qtr),
@@ -293,40 +312,13 @@ conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
   qtr <- rep_len(qtr, n)
   score_differential <- rep_len(score_differential, n)
   h <- rep_len(half_seconds_remaining, n)
-  at <- function(x, y) stats::approx(x, y, xout = h, rule = 2)$y
-  q2 <- at(
-    c(0, 22, 37, 52, 75, 105, 135, 165, 210, 900),
-    c(5.9, 8.9, 11.4, 14.6, 18.2, 21.1, 17, 36, 36.5, 36.6)
-  )
-  q4_behind <- at(
-    c(0, 22, 37, 52, 75, 105, 135, 165, 210, 270, 330, 420, 540, 750, 900),
-    c(
-      7.2,
-      12.1,
-      14.8,
-      15.5,
-      18.4,
-      20.4,
-      13,
-      23,
-      27,
-      25,
-      31,
-      32.3,
-      33.7,
-      34.4,
-      34.4
-    )
-  )
-  q4_ahead <- at(
-    c(0, 75, 105, 135, 165, 210, 270, 330, 420, 900),
-    c(35, 37.5, 31.8, 15, 25, 29, 32, 40, 39.5, 39)
-  )
+  k <- conversion_clock$runoff
+  at <- function(d) stats::approx(d$h, d$gap, xout = h, rule = 2)$y
   case_when(
-    qtr %in% c(1, 3) ~ 36.6,
-    qtr == 2 ~ q2,
-    score_differential > 0 ~ q4_ahead,
-    TRUE ~ q4_behind
+    qtr %in% c(1, 3) ~ k$q1_q3,
+    qtr == 2 ~ at(k$q2),
+    score_differential > 0 ~ at(k$q4_ahead),
+    TRUE ~ at(k$q4_behind)
   )
 }
 
@@ -338,12 +330,8 @@ conversion_runoff <- function(qtr, half_seconds_remaining, score_differential) {
 # in conversion_runoff() are those of the conversions that were followed by a
 # snap.
 conversion_clock_out <- function(half_seconds_remaining) {
-  stats::approx(
-    c(3.5, 8.5, 12.5, 17.5, 25, 37.5, 45),
-    c(0.84, 0.65, 0.44, 0.10, 0.012, 0.009, 0),
-    xout = half_seconds_remaining,
-    rule = 2
-  )$y
+  k <- conversion_clock$clock_out
+  stats::approx(k$h, k$share, xout = half_seconds_remaining, rule = 2)$y
 }
 
 # Seconds a play that gains a first down takes when the offense stops the clock
@@ -351,7 +339,8 @@ conversion_clock_out <- function(half_seconds_remaining) {
 # (plays stopped by an offense timeout in the last 2:00 of a half, 2016-2026,
 # data-raw/_conversion_runoff.R)
 conversion_play_time <- function(gain) {
-  5.99 + 0.107 * gain
+  k <- conversion_clock$play_time
+  k[["intercept"]] + k[["per_yard"]] * gain
 }
 
 # Era bucket for the field goal model. Kicking has improved steadily rather
@@ -365,9 +354,7 @@ conversion_play_time <- function(gain) {
 # but an NA here would silently produce an fg_model_roof level the model has
 # never seen, so fail loudly instead.
 get_fg_era <- function(season) {
-  if (anyNA(season)) {
-    cli::cli_abort("{.arg season} must not contain missing values.")
-  }
+  check_season(season)
   if_else(season >= 2023, 1L, 0L)
 }
 
@@ -381,70 +368,58 @@ get_fg_era <- function(season) {
 # Used by both the prediction path (R/go_model.R) and
 # data-raw/_go_for_it_model.R. Like get_fg_era(), a missing season is an error.
 get_fd_era <- function(season) {
-  if (anyNA(season)) {
-    cli::cli_abort("{.arg season} must not contain missing values.")
-  }
+  check_season(season)
   if_else(season >= 2020, 1L, 0L)
+}
+
+# the era functions' check: a missing season is an error (reported as the
+# caller's)
+check_season <- function(season, call = parent.frame()) {
+  if (anyNA(season)) {
+    cli::cli_abort(
+      "{.arg season} must not contain missing values.",
+      call = call
+    )
+  }
 }
 
 # helper function to move the game to start of 3rd Q on an end-of-half play
 # on the plays where we find that the half has ended
 flip_half <- function(df) {
   prior_posteam <- df$posteam
-  end_of_half <- ifelse(df$qtr == 2 & df$half_seconds_remaining == 0, 1, 0)
+  end_of_half <- df$qtr == 2 & df$half_seconds_remaining == 0
+  # the team that kicked off to start the game receives
   df$posteam <- case_when(
-    df$home_opening_kickoff == 1 & end_of_half == 1 ~ df$away_team,
-    df$home_opening_kickoff == 0 & end_of_half == 1 ~ df$home_team,
+    df$home_opening_kickoff == 1 & end_of_half ~ df$away_team,
+    df$home_opening_kickoff == 0 & end_of_half ~ df$home_team,
     TRUE ~ df$posteam
   )
-  df$qtr <- ifelse(end_of_half == 1, 3L, df$qtr)
-  df$down <- ifelse(end_of_half == 1, 1, df$down)
-  df$ydstogo <- ifelse(end_of_half == 1, 10L, df$ydstogo)
-  df$yardline_100 <- ifelse(
-    end_of_half == 1,
+  df$qtr <- if_else(end_of_half, 3L, df$qtr)
+  df$down <- if_else(end_of_half, 1, df$down)
+  df$ydstogo <- if_else(end_of_half, 10L, df$ydstogo)
+  df$yardline_100 <- if_else(
+    end_of_half,
     kickoff_yardline(df$season),
     df$yardline_100
   )
-  df$half_seconds_remaining <- ifelse(
-    end_of_half == 1,
+  df$half_seconds_remaining <- if_else(
+    end_of_half,
     1800,
     df$half_seconds_remaining
   )
-  df$game_seconds_remaining <- ifelse(
-    end_of_half == 1,
+  df$game_seconds_remaining <- if_else(
+    end_of_half,
     1800,
     df$game_seconds_remaining
   )
-  df$score_differential <- ifelse(
-    df$posteam != prior_posteam & end_of_half == 1,
+  df$score_differential <- if_else(
+    df$posteam != prior_posteam & end_of_half,
     -df$score_differential,
     df$score_differential
   )
-  df$home_receive_2h_ko <- ifelse(end_of_half == 1, 0, df$home_receive_2h_ko)
+  df$home_receive_2h_ko <- if_else(end_of_half, 0, df$home_receive_2h_ko)
   df
 }
-
-# fill in end of game situation when team can kneel out clock
-# discourages punting or fg when the other team can end the game
-end_game_fn <- function(pbp) {
-  pbp$defteam_timeouts_remaining <- ifelse(
-    pbp$posteam == pbp$home_team,
-    pbp$away_timeouts_remaining,
-    pbp$home_timeouts_remaining
-  )
-  sd <- pbp$score_differential
-  g <- pbp$game_seconds_remaining
-  dto <- pbp$defteam_timeouts_remaining
-  pbp$vegas_wp <- case_when(
-    pbp$qtr > 4 ~ pbp$vegas_wp,
-    sd > 0 & g < 120 & dto == 0 ~ 0,
-    sd > 0 & g < 80 & dto == 1 ~ 0,
-    sd > 0 & g < 40 & dto == 2 ~ 0,
-    TRUE ~ pbp$vegas_wp
-  )
-  pbp
-}
-
 
 # ##############################################################################
 # other: this isn't used by the bot or shiny app but helps get an nflfastR df
@@ -456,7 +431,7 @@ prepare_nflfastr_data <- function(pbp) {
   # plays are filtered down to 4th downs
   data <- df_assign(
     pbp,
-    list(type = ifelse(tolower(pbp$season_type) == "reg", "reg", "post"))
+    list(type = if_else(tolower(pbp$season_type) == "reg", "reg", "post"))
   )
   data <- ot_possession_from_pbp(data)
   df_filter(
@@ -469,7 +444,9 @@ prepare_nflfastr_data <- function(pbp) {
 }
 
 # Columns the decision functions and models read (a superset: every prepared
-# column the package code names)
+# column the package code names). A column the code reads must be listed here:
+# tests/testthat/test-helpers.R checks that add_probs() gives the same result
+# on every column of nflfastR play-by-play.
 decision_cols <- c(
   # the bootstrap draw of stacked plays (add_boot_probs())
   ".draw",
@@ -541,16 +518,23 @@ decision_cols <- c(
   "runoff"
 )
 
-# convenience function to add the probs from each model. The decision
+# The columns of `df` in decision_cols, as a plain data.frame. The decision
 # functions expand every play into its outcomes, so they work on only the
-# columns they read (nflfastR play-by-play has hundreds more), and the results
-# are attached to the full rows at the end
+# columns they read (nflfastR play-by-play has hundreds more). A plain
+# data.frame because tibble's checks on every column assignment add up, and
+# built from the columns rather than with `[` on the caller's data frame (an
+# nflreadr data frame is also a data.table, whose `[` follows other rules).
+decision_frame <- function(df) {
+  vctrs::new_data_frame(
+    df_cols(df)[names(df) %in% decision_cols],
+    n = .row_names_info(df, 2L)
+  )
+}
+
+# convenience function to add the probs from each model, attached to the full
+# rows at the end
 add_probs <- function(df) {
-  # a plain data.frame: tibble's checks on every column assignment add up
-  # the columns as a plain data.frame, without `[` on the caller's data frame
-  # (an nflreadr data frame is also a data.table)
-  keep <- df_cols(df)[names(df) %in% decision_cols]
-  out <- vctrs::new_data_frame(keep, n = .row_names_info(df, 2L)) |>
+  out <- decision_frame(df) |>
     get_go_wp() |>
     get_fg_wp() |>
     get_punt_wp()

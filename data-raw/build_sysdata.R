@@ -33,15 +33,21 @@ fd_tables <- readRDS("data-raw/fd_tables.rds")
 
 # nflfastR's vegas_wp and overtime models and its field goal table, for the
 # code copied from nflfastR in R/nflfastr_models.R (nflverse/nflfastR#625 at
-# dc295839; nfl4th-checks/vendor/01_extract.R writes the .rds)
+# 856232ab; data-raw/nflfastr_extract.R writes the .rds)
 nflfastr_models <- readRDS("data-raw/nflfastr_models.rds")
 wp_vegas_model <- nflfastr_models$wp_vegas_model
 ot_wp_dp <- nflfastr_models$ot_wp_dp
 ot_wp_models <- nflfastr_models$ot_wp_models
 fg_prob_table <- nflfastr_models$fg_prob_table
 
+# the clock after a 4th down conversion (conversion_runoff(),
+# conversion_clock_out() and conversion_play_time()), written by
+# data-raw/_conversion_runoff.R
+conversion_clock <- readRDS("data-raw/conversion_clock.rds")
+
 usethis::use_data(
   pat_make_prob,
+  conversion_clock,
   fg_prob_df,
   punt_df,
   wp_first_down_model,

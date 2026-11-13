@@ -15,17 +15,29 @@ test_that("go_boost and the best option work on matrices of draws", {
   expect_equal(boot_decision(go, fg, punt), matrix(c(1L, 3L, 2L, 1L), 2))
 })
 
-test_that("a draw's models are used only inside with_draw()", {
+test_that("a draw's models are used only inside with_active()", {
   other <- list(wp = list(trees_raw = as.raw(1:3)), fd = list(conv = 1))
-  with_draw(other, {
+  with_active(other, {
     expect_identical(active_wp_model(), other$wp)
     expect_identical(active_fd_tables(), other$fd)
   })
   expect_identical(active_wp_model(), wp_first_down_model)
   expect_identical(active_fd_tables(), fd_tables)
   # also after an error
-  try(with_draw(other, stop("x")), silent = TRUE)
+  try(with_active(other, stop("x")), silent = TRUE)
   expect_identical(active_wp_model(), wp_first_down_model)
+  expect_null(nfl4th_active$wp)
+})
+
+test_that("each WP model keeps its own loaded xgboost model", {
+  shipped <- wpfd_booster()
+  expect_identical(wpfd_booster(wp_first_down_model), shipped)
+  # a draw (here a copy of the shipped fit) gets its own, loaded once
+  draw <- wpfd_cached(wp_first_down_model)
+  b <- wpfd_booster(draw)
+  expect_false(identical(b, shipped))
+  expect_identical(wpfd_booster(draw), b)
+  expect_identical(draw$booster_cache$booster, b)
 })
 
 test_that("add_4th_probs(bootstrap = TRUE) adds the draws", {

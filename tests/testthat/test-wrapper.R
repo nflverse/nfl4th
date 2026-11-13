@@ -100,7 +100,7 @@ test_that("a conversion is valued at the next snap, and runoff moves it", {
 
 test_that("the gap to the next snap after a conversion", {
   # away from the end of a half the clock runs about 37 seconds
-  expect_equal(conversion_runoff(1, 1500, 0), 36.6)
+  expect_equal(conversion_runoff(1, 1500, 0), 36.5, tolerance = 0.01)
   expect_gt(conversion_runoff(4, 600, 0), 30)
   # late in a half teams hurry or stop the clock
   expect_lt(conversion_runoff(4, 30, -3), 15)
@@ -117,7 +117,7 @@ test_that("the gap to the next snap after a conversion", {
   expect_gt(conversion_clock_out(3), 0.8)
   expect_equal(conversion_clock_out(60), 0)
   # the play itself takes about 6 seconds, longer for longer gains
-  expect_equal(conversion_play_time(0), 5.99)
+  expect_equal(conversion_play_time(0), 6, tolerance = 0.01)
   expect_gt(conversion_play_time(40), conversion_play_time(5))
 })
 

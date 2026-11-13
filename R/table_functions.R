@@ -50,7 +50,7 @@ make_table_data <- function(probs) {
     ),
     choice_rows(
       "Punt",
-      if_else(is.na(probs$punt_wp), NA_real_, probs$punt_wp),
+      probs$punt_wp,
       NA_real_,
       NA_real_,
       NA_real_

@@ -17,65 +17,62 @@ get_punt_wp <- function(pbp) {
   for (n in setdiff(names(punt_df), "yardline_100")) {
     probs[[n]] <- punt_df[[n]][m$haystack]
   }
+  # a return touchdown (yardline_after 100) or a muff the punting team
+  # recovers (muff 1)
+  td <- probs$yardline_after == 100
+  muff <- probs$muff == 1
   probs$.ot_possession <- probs$ot_possession
   probs <- flip_team(probs)
 
   # overtime: a muffed punt recovered by the punting team keeps its
   # possession going, a return touchdown ends the game
   probs$ot_possession <- if_else(
-    probs$muff %in% 1,
+    muff,
     probs$.ot_possession,
     probs$ot_possession
   )
   probs$ot_end <- case_when(
-    probs$qtr > 4 & probs$yardline_after %in% 100 ~ 0,
-    probs$muff %in% 1 ~ NA_real_,
+    probs$qtr > 4 & td ~ 0,
+    muff ~ NA_real_,
     TRUE ~ probs$ot_end
   )
+  probs$.ot_possession <- NULL
   probs$yardline_100 <- 100 - probs$yardline_after
 
-  # deal with punt return TD (yardline_after == 100) or muff (muff == 1)
-  # we want punting team to be receiving a kickoff so have to flip
-  # everything back
-  td_or_muff <- probs$yardline_after == 100 | probs$muff == 1
-  probs$posteam <- case_when(
-    td_or_muff & probs$original_posteam == probs$away_team ~ probs$away_team,
-    td_or_muff & probs$original_posteam == probs$home_team ~ probs$home_team,
-    TRUE ~ probs$posteam
-  )
-
-  # muff / return TD stuff
-  probs$yardline_100 <- ifelse(
-    probs$muff == 1,
-    as.integer(100 - probs$yardline_100),
+  # after a return touchdown the punting team receives the kickoff, 7 points
+  # down; after a muff it keeps the ball where the muff was recovered. Either
+  # way it has the ball again
+  probs$posteam <- if_else(td | muff, probs$original_posteam, probs$posteam)
+  probs$yardline_100 <- if_else(
+    muff,
+    100 - probs$yardline_100,
     probs$yardline_100
   )
-  probs$yardline_100 <- ifelse(
-    probs$yardline_after == 100,
+  probs$yardline_100 <- if_else(
+    td,
     kickoff_yardline(probs$season),
-    as.integer(probs$yardline_100)
+    probs$yardline_100
   )
   probs$score_differential <- if_else(
-    probs$yardline_after == 100,
-    as.integer(-probs$score_differential - 7),
-    as.integer(probs$score_differential)
+    td,
+    -probs$score_differential - 7,
+    probs$score_differential
   )
   probs$score_differential <- if_else(
-    probs$muff == 1,
-    as.integer(-probs$score_differential),
-    as.integer(probs$score_differential)
+    muff,
+    -probs$score_differential,
+    probs$score_differential
   )
-  probs$ydstogo <- ifelse(
+  probs$ydstogo <- if_else(
     probs$yardline_100 < 10,
     probs$yardline_100,
-    as.integer(probs$ydstogo)
+    probs$ydstogo
   )
-  probs$.ot_possession <- NULL
 
-  probs <- end_game_fn(calculate_win_probability(flip_half(probs)))
+  probs <- decision_state_wp(flip_half(probs))
   # the outcomes' WP weighted by their probability, summed by play in row
   # order (as summarize() does)
-  wt_wp <- probs$pct * probs$vegas_wp
+  wt_wp <- probs$pct * probs$state_wp
   s <- vapply(split(wt_wp, probs$punt_index), sum, numeric(1))
   pbp$punt_wp <- unname(s[match(pbp$punt_index, as.integer(names(s)))])
   pbp$punt_index <- NULL
@@ -108,19 +105,19 @@ get_fg_wp <- function(pbp) {
   make$yardline_100 <- kickoff_yardline(make$season)
   make$score_differential <- make$score_differential - 3
   # (flip_half() for end of 1st half stuff)
-  make <- end_game_fn(calculate_win_probability(flip_half(make)))
+  make <- decision_state_wp(flip_half(make))
 
   # win prob after missed FG
   miss <- flip_team(dat)
   yl <- (100 - miss$yardline_100) - 8
   # yardline_100 can't be bigger than 80 due to some weird nfl rule
   yl <- if_else(yl > 80, 80, yl)
-  miss$yardline_100 <- ifelse(yl < 1, 1, yl)
-  miss <- end_game_fn(calculate_win_probability(flip_half(miss)))
+  miss$yardline_100 <- if_else(yl < 1, 1, yl)
+  miss <- decision_state_wp(flip_half(miss))
 
   # both keep the rows of dat in order
-  dat$make_fg_wp <- make$vegas_wp
-  dat$miss_fg_wp <- miss$vegas_wp
+  dat$make_fg_wp <- make$state_wp
+  dat$miss_fg_wp <- miss$state_wp
   dat$fg_wp <- dat$fg_make_prob *
     dat$make_fg_wp +
     (1 - dat$fg_make_prob) * dat$miss_fg_wp
@@ -157,49 +154,38 @@ two_pt_conversion_prob <- function(pbp) {
 # this is here because it's needed for the going for 4th down model
 get_2pt_wp <- function(pbp) {
   n <- nrow(pbp)
-  pbp$index_2pt <- seq_len(n)
-  pbp$prob_2pt <- two_pt_conversion_prob(pbp)
+  pbp$conv_2pt <- two_pt_conversion_prob(pbp)
 
   # probability of making PAT: the field goal model's make probability from
   # the 15 for the roof/era group (pat_make_prob, built in
   # data-raw/build_sysdata.R)
-  pbp$prob_1pt <- unname(pat_make_prob[as.character(pbp$fg_model_roof)])
+  pbp$conv_1pt <- unname(pat_make_prob[as.character(pbp$fg_model_roof)])
 
   # in overtime the rules decide whether the game goes on after the try. The
   # three tries (0, 1 and 2 points) are stacked, each in the order of pbp
   tries <- lapply(c(0, 1, 2), function(pts) {
     d <- ot_touchdown(pbp, pts)
     d$pts <- rep(pts, n)
-    d$score_differential <- if (pts == 0) {
-      -d$score_differential
-    } else {
-      -d$score_differential - pts
-    }
+    d$score_differential <- -d$score_differential - pts
     d
   })
   probs <- do.call(vctrs::vec_rbind, tries)
   # switch posteam
-  probs$posteam <- case_when(
-    probs$home_team == probs$posteam ~ probs$away_team,
-    probs$away_team == probs$posteam ~ probs$home_team
-  )
+  probs$posteam <- other_team(probs$posteam, probs$home_team, probs$away_team)
   # 1st & 10 after the kickoff
   probs$yardline_100 <- kickoff_yardline(probs$season)
   probs$down <- rep(1, nrow(probs))
   probs$ydstogo <- rep(10, nrow(probs))
-  w <- calculate_win_probability(flip_half(probs))$vegas_wp
+  w <- decision_state_wp(flip_half(probs))$state_wp
 
   i <- seq_len(n)
   pbp$wp_0 <- w[i]
   pbp$wp_1 <- w[n + i]
   pbp$wp_2 <- w[2L * n + i]
-  pbp$conv_2pt <- pbp$prob_2pt
-  pbp$conv_1pt <- pbp$prob_1pt
   pbp$wp_go2 <- pbp$conv_2pt * pbp$wp_2 + (1 - pbp$conv_2pt) * pbp$wp_0
   pbp$wp_go1 <- pbp$conv_1pt * pbp$wp_1 + (1 - pbp$conv_1pt) * pbp$wp_0
   # convenience column useful for other things
-  pbp$wp_td <- ifelse(pbp$wp_go1 > pbp$wp_go2, pbp$wp_go1, pbp$wp_go2)
-  pbp$index_2pt <- NULL
+  pbp$wp_td <- if_else(pbp$wp_go1 > pbp$wp_go2, pbp$wp_go1, pbp$wp_go2)
   pbp
 }
 
@@ -225,47 +211,30 @@ get_go_wp <- function(pbp) {
   p$yardline_100 <- p$yardline_100 - p$gain
   # for figuring out if it was a td later
   p$final_yardline <- p$yardline_100
-  p$turnover <- ifelse(p$gain < p$ydstogo, 1, 0)
+  p$turnover <- if_else(p$gain < p$ydstogo, 1, 0)
+  turnover <- p$turnover == 1
   p$down <- rep(1, nrow(p))
 
-  # overtime: a team that trails in the second possession loses when it
-  # turns the ball over, otherwise the other team's possession starts
-  p$ot_end <- if_else(
-    p$turnover == 1 &
-      p$qtr > 4 &
-      p$ot_rule != "SD" &
-      p$ot_possession == 2 &
-      p$score_differential < 0,
-    0,
-    p$ot_end
-  )
-  p$ot_possession <- case_when(
-    p$turnover == 0 | p$qtr <= 4 ~ p$ot_possession,
-    p$ot_rule == "SD" ~ 3,
-    TRUE ~ pmin(p$ot_possession + 1, 3)
-  )
+  # overtime: a turnover on downs changes possession (ot_change_possession())
+  oc <- ot_change_possession(p)
+  p$ot_end <- if_else(turnover, oc$ot_end, p$ot_end)
+  p$ot_possession <- if_else(turnover, oc$ot_possession, p$ot_possession)
 
   # flip a bunch of columns on turnover on downs where other team gets ball
   # # note: touchdowns are dealt with separately later
-  p$yardline_100 <- ifelse(
-    p$turnover == 1,
-    100 - p$yardline_100,
-    p$yardline_100
+  p$yardline_100 <- if_else(turnover, 100 - p$yardline_100, p$yardline_100)
+  p$posteam <- if_else(
+    turnover,
+    other_team(p$posteam, p$home_team, p$away_team),
+    p$posteam
   )
-  # switch posteam if turnover
-  p$posteam <- case_when(
-    p$home_team == p$posteam & p$turnover == 1 ~ p$away_team,
-    p$away_team == p$posteam & p$turnover == 1 ~ p$home_team,
-    TRUE ~ p$posteam
-  )
-  # swap score diff if turnover on downs
-  p$score_differential <- ifelse(
-    p$turnover == 1,
+  p$score_differential <- if_else(
+    turnover,
     -p$score_differential,
     p$score_differential
   )
   # give 6 points for the TD plays
-  p$score_differential <- ifelse(
+  p$score_differential <- if_else(
     p$yardline_100 == 0,
     p$score_differential + 6,
     p$score_differential
@@ -290,14 +259,10 @@ get_go_wp <- function(pbp) {
   late <- conv &
     h0 <= 45 &
     (p$qtr == 2 | (p$qtr == 4 & p$score_differential <= 0))
-  q <- ifelse(late %in% TRUE, conversion_clock_out(h0), 0)
+  q <- if_else(late %in% TRUE, conversion_clock_out(h0), 0)
   ro <- which(q > 0)
   home_ball <- p$posteam == p$home_team
-  to_left <- ifelse(
-    home_ball,
-    p$home_timeouts_remaining,
-    p$away_timeouts_remaining
-  )
+  to_left <- timeouts_home_away(p, home_ball)
   stop <- which(conv & p$qtr %in% c(2, 4) & h0 <= 120 & to_left > 0)
   n0 <- nrow(p)
   tw <- n0 + seq_along(stop)
@@ -324,7 +289,7 @@ get_go_wp <- function(pbp) {
 
   # if now goal to go for either team, use yardline for yards to go,
   # otherwise it's 1st and 10
-  p$ydstogo <- ifelse(p$yardline_100 < 10, p$yardline_100, 10)
+  p$ydstogo <- if_else(p$yardline_100 < 10, p$yardline_100, 10)
 
   # WP after a TD, from the choice of a 1pt or 2pt try
   td <- which(p$yardline_100 == 0)
@@ -333,45 +298,23 @@ get_go_wp <- function(pbp) {
     p$wp_td <- tds$wp_td[match(seq_len(nrow(p)), td)]
   }
 
-  preds <- calculate_win_probability(flip_half(p))
+  preds <- decision_state_wp(flip_half(p))
   # get the TD probs computed separately
-  preds$vegas_wp <- ifelse(preds$yardline_100 == 0, preds$wp_td, preds$vegas_wp)
-  # fill in end of game situation when team can kneel out clock after
-  # successful non-td conversion
-  preds$defteam_timeouts_remaining <- ifelse(
-    preds$posteam == preds$home_team,
-    preds$away_timeouts_remaining,
-    preds$home_timeouts_remaining
-  )
-  sd <- preds$score_differential
-  g <- preds$game_seconds_remaining
-  dto <- preds$defteam_timeouts_remaining
-  to <- preds$turnover
-  yl <- preds$yardline_100
-  preds$vegas_wp <- case_when(
-    preds$qtr > 4 ~ preds$vegas_wp,
-    sd > 0 & to == 0 & yl > 0 & g < 120 & dto == 0 ~ 1,
-    sd > 0 & to == 0 & yl > 0 & g < 80 & dto == 1 ~ 1,
-    sd > 0 & to == 0 & yl > 0 & g < 40 & dto == 2 ~ 1,
-    TRUE ~ preds$vegas_wp
-  )
-  # fill in end of game situation when other team can kneel out clock after
-  # failed attempt
-  preds$vegas_wp <- case_when(
-    preds$qtr > 4 ~ preds$vegas_wp,
-    sd > 0 & to == 1 & g < 120 & dto == 0 ~ 0,
-    sd > 0 & to == 1 & g < 80 & dto == 1 ~ 0,
-    sd > 0 & to == 1 & g < 40 & dto == 2 ~ 0,
-    TRUE ~ preds$vegas_wp
-  )
+  if (!is.null(preds$wp_td)) {
+    preds$state_wp <- if_else(
+      preds$yardline_100 == 0,
+      preds$wp_td,
+      preds$state_wp
+    )
+  }
 
   # without a timeout the clock may run out after a conversion; a team with one
   # uses it if that is better
   if (length(stop) + length(ro) > 0) {
-    wp <- preds$vegas_wp
+    wp <- preds$state_wp
     wp[ro] <- (1 - q[ro]) * wp[ro] + q[ro] * wp[rw]
     wp[stop] <- pmax(wp[stop], wp[tw])
-    preds$vegas_wp <- wp
+    preds$state_wp <- wp
     preds <- preds[seq_len(n0), , drop = FALSE]
   }
 
@@ -379,7 +322,7 @@ get_go_wp <- function(pbp) {
   # weighted by the outcomes' probability within it. Sums by group in row
   # order, as group_by() and summarize() did
   fd_pct <- stats::ave(preds$prob, preds$go_index, preds$turnover, FUN = sum)
-  wt_within <- preds$prob / fd_pct * preds$vegas_wp
+  wt_within <- preds$prob / fd_pct * preds$state_wp
   by <- list(preds$go_index, preds$turnover)
   pct <- tapply(preds$prob, by, sum)
   wp <- tapply(wt_within, by, sum)
@@ -389,7 +332,7 @@ get_go_wp <- function(pbp) {
   pbp$wp_fail <- unname(col(wp, "1")[i])
   pbp$wp_succeed <- unname(col(wp, "0")[i])
 
-  go <- tapply(preds$prob * preds$vegas_wp, preds$go_index, sum)
+  go <- tapply(preds$prob * preds$state_wp, preds$go_index, sum)
   pbp$go_wp <- as.vector(go)[match(pbp$go_index, as.integer(names(go)))]
   pbp$go_index <- NULL
   pbp

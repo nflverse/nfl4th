@@ -172,16 +172,17 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 
   # season-by-season = less likely to result in crashes due to memory
   if (fast) {
+    pre_computed <- nflreadr::rds_from_url(paste0(
+      "https://github.com/nflverse/nfl4th/releases/download/",
+      "nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
+    ))
     data <- df_bind_rows(lapply(
       seasons,
       function(.x) {
         cli::cli_alert_info("Loading season {.x}")
         df_left_join(
           nflreadr::load_pbp(.x),
-          nflreadr::rds_from_url(paste0(
-            "https://github.com/nflverse/nfl4th/releases/download/",
-            "nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
-          )),
+          pre_computed,
           by = c("game_id", "play_id")
         )
       }
@@ -198,14 +199,14 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
   }
 
   desc <- data$desc
-  go <- ifelse(
+  go <- if_else(
     (data$rush == 1 | data$pass == 1) &
       !data$play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
     100,
     0
   )
   # if it's an aborted snap in punt formation, call it a punt
-  go <- ifelse(
+  go <- if_else(
     data$aborted_play == 1 & re_detect(desc, "Punt formation"),
     0,
     go

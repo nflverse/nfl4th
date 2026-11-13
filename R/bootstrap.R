@@ -5,7 +5,18 @@
 # models are the same in every draw. add_4th_probs(bootstrap = TRUE) values
 # every play under each draw.
 
-# The models in use: the shipped fit unless a draw is active (with_draw())
+# Hooks. The model functions use the shipped fits unless one of these is set
+# in nfl4th_active. Only the bootstrap sets them, always through with_active(),
+# which restores them when its code is done:
+# - wp: the 1st down WP model in use (active_wp_model(): wpfd_logit() and the
+#   WP model functions)
+# - fd: the go for it model's tables in use (active_fd_tables():
+#   fd_gain_probs())
+# - logit: a function called in place of wpfd_logit() (add_boot_probs()
+#   records the states the WP model is asked about, then looks up each draw's
+#   values for them)
+# - fd_draws: every draw's go for it tables, for plays stacked once per draw
+#   with a `.draw` column (fd_gain_probs())
 nfl4th_active <- new.env(parent = emptyenv())
 
 active_wp_model <- function() {
@@ -18,15 +29,17 @@ active_fd_tables <- function() {
   if (is.null(tb)) fd_tables else tb
 }
 
-# evaluate `code` with a draw's models
-with_draw <- function(draw, code) {
-  old <- list(wp = nfl4th_active$wp, fd = nfl4th_active$fd)
-  on.exit({
-    nfl4th_active$wp <- old$wp
-    nfl4th_active$fd <- old$fd
-  })
-  nfl4th_active$wp <- draw$wp
-  nfl4th_active$fd <- draw$fd
+# evaluate `code` with the hooks in the named list `set` (NULL removes one)
+with_active <- function(set, code) {
+  old <- mget(names(set), envir = nfl4th_active, ifnotfound = list(NULL))
+  on.exit(
+    for (n in names(old)) {
+      assign(n, old[[n]], envir = nfl4th_active)
+    }
+  )
+  for (n in names(set)) {
+    assign(n, set[[n]], envir = nfl4th_active)
+  }
   force(code)
 }
 
@@ -84,6 +97,11 @@ bootstrap_models <- function() {
         )
       ))
     }
+    # each draw's xgboost model is loaded once, when first used
+    m$draws <- lapply(m$draws, function(d) {
+      d$wp <- wpfd_cached(d$wp)
+      d
+    })
     bootstrap_memo$models <- m
     bootstrap_memo$file <- f
     bootstrap_memo$info <- info
@@ -94,7 +112,7 @@ bootstrap_models <- function() {
 # go_boost as add_4th_probs() computes it, for matrices (plays x draws)
 boot_go_boost <- function(go, fg, punt) {
   punt[is.na(punt)] <- 0
-  kick <- ifelse(is.na(fg), punt, pmax(fg, punt))
+  kick <- pmax(fg, punt, na.rm = TRUE)
   100 * (go - kick)
 }
 
@@ -118,20 +136,6 @@ wpfd_inputs <- c(
   "posteam_timeouts_remaining",
   "defteam_timeouts_remaining"
 )
-
-# evaluate `code` with hooks set in nfl4th_active (NULL removes one)
-with_active <- function(set, code) {
-  old <- mget(names(set), envir = nfl4th_active, ifnotfound = list(NULL))
-  on.exit(
-    for (n in names(old)) {
-      assign(n, old[[n]], envir = nfl4th_active)
-    }
-  )
-  for (n in names(set)) {
-    assign(n, set[[n]], envir = nfl4th_active)
-  }
-  force(code)
-}
 
 # Every play under every draw. `x` is what add_4th_probs() passes to
 # add_probs(). Valuing a play asks the WP model about the same states whatever
@@ -185,10 +189,7 @@ add_boot_probs <- function(x, chunk = 50L) {
   q <- vctrs::vec_unique(do.call(vctrs::vec_rbind, rec$q))
 
   # 2. and 3., in the worker processes if they are running
-  xr <- vctrs::new_data_frame(
-    df_cols(x)[names(x) %in% decision_cols],
-    n = .row_names_info(x, 2L)
-  )
+  xr <- decision_frame(x)
   ev <- boot_eval_workers(xr, q)
   if (is.null(ev)) {
     ev <- boot_eval(xr, q, others)

@@ -49,7 +49,7 @@ test_that("a team can't be worse off after scoring a touchdown", {
   expect_true(all(wp <= post + 1e-12))
 })
 
-test_that("a team ahead that can kneel out the clock is at 0.9998", {
+test_that("a team ahead that can kneel out the clock wins", {
   # 1st and 10 up 3 with 1:00 left: the defense's 2 timeouts stop the clock
   # twice, so three kneels run off 52 seconds
   x <- wp_state(
@@ -59,9 +59,9 @@ test_that("a team ahead that can kneel out the clock is at 0.9998", {
     defteam_timeouts_remaining = 2
   )
   wp <- wpfd_predict(x)
-  expect_true(all(wp[1:3] >= 0.9998))
+  expect_identical(wp[1:3], c(1, 1, 1))
   # 38 seconds beyond the kneel time the model is nearly back
-  expect_lt(wp[4], 0.9998)
+  expect_lt(wp[4], 0.999)
 })
 
 test_that("a team behind deep in its own half with seconds left rarely wins", {

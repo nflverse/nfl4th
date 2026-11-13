@@ -36,7 +36,7 @@ ot_win_probability <- function(x, w) {
   # a regular season game ends when the clock runs out, a tie is half a win
   over <- x$type %in% "reg" & x$game_seconds_remaining <= 0
   d <- x$score_differential[over]
-  w[over] <- ifelse(d > 0, 1, ifelse(d == 0, 0.5, 0))
+  w[over] <- if_else(d > 0, 1, if_else(d == 0, 0.5, 0))
   w
 }
 
@@ -112,7 +112,7 @@ ot_touchdown <- function(df, pts) {
 ot_possession_from_pbp <- function(pbp) {
   ot <- which(pbp$qtr > 4)
   poss <- rep(NA_real_, nrow(pbp))
-  team <- ifelse(!is.na(pbp$down), pbp$posteam, NA_character_)
+  team <- if_else(!is.na(pbp$down), pbp$posteam, NA_character_)
   for (idx in split(ot, pbp$game_id[ot])) {
     t <- team[idx]
     snap <- which(!is.na(t))

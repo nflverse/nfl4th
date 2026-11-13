@@ -26,6 +26,7 @@ Imports:
     vctrs (>= 0.7.0),
     xgboost
 Suggests: 
+    dplyr (>= 1.2.0),
     future,
     gt,
     knitr,

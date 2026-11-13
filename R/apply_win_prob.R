@@ -30,8 +30,10 @@
 #    the game is valued by the final result, a tie by nflfastR's overtime model.
 # 6. The end of the game, as in nflfastR's vegas_wp (nflfastR#625): in the last
 #    4 minutes WP is averaged over +-16 seconds and +-2 yards; a team ahead
-#    that can kneel out the clock is at 0.9998, moving back to the model 10 to
-#    40 seconds short of that; a team behind deep in its own half moves to 0
+#    that can kneel out the clock wins (WP 1, where nflfastR has 0.9998),
+#    moving back to the model 10 to 40 seconds short of that; this is also the
+#    only kneel rule the decision functions use; a team behind deep in its own
+#    half moves to 0
 #    over the last 20 seconds; a tied game moves over the last 10 seconds to
 #    the value of the best option left at 0:00, a field goal from this spot or
 #    overtime. (nflfastR's rule for 4th down kicks in the last 30 seconds
@@ -157,7 +159,7 @@ wpfd_fg_make <- function(yl) {
 
 # weight of the whole offset
 wpfd_fade <- function(g, k) {
-  ifelse(g >= k$fade_t, 1, k$fade_end + (1 - k$fade_end) * g / k$fade_t)
+  if_else(g >= k$fade_t, 1, k$fade_end + (1 - k$fade_end) * g / k$fade_t)
 }
 
 # offset on the logit scale
@@ -174,37 +176,44 @@ wpfd_offset <- function(x, beta, k) {
 
 wpfd_cache <- new.env(parent = emptyenv())
 
-# The loaded xgboost model, kept for each model used (the shipped fit and the
-# bootstrap draws, see R/bootstrap.R), by a fingerprint of its bytes
+# The loaded xgboost model of a WP model, loaded once and kept: the shipped
+# fit's in wpfd_cache, a bootstrap draw's with the draw (in the environment
+# wpfd_cached() adds, see bootstrap_models()). A model with neither is loaded
+# on every call.
 wpfd_booster <- function(model = active_wp_model()) {
-  raw <- model$trees_raw
-  key <- paste(
-    length(raw),
-    paste(
-      as.integer(raw[round(seq(1, length(raw), length.out = 64))]),
-      collapse = "."
-    )
-  )
-  if (is.null(wpfd_cache$boosters[[key]])) {
-    booster <- tryCatch(
-      xgboost::xgb.load.raw(raw),
-      error = function(e) {
-        cli::cli_abort(c(
-          "Can't load the win probability model.",
-          "i" = paste(
-            "It was saved with xgboost {.val {model$xgboost_version}} and you",
-            "have {.val {as.character(utils::packageVersion('xgboost'))}}."
-          ),
-          "x" = conditionMessage(e)
-        ))
-      }
-    )
-    if (is.null(wpfd_cache$boosters)) {
-      wpfd_cache$boosters <- list()
+  cache <- model$booster_cache
+  if (is.null(cache)) {
+    if (!identical(model$trees_raw, wp_first_down_model$trees_raw)) {
+      return(wpfd_load_booster(model))
     }
-    wpfd_cache$boosters[[key]] <- booster
+    cache <- wpfd_cache
   }
-  wpfd_cache$boosters[[key]]
+  if (is.null(cache$booster)) {
+    cache$booster <- wpfd_load_booster(model)
+  }
+  cache$booster
+}
+
+# `model` with a place to keep its loaded xgboost model (wpfd_booster())
+wpfd_cached <- function(model) {
+  model$booster_cache <- new.env(parent = emptyenv())
+  model
+}
+
+wpfd_load_booster <- function(model) {
+  tryCatch(
+    xgboost::xgb.load.raw(model$trees_raw),
+    error = function(e) {
+      cli::cli_abort(c(
+        "Can't load the win probability model.",
+        "i" = paste(
+          "It was saved with xgboost {.val {model$xgboost_version}} and you",
+          "have {.val {as.character(utils::packageVersion('xgboost'))}}."
+        ),
+        "x" = conditionMessage(e)
+      ))
+    }
+  )
 }
 
 # xgboost changed `iterationrange` from a half open [start, end) range (1.x) to
@@ -395,14 +404,14 @@ wpfd_behind_t <- 20
 
 # Seconds a team can run off by kneeling: each kneel takes about 3 seconds and
 # 40 more run off between kneels unless the other team stops the clock (its
-# timeouts, and the 2 minute warning once). WP is wpfd_kneel_value up to 10
-# seconds beyond this, moving to the model's value at 40.
+# timeouts, and the 2 minute warning once). WP is wpfd_kneel_value (a win) up
+# to 10 seconds beyond this, moving to the model's value at 40.
 wpfd_kneel_time <- function(t, down, dto) {
   n <- 5 - down
   stops <- dto + as.numeric(t > 120)
   3 * n + 40 * pmax(n - 1 - stops, 0)
 }
-wpfd_kneel_value <- 0.9998
+wpfd_kneel_value <- 1
 
 # seconds left after a kick at the end of the game below which the field goal
 # value moves toward the final result
@@ -415,7 +424,7 @@ wpfd_tie_t <- 10
 # value of the final score of regulation for the team with the ball (a tie
 # goes to overtime)
 wpfd_end_value <- function(sd, tie = 0.5) {
-  ifelse(sd > 0, 1, ifelse(sd < 0, 0, tie))
+  if_else(sd > 0, 1, if_else(sd < 0, 0, tie))
 }
 
 # WP of the team with the ball at the start of overtime, before the coin toss,
@@ -426,7 +435,7 @@ wpfd_ot_start <- function(x) {
   type <- if (is.null(x[["type"]])) rep("reg", n) else x[["type"]]
   wp_ot_start(data.frame(
     season = season,
-    season_type = ifelse(type %in% "post", "POST", "REG"),
+    season_type = if_else(type %in% "post", "POST", "REG"),
     posteam_spread = x$posteam_spread
   ))
 }
@@ -444,7 +453,7 @@ wpfd_post_td_state <- function(x, pts, dt = 6) {
   y$posteam_timeouts_remaining <- x$defteam_timeouts_remaining
   y$defteam_timeouts_remaining <- x$posteam_timeouts_remaining
   first <- x$game_seconds_remaining > 1800
-  y$receive_2h_ko <- ifelse(first, 1 - x$receive_2h_ko, 0)
+  y$receive_2h_ko <- if_else(first, 1 - x$receive_2h_ko, 0)
   y$game_seconds_remaining <- pmax(x$game_seconds_remaining - dt, 0)
   y$half_seconds_remaining <- pmax(x$half_seconds_remaining - dt, 0)
   y
@@ -469,7 +478,7 @@ wpfd_fg_prob <- function(x) {
 # probability that the PAT after a touchdown is good: a field goal from the 15
 # since 2015 (the 2 before)
 wpfd_pat_prob <- function(x) {
-  x$yardline_100 <- ifelse(x$season >= 2015, 15, 2)
+  x$yardline_100 <- if_else(x$season >= 2015, 15, 2)
   wpfd_fg_prob(x)
 }
 
@@ -484,12 +493,12 @@ wpfd_fg_value <- function(x, model, p_fg, dt = 5) {
   # a kick at the end of the 1st half ends the half: value it just before
   # halftime, where the 2nd half kickoff still counts
   first <- x$game_seconds_remaining > 1800
-  h <- ifelse(
+  h <- if_else(
     first,
     pmax(x$half_seconds_remaining - dt, 1),
     made$half_seconds_remaining
   )
-  g <- ifelse(first, 1800 + h, made$game_seconds_remaining)
+  g <- if_else(first, 1800 + h, made$game_seconds_remaining)
   made$half_seconds_remaining <- miss$half_seconds_remaining <- h
   made$game_seconds_remaining <- miss$game_seconds_remaining <- g
   v_made <- 1 - wpfd_raw(made, model)
@@ -498,7 +507,7 @@ wpfd_fg_value <- function(x, model, p_fg, dt = 5) {
   # ahead; missed, the score stands (a tie goes to overtime). The model doesn't
   # know that the game ends, so with up to wpfd_fg_end_t seconds left after the
   # kick its value is blended toward the final result.
-  w <- ifelse(
+  w <- if_else(
     first,
     1,
     pmin(pmax(x$game_seconds_remaining - dt, 0) / wpfd_fg_end_t, 1)
@@ -564,22 +573,25 @@ wpfd_predict <- function(x, model = active_wp_model(), dt = 6) {
   w
 }
 
-drop.me <- c("vegas_wp", "vegas_home_wp", "ep")
+# model outputs a row of play-by-play can carry that don't belong to the
+# states after the play (nflfastR's own WP and EP, and every *_prob column)
+state_drop_cols <- c("vegas_wp", "vegas_home_wp", "ep")
 
-# Win probability of the states in `pbp_data`, from the point of view of the
-# team that has the 4th down decision (`original_posteam`). Regulation states
-# are valued with nfl4th's model above, overtime states with nflfastR's
-# overtime model. Rows can carry `ot_end`, the final
-# WP (again for `original_posteam`) of states where the overtime rules end the
-# game.
-calculate_win_probability <- function(pbp_data) {
+# Win probability (`state_wp`) of the states in `pbp_data`, which the decision
+# functions build from the outcomes of each option, from the point of view of
+# the team that has the 4th down decision (`original_posteam`). Regulation
+# states are valued with nfl4th's model above, overtime states with nflfastR's
+# overtime model. Rows can carry `ot_end`, the final WP (again for
+# `original_posteam`) of states where the overtime rules end the game. The
+# model outputs in state_drop_cols and *_prob columns are dropped.
+decision_state_wp <- function(pbp_data) {
   # (tidyselect's ends_with() ignores case)
   drop <- names(pbp_data) %in%
-    drop.me |
+    state_drop_cols |
     grepl("_prob$", names(pbp_data), ignore.case = TRUE)
   pbp_data <- pbp_data[, !drop, drop = FALSE]
   if (nrow(pbp_data) == 0) {
-    pbp_data$vegas_wp <- numeric(0)
+    pbp_data$state_wp <- numeric(0)
     return(pbp_data)
   }
 
@@ -606,11 +618,11 @@ calculate_win_probability <- function(pbp_data) {
   }
 
   # from the point of view of the team with the 4th down decision
-  wp <- ifelse(x$posteam != x$original_posteam, 1 - wp, wp)
+  wp <- if_else(x$posteam != x$original_posteam, 1 - wp, wp)
   if ("ot_end" %in% names(x)) {
-    wp <- ifelse(!is.na(x$ot_end), x$ot_end, wp)
+    wp <- if_else(!is.na(x$ot_end), x$ot_end, wp)
   }
-  pbp_data$vegas_wp <- wp
+  pbp_data$state_wp <- wp
   pbp_data
 }
 
@@ -627,16 +639,8 @@ wp_inputs <- function(pbp_data) {
     x$qtr <= 2 & x$home_opening_kickoff == 0 & x$posteam == x$home_team ~ 1,
     TRUE ~ 0
   )
-  x$posteam_timeouts_remaining <- if_else(
-    x$home == 1,
-    x$home_timeouts_remaining,
-    x$away_timeouts_remaining
-  )
-  x$defteam_timeouts_remaining <- if_else(
-    x$home == 1,
-    x$away_timeouts_remaining,
-    x$home_timeouts_remaining
-  )
+  x$posteam_timeouts_remaining <- timeouts_home_away(x, x$home == 1)
+  x$defteam_timeouts_remaining <- timeouts_home_away(x, x$home != 1)
   x
 }
 

@@ -48,7 +48,10 @@ get_4th_plays <- function(gid) {
         jsonlite::fromJSON(flatten = TRUE)
 
       if ("code" %in% names(pbp)) {
-        warning(warn <- 1)
+        cli::cli_alert_warning(
+          "Warning: The requested GameID {df$espn} ({df$game_id}) is invalid!"
+        )
+        return(plays)
       }
 
       # get plays out of the drives lists
@@ -91,41 +94,37 @@ get_4th_plays <- function(gid) {
             time = "clock_display_value"
           )
         )
-        plays <- df_mutate(
-          plays,
-          # time column is wacky so extract it from play description when
-          # possible
-          play_time = re_extract(desc, "\\([^()]+(?=\\)\\s)"),
-          play_time = substr(play_time, 2, nchar(play_time)),
-          play_min = re_extract(play_time, "[^()]+(?=\\:)") |>
-            as.integer(),
-          play_min = if_else(
-            is.na(play_min) & !is.na(play_time),
-            as.integer(0),
-            play_min
-          ),
-          play_sec = substr(
-            play_time,
-            nchar(play_time) - 1,
-            nchar(play_time)
-          ) |>
-            as.integer(),
-          mins = if_else(
-            nchar(time) == 5,
-            substr(time, 1, 2),
-            substr(time, 1, 1)
-          ) |>
-            as.integer(),
-          secs = if_else(
-            nchar(time) == 5,
-            substr(time, 4, 5),
-            substr(time, 3, 4)
-          ) |>
-            as.integer()
-          # trying to fix wacky behavior 9/2023
-          # mins = if_else(is.na(play_min), mins, play_min),
-          # secs = if_else(is.na(play_sec), secs, play_sec)
+
+        # time column is wacky so extract it from play description when
+        # possible
+        play_time <- re_extract(plays$desc, "\\([^()]+(?=\\)\\s)")
+        play_time <- substr(play_time, 2, nchar(play_time))
+        play_min <- as.integer(re_extract(play_time, "[^()]+(?=\\:)"))
+        plays$play_time <- play_time
+        plays$play_min <- if_else(
+          is.na(play_min) & !is.na(play_time),
+          as.integer(0),
+          play_min
         )
+        plays$play_sec <- as.integer(substr(
+          play_time,
+          nchar(play_time) - 1,
+          nchar(play_time)
+        ))
+        long <- nchar(plays$time) == 5
+        plays$mins <- as.integer(if_else(
+          long,
+          substr(plays$time, 1, 2),
+          substr(plays$time, 1, 1)
+        ))
+        plays$secs <- as.integer(if_else(
+          long,
+          substr(plays$time, 4, 5),
+          substr(plays$time, 3, 4)
+        ))
+        # trying to fix wacky behavior 9/2023
+        # mins = if_else(is.na(play_min), mins, play_min),
+        # secs = if_else(is.na(play_sec), secs, play_sec)
         plays <- df_slice(
           plays,
           df_order(
@@ -133,176 +132,112 @@ get_4th_plays <- function(gid) {
             c(FALSE, TRUE, TRUE, FALSE)
           )
         )
-        plays <- df_mutate(
-          plays,
-          home_team = df$home_team,
-          away_team = df$away_team,
-          posteam = case_when(
-            posteam == "WSH" ~ "WAS",
-            posteam == "LAR" ~ "LA",
-            TRUE ~ posteam
-          )
-        )
-        plays <- df_assign(
-          plays,
-          lapply(
-            df_cols(plays)[c("home_team", "away_team", "posteam")],
-            team_name_fn
-          )
-        )
-        plays <- df_mutate(
-          plays,
-          defteam = if_else(posteam == home_team, away_team, home_team),
-          # overtime periods count their timeouts on their own
-          half = case_when(qtr <= 2 ~ 1, qtr <= 4 ~ 2, TRUE ~ qtr),
-          challenge_team = re_extract(
-            desc,
-            paste0(
-              "[[:alpha:]]*\\s*[[:alpha:]]*\\s*[[:alpha:]]*",
-              "[[:alpha:]]+(?=\\schallenged)"
-            )
-          ),
-          challenge_team = gsub("[\r\n]", "", challenge_team),
-          challenge_team = trimws(challenge_team),
-          desc_timeout = if_else(
-            re_detect(desc, "Timeout #[[:digit:]]"),
-            1,
-            0
-          ),
-          timeout_team = re_extract(
-            desc,
-            "(?<=Timeout #[[:digit:]] by )[[:upper:]]{2,3}"
-          ),
-          timeout_team = case_when(
-            # fix team abbrevs
-            timeout_team == "WSH" ~ "WAS",
-            timeout_team == "LAR" ~ "LA",
-            timeout_team == "ARZ" ~ "ARI",
-            timeout_team == "BLT" ~ "BAL",
-            timeout_team == "CLV" ~ "CLE",
-            timeout_team == "HST" ~ "HOU",
-            timeout_team == "SL" ~ "LA",
 
-            # fill in timeouts charged on challenges
-            challenge_team == "Arizona" & desc_timeout == 1 ~ "ARI",
-            challenge_team == "Atlanta" & desc_timeout == 1 ~ "ATL",
-            challenge_team == "Baltimore" & desc_timeout == 1 ~ "BAL",
-            challenge_team == "Buffalo" & desc_timeout == 1 ~ "BUF",
-            challenge_team == "Carolina" & desc_timeout == 1 ~ "CAR",
-            challenge_team == "Chicago" & desc_timeout == 1 ~ "CHI",
-            challenge_team == "Cincinnati" & desc_timeout == 1 ~ "CIN",
-            challenge_team == "Cleveland" & desc_timeout == 1 ~ "CLE",
-            challenge_team == "Dallas" & desc_timeout == 1 ~ "DAL",
-            challenge_team == "Denver" & desc_timeout == 1 ~ "DEN",
-            challenge_team == "Detroit" & desc_timeout == 1 ~ "DET",
-            challenge_team == "Green Bay" & desc_timeout == 1 ~ "GB",
-            challenge_team == "Houston" & desc_timeout == 1 ~ "HOU",
-            challenge_team == "Indianapolis" & desc_timeout == 1 ~ "IND",
-            challenge_team == "Jacksonville" & desc_timeout == 1 ~ "JAX",
-            challenge_team == "Kansas City" & desc_timeout == 1 ~ "KC",
-            challenge_team == "Los Angeles Rams" & desc_timeout == 1 ~ "LA",
-            challenge_team == "Los Angeles Chargers" &
-              desc_timeout == 1 ~ "LAC",
-            challenge_team == "Las Vegas" & desc_timeout == 1 ~ "LV",
-            challenge_team == "Miami" & desc_timeout == 1 ~ "MIA",
-            challenge_team == "Minnesota" & desc_timeout == 1 ~ "MIN",
-            challenge_team == "New England" & desc_timeout == 1 ~ "NE",
-            challenge_team == "New Orleans" & desc_timeout == 1 ~ "NO",
-            challenge_team == "New York Giants" & desc_timeout == 1 ~ "NYG",
-            challenge_team == "New York Jets" & desc_timeout == 1 ~ "NYJ",
-            challenge_team == "Philadelphia" & desc_timeout == 1 ~ "PHI",
-            challenge_team == "Pittsburgh" & desc_timeout == 1 ~ "PIT",
-            challenge_team == "Seattle" & desc_timeout == 1 ~ "SEA",
-            challenge_team == "San Francisco" & desc_timeout == 1 ~ "SF",
-            challenge_team == "Tampa Bay" & desc_timeout == 1 ~ "TB",
-            challenge_team == "Tennessee" & desc_timeout == 1 ~ "TEN",
-            challenge_team == "Washington" & desc_timeout == 1 ~ "WAS",
-
-            TRUE ~ timeout_team
-          ),
-          home_timeout_used = case_when(
-            timeout_team == home_team ~ 1,
-            timeout_team != home_team ~ 0,
-            is.na(timeout_team) ~ 0
-          ),
-          away_timeout_used = case_when(
-            timeout_team == away_team ~ 1,
-            timeout_team != away_team ~ 0,
-            is.na(timeout_team) ~ 0
-          ),
-          # two timeouts per team in overtime (the overtime win probability
-          # model does not use them)
-          home_timeouts_remaining = if_else(qtr > 4, 2, 3),
-          away_timeouts_remaining = if_else(qtr > 4, 2, 3)
+        plays$home_team <- team_name_fn(df$home_team)
+        plays$away_team <- team_name_fn(df$away_team)
+        plays$posteam <- team_name_fn(plays$posteam)
+        plays$defteam <- other_team(
+          plays$posteam,
+          plays$home_team,
+          plays$away_team
         )
-        plays <- df_slice(
-          plays,
-          df_order(
-            list(plays$qtr, plays$mins, plays$secs, plays$id),
-            c(FALSE, TRUE, TRUE, FALSE)
+        # overtime periods count their timeouts on their own
+        plays$half <- case_when(
+          plays$qtr <= 2 ~ 1,
+          plays$qtr <= 4 ~ 2,
+          TRUE ~ plays$qtr
+        )
+        challenge_team <- re_extract(
+          plays$desc,
+          paste0(
+            "[[:alpha:]]*\\s*[[:alpha:]]*\\s*[[:alpha:]]*",
+            "[[:alpha:]]+(?=\\schallenged)"
           )
         )
-        # timeouts used so far in each half (in the row order above)
+        plays$challenge_team <- trimws(gsub("[\r\n]", "", challenge_team))
+        plays$desc_timeout <- if_else(
+          re_detect(plays$desc, "Timeout #[[:digit:]]"),
+          1,
+          0
+        )
+        # the team that called a timeout: ESPN's abbreviation, standardized,
+        # or on a challenge that cost a timeout, the team that challenged
+        timeout_team <- re_extract(
+          plays$desc,
+          "(?<=Timeout #[[:digit:]] by )[[:upper:]]{2,3}"
+        )
+        fixed <- team_name_fn(timeout_team)
+        challenger <- unname(challenge_teams[plays$challenge_team])
+        plays$timeout_team <- case_when(
+          fixed != timeout_team ~ fixed,
+          plays$desc_timeout == 1 & !is.na(challenger) ~ challenger,
+          TRUE ~ timeout_team
+        )
+        plays$home_timeout_used <- case_when(
+          plays$timeout_team == plays$home_team ~ 1,
+          plays$timeout_team != plays$home_team ~ 0,
+          is.na(plays$timeout_team) ~ 0
+        )
+        plays$away_timeout_used <- case_when(
+          plays$timeout_team == plays$away_team ~ 1,
+          plays$timeout_team != plays$away_team ~ 0,
+          is.na(plays$timeout_team) ~ 0
+        )
+
+        # timeouts used so far in each half (in the row order above). Two
+        # timeouts per team in overtime (the overtime win probability model
+        # does not use them)
         half <- vctrs::vec_group_id(plays$half)
         home_used <- stats::ave(plays$home_timeout_used, half, FUN = cumsum)
         away_used <- stats::ave(plays$away_timeout_used, half, FUN = cumsum)
-        plays <- df_assign(
+        plays$total_home_timeouts_used <- if_else(home_used > 3, 3, home_used)
+        plays$total_away_timeouts_used <- if_else(away_used > 3, 3, away_used)
+        plays$home_timeouts_remaining <- if_else(plays$qtr > 4, 2, 3) -
+          plays$total_home_timeouts_used
+        plays$away_timeouts_remaining <- if_else(plays$qtr > 4, 2, 3) -
+          plays$total_away_timeouts_used
+        plays$posteam_timeouts_remaining <- timeouts_home_away(
           plays,
-          list(
-            total_home_timeouts_used = if_else(home_used > 3, 3, home_used),
-            total_away_timeouts_used = if_else(away_used > 3, 3, away_used)
-          )
+          plays$posteam == plays$home_team
         )
-        plays <- df_mutate(
+        plays$defteam_timeouts_remaining <- timeouts_home_away(
           plays,
-          home_timeouts_remaining = home_timeouts_remaining -
-            total_home_timeouts_used,
-          away_timeouts_remaining = away_timeouts_remaining -
-            total_away_timeouts_used,
-          posteam_timeouts_remaining = if_else(
-            posteam == home_team,
-            home_timeouts_remaining,
-            away_timeouts_remaining
-          ),
-          defteam_timeouts_remaining = if_else(
-            defteam == home_team,
-            home_timeouts_remaining,
-            away_timeouts_remaining
-          ),
-          time = 60 * as.integer(mins) + as.integer(secs),
-          home_score = lag1(home_score),
-          away_score = lag1(away_score),
-          score_differential = if_else(
-            posteam == home_team,
-            home_score - away_score,
-            away_score - home_score
-          ),
-          # the typical gap to the next snap after a conversion (see
-          # conversion_runoff())
-          runoff = NA_real_,
-          season = df$season,
-          home_opening_kickoff = if_else(
-            first_value(stats::na.omit(posteam)) == home_team,
-            1,
-            0
-          ),
-          type = df$type,
-          # overtime possession number, counted over the snaps
-          game_id = df$game_id,
-          down = if_else(
-            down %in%
-              1:4 &
-              !type_text %in%
-                c(
-                  "Timeout",
-                  "Two-minute warning",
-                  "End Period",
-                  "End of Game"
-                ),
-            down,
-            NA_integer_
-          )
+          plays$defteam == plays$home_team
         )
+
+        plays$time <- 60 * as.integer(plays$mins) + as.integer(plays$secs)
+        plays$home_score <- lag1(plays$home_score)
+        plays$away_score <- lag1(plays$away_score)
+        plays$score_differential <- if_else(
+          plays$posteam == plays$home_team,
+          plays$home_score - plays$away_score,
+          plays$away_score - plays$home_score
+        )
+        # the typical gap to the next snap after a conversion (see
+        # conversion_runoff())
+        plays$runoff <- NA_real_
+        plays$season <- df$season
+        plays$home_opening_kickoff <- if_else(
+          first_value(stats::na.omit(plays$posteam)) == plays$home_team,
+          1,
+          0
+        )
+        plays$type <- df$type
+        plays$game_id <- df$game_id
+        plays$down <- if_else(
+          plays$down %in%
+            1:4 &
+            !plays$type_text %in%
+              c(
+                "Timeout",
+                "Two-minute warning",
+                "End Period",
+                "End of Game"
+              ),
+          plays$down,
+          NA_integer_
+        )
+        # overtime possession number, counted over the snaps
         plays <- ot_possession_from_pbp(plays)
         plays <- df_filter(
           plays,
@@ -323,27 +258,19 @@ get_4th_plays <- function(gid) {
             c(FALSE, TRUE, FALSE)
           )
         )
-        plays <- df_mutate(
-          plays,
-          game_id = df$game_id,
-          espn_id = df$espn,
-          yardline_side = split_part(yardline, 1L),
-          yardline_side = case_when(
-            yardline_side == "WSH" ~ "WAS",
-            yardline_side == "LAR" ~ "LA",
-            TRUE ~ yardline_side
-          ),
-          yardline_number = as.numeric(split_part(yardline, 2L)),
-          temp_yardline = if_else(
-            yardline_side == posteam | yardline_100 == 50,
-            100 - yardline_number,
-            yardline_number
-          ),
-          yardline_100 = if_else(
-            !is.na(temp_yardline),
-            as.integer(temp_yardline),
-            yardline_100
-          )
+
+        plays$espn_id <- df$espn
+        yardline_side <- team_name_fn(split_part(plays$yardline, 1L))
+        yardline_number <- as.numeric(split_part(plays$yardline, 2L))
+        temp_yardline <- if_else(
+          yardline_side == plays$posteam | plays$yardline_100 == 50,
+          100 - yardline_number,
+          yardline_number
+        )
+        plays$yardline_100 <- if_else(
+          !is.na(temp_yardline),
+          as.integer(temp_yardline),
+          plays$yardline_100
         )
         plays <- df_select(
           plays,
@@ -385,18 +312,48 @@ get_4th_plays <- function(gid) {
       message("The following error has occured:")
       message(e)
     },
-    warning = function(w) {
-      if (warn == 1) {
-        cli::cli_alert_warning(
-          "Warning: The requested GameID {df$espn} ({df$game_id}) is invalid!"
-        )
-      }
-    },
     finally = {}
   )
 
   return(plays)
 }
+
+# ESPN's names of the teams in "<team> challenged", for timeouts charged on a
+# lost challenge
+challenge_teams <- c(
+  "Arizona" = "ARI",
+  "Atlanta" = "ATL",
+  "Baltimore" = "BAL",
+  "Buffalo" = "BUF",
+  "Carolina" = "CAR",
+  "Chicago" = "CHI",
+  "Cincinnati" = "CIN",
+  "Cleveland" = "CLE",
+  "Dallas" = "DAL",
+  "Denver" = "DEN",
+  "Detroit" = "DET",
+  "Green Bay" = "GB",
+  "Houston" = "HOU",
+  "Indianapolis" = "IND",
+  "Jacksonville" = "JAX",
+  "Kansas City" = "KC",
+  "Los Angeles Rams" = "LA",
+  "Los Angeles Chargers" = "LAC",
+  "Las Vegas" = "LV",
+  "Miami" = "MIA",
+  "Minnesota" = "MIN",
+  "New England" = "NE",
+  "New Orleans" = "NO",
+  "New York Giants" = "NYG",
+  "New York Jets" = "NYJ",
+  "Philadelphia" = "PHI",
+  "Pittsburgh" = "PIT",
+  "Seattle" = "SEA",
+  "San Francisco" = "SF",
+  "Tampa Bay" = "TB",
+  "Tennessee" = "TEN",
+  "Washington" = "WAS"
+)
 
 # tidyr::unnest() of the plays of the previous drives: each drive's plays, with
 # the drive's team

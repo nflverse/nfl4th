@@ -86,9 +86,9 @@ df_left_join <- function(x, y, by) {
   out_x <- lapply(x_names, function(k) {
     vctrs::vec_slice(if (k %in% by) xk[[k]] else x[[k]], xi)
   })
-  names(out_x) <- ifelse(x_names %in% both, paste0(x_names, ".x"), x_names)
+  names(out_x) <- if_else(x_names %in% both, paste0(x_names, ".x"), x_names)
   out_y <- lapply(y_names, function(k) vctrs::vec_slice(y[[k]], yi))
-  names(out_y) <- ifelse(y_names %in% both, paste0(y_names, ".y"), y_names)
+  names(out_y) <- if_else(y_names %in% both, paste0(y_names, ".y"), y_names)
   df_new(c(out_x, out_y), .set_row_names(length(xi)), x)
 }
 
@@ -136,21 +136,4 @@ df_rename <- function(x, cols) {
   out <- df_cols(x)
   names(out)[i] <- names(cols)
   df_new(out, .row_names_info(x, 0L), x)
-}
-
-# dplyr::mutate() with expressions, for the ESPN scraper: each argument is
-# evaluated in turn with the columns and the arguments before it in scope, and
-# recycled to the number of rows
-df_mutate <- function(.data, ...) {
-  exprs <- as.list(substitute(list(...)))[-1]
-  n <- .row_names_info(.data, 2L)
-  env <- list2env(df_cols(.data), parent = parent.frame())
-  cols <- list()
-  for (i in seq_along(exprs)) {
-    nm <- names(exprs)[i]
-    val <- vctrs::vec_recycle(eval(exprs[[i]], env), n)
-    assign(nm, val, envir = env)
-    cols[[nm]] <- val
-  }
-  df_assign(.data, cols)
 }

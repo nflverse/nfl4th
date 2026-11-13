@@ -199,7 +199,7 @@ if (!isTRUE(get0("WP_FUNCTIONS_ONLY", ifnotfound = FALSE))) {
   # sanity check: predictions in this session match the stored model
   chk <- model_data[sample(nrow(model_data), 2000), ] |>
     mutate(season = 2025)
-  wpfd_cache$boosters <- NULL
+  wpfd_cache$booster <- NULL
   wpfd_cache$inclusive <- NULL
   p_stored <- wpfd_predict(chk, wp_first_down_model)
   stopifnot(all(is.finite(p_stored)), all(p_stored > 0 & p_stored < 1))
