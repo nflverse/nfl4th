@@ -96,6 +96,55 @@ It doesn't know the weather, whether there's a roof, or anything about the two t
 
 The gain over what nfl4th used before is small, and within the margin of error. The bigger improvement is that the new model behaves sensibly. The old one sometimes valued 1st & goal at the 2 more highly than the touchdown itself: on a test grid of tied games in the first three quarters, a quarter of the time, by as much as 5.6 points. It also wobbled from one second and one yard line to the next. The new one never values 1st & goal above the touchdown, and it's about 5 times smoother across the field and 20 times smoother across the clock.
 
+Here's how the new model's predictions lined up with what actually happened in those 2022–2026 games. Each dot is a group of plays with similar predictions, sized by how many plays are in it. On the dashed line, teams won exactly as often as the model said they would.
+
+```{r fig-wp-calibration, fig.height = 8.5, fig.alt = "Win probability calibration by quarter: predicted win probability against how often teams won, 2022-2026 1st downs"}
+# nfl4th's win probability model trained through 2021, scored on 2022-2026 regulation 1st downs (the predictions
+# behind the table above), in 5-point bins of predicted WP by quarter
+cal <- read.csv("wp_calibration.csv")
+quarters <- paste(c("1st", "2nd", "3rd", "4th"), "Quarter")
+cal$quarter <- factor(quarters[cal$qtr], levels = quarters)
+err <- do.call(rbind, lapply(split(cal, cal$quarter), function(d) {
+  data.frame(
+    quarter = d$quarter[1],
+    label = sprintf("Calibration error: %.1f points", 100 * sum(d$plays * abs(d$actual - d$predicted)) / sum(d$plays))
+  )
+}))
+ann <- data.frame(
+  quarter = factor(quarters[1], levels = quarters),
+  x = c(22, 78),
+  y = c(80, 32),
+  label = c("Won more often\nthan predicted", "Won less often\nthan predicted")
+)
+
+ggplot(cal, aes(100 * predicted, 100 * actual)) +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.8) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "#52514e") +
+  geom_point(aes(size = plays), color = col_1, alpha = 0.85) +
+  geom_text(
+    data = ann, aes(x, y, label = label),
+    size = 3.3, color = "#52514e", inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = err, aes(x = 98, y = 4, label = label),
+    hjust = 1, size = 3.3, color = "#52514e", inherit.aes = FALSE
+  ) +
+  facet_wrap(~quarter, nrow = 2) +
+  coord_equal() +
+  scale_x_continuous(limits = c(0, 100), breaks = seq(0, 100, 25), labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 25), labels = function(x) paste0(x, "%")) +
+  scale_size_area(max_size = 5, labels = scales::comma) +
+  labs(
+    title = "Teams win about as often as the model predicts",
+    x = "Predicted win probability",
+    y = "How often teams won",
+    size = "Plays",
+    caption = "Model trained on games through 2021, tested on 2022–2026 1st downs it had never seen."
+  ) +
+  theme_article +
+  theme(legend.title = element_text(), panel.spacing = unit(2, "lines"))
+```
+
 ## Going for it: will it work, and where does the play end?
 
 Converting is only part of the story. A 4th & 2 that gains 40 yards is worth a lot more than one that gains exactly 2, and a failed attempt at the opponent's 30 hands over the ball in a very different spot than one at your own 30.
