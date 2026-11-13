@@ -1,8 +1,11 @@
-# these helpers read games or models and save them to a package cache
+# these helpers read the games file and save it to a package cache
 
 nfl4th_games_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "games_nfl4th.rds")
 }
+# the go for it and win probability models used to be downloaded and cached
+# here. They now live in the package, the paths are kept so that
+# nfl4th_clear_cache() can remove old files
 nfl4th_fdmodel_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "fd_model.rds")
 }
@@ -10,86 +13,37 @@ nfl4th_wpmodel_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), "wp_model.rds")
 }
 
+# the games file in memory, read again only when the file changes
+nfl4th_games_memo <- new.env(parent = emptyenv())
+
 .games_nfl4th <- function() {
   if (probably_cran() && !force_cache()) {
     return(get_games_file())
   }
-  if (!file.exists(nfl4th_games_path())) {
-    saveRDS(get_games_file(), nfl4th_games_path())
+  f <- nfl4th_games_path()
+  if (!file.exists(f)) {
+    saveRDS(get_games_file(), f)
   }
-  readRDS(nfl4th_games_path())
-}
-
-fd_model <- function() {
-  cached_model("fd")
-}
-
-wp_model <- function() {
-  cached_model("wp")
-}
-
-cached_model <- function(type = c("wp", "fd")) {
-  type <- arg_match(type)
-  model_load <- switch(
-    type,
-    "wp" = load_wp_model,
-    "fd" = load_fd_model
-  )
-  # a.) we don't want to handle any sort of cache
-  # just return the model
-  if (probably_cran() && !force_cache()) {
-    model <- model_load()
-    return(
-      xgboost::xgb.load.raw(model)
-    )
+  info <- file.info(f)[c("mtime", "size")]
+  if (
+    is.null(nfl4th_games_memo$data) || !identical(nfl4th_games_memo$info, info)
+  ) {
+    nfl4th_games_memo$data <- readRDS(f)
+    nfl4th_games_memo$info <- info
   }
-
-  # b.) we want a cache
-  # if the model is cached, it is saved under this file path
-  model_path <- switch(
-    type,
-    "wp" = nfl4th_wpmodel_path(),
-    "fd" = nfl4th_fdmodel_path()
-  )
-
-  if (!file.exists(model_path)) {
-    # the file doesn't exist -> file isn't cached yet
-    # load and save it and return the parsed model
-    model <- model_load()
-    saveRDS(model, model_path)
-    return(
-      xgboost::xgb.load.raw(model)
-    )
-  } else {
-    # the file exists. read it.
-    model <- readRDS(model_path)
-    # nfl4th v 1.0.5 introduced new raw model formats that are incompatible
-    # with previous formats. We need to check the format of the cached file
-    # and clear it in case it's outdated.
-    if (is.raw(model)) {
-      return(
-        xgboost::xgb.load.raw(model)
-      )
-    } else {
-      # file in cache has old format -> remove it and call the whole thing
-      # recursively
-      file.remove(model_path)
-      # this time the cache will be empty and cached_model() will load it fresh
-      return(
-        cached_model(type = type)
-      )
-    }
-  }
+  nfl4th_games_memo$data
 }
 
 #' Reset nfl4th Package Cache
 #'
-#' @param type One of `"games"` (the default), `"fd_model"`, or `"all"`.
+#' @param type One of `"games"` (the default), `"fd_model"`, `"wp_model"`,
+#'   `"bootstrap"`, or `"all"`.
 #'   `"games"` will remove an internally used games file.
-#'   `"fd_model"` will remove the nfl4th 4th down model (only necessary in the
-#'   unlikely case of a model update).
-#'   `"wp_model"` will remove the nfl4th win probability model (only necessary in the
-#'   unlikely case of a model update).
+#'   `"bootstrap"` will remove the bootstrap models downloaded by
+#'   `add_4th_probs(bootstrap = TRUE)`.
+#'   `"fd_model"` and `"wp_model"` will remove the go for it and win
+#'   probability models cached by earlier nfl4th versions (both models now ship
+#'   with the package).
 #'   `"all"` will remove all of the above.
 #'
 #' @return Returns `TRUE` invisibly if cache has been cleared.
@@ -98,17 +52,24 @@ cached_model <- function(type = c("wp", "fd")) {
 #' @examples
 #' nfl4th_clear_cache()
 nfl4th_clear_cache <- function(
-  type = c("games", "fd_model", "wp_model", "all")
+  type = c("games", "fd_model", "wp_model", "bootstrap", "all")
 ) {
-  type <- rlang::arg_match(type)
+  type <- match.arg(type)
   to_delete <- switch(
     type,
     "games" = nfl4th_games_path(),
     "fd_model" = nfl4th_fdmodel_path(),
     "wp_model" = nfl4th_wpmodel_path(),
-    "all" = c(nfl4th_games_path(), nfl4th_fdmodel_path(), nfl4th_wpmodel_path())
+    "bootstrap" = nfl4th_bootstrap_path(),
+    "all" = c(
+      nfl4th_games_path(),
+      nfl4th_fdmodel_path(),
+      nfl4th_wpmodel_path(),
+      nfl4th_bootstrap_path()
+    )
   )
   file.remove(to_delete[file.exists(to_delete)])
+  bootstrap_memo$models <- NULL
   invisible(TRUE)
 }
 

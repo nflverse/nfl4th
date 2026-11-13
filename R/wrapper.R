@@ -10,7 +10,32 @@
 #' for it, kick field goal, punt).
 #'
 #' @param df A data frame of decisions to be computed for.
-#' @return Original data frame Data frame plus the following columns added:
+#' @param bootstrap If `TRUE`, also value every play under 100 bootstrap
+#'   versions of nfl4th's win probability and go for it models (see Details).
+#'   The first use downloads them (about 38 MB) to the package cache.
+#' @details Overtime plays (`qtr > 4`) are valued with the overtime rules of
+#' the game (sudden death, modified sudden death, or both teams getting the
+#' ball) using nflfastR's overtime win probability model. `quarter_seconds_remaining`
+#' is then the time left in the overtime period. Add `ot_possession` (1 for the
+#' first possession of overtime, 2 for the second, 3 for any later possession)
+#' to tell which possession it is. Without it, a tied game is assumed to be in
+#' the first possession and a team that trails in the second. `nflfastR` data
+#' doesn't need it, the possessions are counted from the plays.
+#'
+#' A conversion that doesn't score is valued at the offense's next snap, at the
+#' typical gap after a conversion for the quarter, the time left and the score
+#' (about 37 seconds away from the end of a half, as little as 6 to 10 in the
+#' last seconds). Add `runoff` to set the seconds that run off after the 6 of
+#' the play instead.
+#'
+#' With `bootstrap = TRUE` each play is also valued under 100 bootstrap
+#' versions of the two models nfl4th fits itself, the 1st down win probability
+#' model and the go for it model, each refit on a history resampled by game.
+#' With the shipped fit that makes 101 draws, the shipped fit first. They show
+#' how much a recommendation depends on the particular games the models were
+#' fit on (sampling uncertainty, not every source of model error). The punt and
+#' field goal models are the same in every draw.
+#' @return The original data frame plus the following columns:
 #' \describe{
 #' \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
 #' \item{first_down_prob}{Probability of earning a first down if going for it on 4th down.}
@@ -22,6 +47,15 @@
 #' \item{make_fg_wp}{Win probability in the event of a made field goal.}
 #' \item{fg_wp}{Average win probability when attempting field goal.}
 #' \item{punt_wp}{Average win probability when punting.}
+#' }
+#' With `bootstrap = TRUE`, also:
+#' \describe{
+#' \item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+#' \item{boot_go_pct}{Percent of the draws in which going beats the better kick (go_boost > 0). The recommendation itself is the sign of go_boost; this says how often the draws agree that going is better.}
+#' \item{go_boost_lo, go_boost_hi}{10th and 90th percentile of go_boost across the draws, an 80% interval.}
+#' \item{boot_median_draw}{The draw whose go_boost is the median of the play's draws (1 to 101; 1 is the shipped fit). Taking every number from that draw gives one coherent fit at the median, e.g. `go_wp_boot[[i]][boot_median_draw[i]]`.}
+#' \item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
+#' \item{go_wp_boot, fg_wp_boot, punt_wp_boot, first_down_prob_boot, wp_fail_boot, wp_succeed_boot, fg_make_prob_boot, miss_fg_wp_boot, make_fg_wp_boot}{Each of those columns in each draw, likewise. Within a draw they fit together: go_wp is first_down_prob x wp_succeed + (1 - first_down_prob) x wp_fail, and fg_wp likewise. fg_make_prob is the same in every draw (the field goal table isn't resampled).}
 #' }
 #' @export
 #' @examplesIf identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")
@@ -49,57 +83,62 @@
 #' try({# to avoid cran issues
 #' probs <- nfl4th::add_4th_probs(play)
 #'
-#' dplyr::glimpse(probs)
+#' tibble::glimpse(probs)
 #' })
 #' }
-add_4th_probs <- function(df) {
-  original_df <- df |> mutate(index = 1:n())
+add_4th_probs <- function(df, bootstrap = FALSE) {
+  original_df <- df_assign(df, list(index = seq_len(nrow(df))))
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
     # message("type not found. Assuming an nflfastR df and doing necessary
     # cleaning . . .")
-    modified_df <- original_df |>
-      prepare_nflfastr_data() |>
-      filter(down == 4)
+    modified_df <- prepare_nflfastr_data(original_df)
+    modified_df <- df_filter(modified_df, modified_df$down == 4)
   }
 
   # message("Performing final preparation . . .")
-  df <- modified_df |>
-    prepare_df()
+  df <- prepare_df(modified_df)
 
+  # seconds run off after a conversion beyond the 6 of the play; NA uses the
+  # typical gap to the next snap (see conversion_runoff())
   if (!"runoff" %in% names(df)) {
-    df$runoff <- 0L
+    df$runoff <- NA_real_
   }
 
   cli::cli_alert_info("Computing probabilities for {nrow(df)} plays. . .")
-  df <- df |>
-    add_probs() |>
-    mutate(play_no = 1:n()) |>
-    group_by(play_no) |>
-    mutate(
-      punt_prob = if_else(is.na(punt_wp), 0, punt_wp),
-      max_non_go = max(fg_wp, punt_prob, na.rm = T),
-      go_boost = 100 * (go_wp - max_non_go)
-    ) |>
-    ungroup() |>
-    select(
-      index,
-      go_boost,
-      first_down_prob,
-      wp_fail,
-      wp_succeed,
-      go_wp,
-      fg_make_prob,
-      miss_fg_wp,
-      make_fg_wp,
-      fg_wp,
-      punt_wp
-    )
+  if (isTRUE(bootstrap) && nrow(df) > 0) {
+    # the point estimate comes with the draws
+    boot <- add_boot_probs(df)
+    df <- boot$point
+  } else {
+    bootstrap <- FALSE
+    df <- add_probs(df)
+  }
+  punt_prob <- if_else(is.na(df$punt_wp), 0, df$punt_wp)
+  # the better kick (punt_prob is never NA)
+  max_non_go <- pmax(df$fg_wp, punt_prob, na.rm = TRUE)
+  probs <- c(
+    list(index = df$index, go_boost = 100 * (df$go_wp - max_non_go)),
+    df_cols(df)[c(
+      "first_down_prob",
+      "wp_fail",
+      "wp_succeed",
+      "go_wp",
+      "fg_make_prob",
+      "miss_fg_wp",
+      "make_fg_wp",
+      "fg_wp",
+      "punt_wp"
+    )]
+  )
 
-  original_df |>
-    left_join(df, by = c("index")) |>
-    select(-index)
+  if (isTRUE(bootstrap)) {
+    probs <- c(probs, boot$cols)
+  }
+
+  out <- df_left_join(original_df, probs, by = "index")
+  df_select(out, setdiff(names(out), "index"))
 }
 
 #' Load calculated 4th down probabilities from `nflfastR` data
@@ -117,7 +156,7 @@ add_4th_probs <- function(df) {
 #' \donttest{
 #' try({# Wrap in try to avoid CRAN test problems
 #' probs <- load_4th_pbp(2019:2020)
-#' dplyr::glimpse(probs)
+#' tibble::glimpse(probs)
 #' })
 #' \dontshow{
 #' # Close open connections for R CMD Check
@@ -133,59 +172,55 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 
   # season-by-season = less likely to result in crashes due to memory
   if (fast) {
-    data <- purrr::map_df(
+    pre_computed <- nflreadr::rds_from_url(paste0(
+      "https://github.com/nflverse/nfl4th/releases/download/",
+      "nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
+    ))
+    data <- df_bind_rows(lapply(
       seasons,
-      ~ {
+      function(.x) {
         cli::cli_alert_info("Loading season {.x}")
-        nflfastR::load_pbp(.x) |>
-          left_join(
-            nflreadr::rds_from_url(paste0(
-              "https://github.com/nflverse/nfl4th/releases/download/",
-              "nfl4th_infrastructure/pre_computed_go_boost.rds?raw=true"
-            )),
-            by = c("game_id", "play_id")
-          )
+        df_left_join(
+          nflreadr::load_pbp(.x),
+          pre_computed,
+          by = c("game_id", "play_id")
+        )
       }
-    )
+    ))
   } else {
-    data <- purrr::map_df(
+    data <- df_bind_rows(lapply(
       seasons,
-      ~ {
+      function(.x) {
         cli::cli_alert_info("Loading season {.x}")
         nflreadr::load_pbp(.x) |>
           nfl4th::add_4th_probs()
       }
-    )
+    ))
   }
 
-  data |>
-    dplyr::mutate(
-      go = ifelse(
-        (rush == 1 | pass == 1) & !play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
-        100,
-        0
-      ),
-      # if it's an aborted snap in punt formation, call it a punt
-      go = ifelse(
-        aborted_play == 1 & stringr::str_detect(desc, "Punt formation"),
-        0,
-        go
-      ),
-      # if it's a run formation or pass formation and there's a dead ball
-      # penalty, set go to NA
-      # since we can't know the intention of the play
-      go = case_when(
-        stringr::str_detect(
-          desc,
-          "(Run formation)|(Pass formation)|(Shotgun)"
-        ) &
-          stringr::str_detect(
-            desc,
-            "(False Start)|(Neutral Zone Infraction)"
-          ) ~ NA_real_,
-        TRUE ~ go
-      )
-    )
+  desc <- data$desc
+  go <- if_else(
+    (data$rush == 1 | data$pass == 1) &
+      !data$play_type_nfl %in% c("PUNT", "FIELD_GOAL"),
+    100,
+    0
+  )
+  # if it's an aborted snap in punt formation, call it a punt
+  go <- if_else(
+    data$aborted_play == 1 & re_detect(desc, "Punt formation"),
+    0,
+    go
+  )
+  # if it's a run formation or pass formation and there's a dead ball
+  # penalty, set go to NA
+  # since we can't know the intention of the play
+  go <- case_when(
+    re_detect(desc, "(Run formation)|(Pass formation)|(Shotgun)") &
+      re_detect(desc, "(False Start)|(Neutral Zone Infraction)") ~
+      NA_real_,
+    TRUE ~ go
+  )
+  df_assign(data, list(go = go))
 }
 
 
@@ -195,7 +230,15 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' for it, kick PAT).
 #'
 #' @param df A data frame of decisions to be computed for.
-#' @return Original data frame Data frame plus the following columns added:
+#' @details Overtime plays (`qtr > 4`) are valued with the overtime rules of
+#' the game (sudden death, modified sudden death, or both teams getting the
+#' ball) using nflfastR's overtime win probability model. `quarter_seconds_remaining`
+#' is then the time left in the overtime period. Add `ot_possession` (1 for the
+#' first possession of overtime, 2 for the second, 3 for any later possession)
+#' to tell which possession it is. Without it, a tied game is assumed to be in
+#' the first possession and a team that trails in the second. `nflfastR` data
+#' doesn't need it, the possessions are counted from the plays.
+#' @return The original data frame plus the following columns:
 #' \describe{
 #'  first_down_prob, wp_fail, wp_succeed, go_wp, fg_make_prob, miss_fg_wp, make_fg_wp, fg_wp, punt_wp
 #' \item{wp_0}{Win probability when scoring 0 points on PAT.}
@@ -230,11 +273,11 @@ load_4th_pbp <- function(seasons, fast = FALSE) {
 #' try({# to avoid cran issues
 #' probs <- nfl4th::add_2pt_probs(play)
 #'
-#' dplyr::glimpse(probs)
+#' tibble::glimpse(probs)
 #' })
 #' }
 add_2pt_probs <- function(df) {
-  original_df <- df |> mutate(index = 1:n())
+  original_df <- df_assign(df, list(index = seq_len(nrow(df))))
   modified_df <- original_df
 
   if (!"type" %in% names(df)) {
@@ -242,32 +285,30 @@ add_2pt_probs <- function(df) {
       "type not found. Assuming an nflfastR df and doing necessary ",
       "cleaning . . ."
     )
-    modified_df <- original_df |>
-      prepare_nflfastr_data() |>
-      filter(
-        !is.na(two_point_conv_result) | !is.na(extra_point_result)
-      )
+    modified_df <- prepare_nflfastr_data(original_df)
+    modified_df <- df_filter(
+      modified_df,
+      !is.na(modified_df$two_point_conv_result) |
+        !is.na(modified_df$extra_point_result)
+    )
   }
 
   # message("Performing final preparation . . .")
-  df <- modified_df |>
-    prepare_df()
+  df <- prepare_df(modified_df)
 
   cli::cli_alert_info("Computing probabilities for  {nrow(df)} plays. . .")
-  df <- df |>
-    get_2pt_wp() |>
-    select(
-      index,
-      wp_0,
-      wp_1,
-      wp_2,
-      conv_1pt,
-      conv_2pt,
-      wp_go1,
-      wp_go2
-    )
+  df <- get_2pt_wp(df)
+  probs <- df_cols(df)[c(
+    "index",
+    "wp_0",
+    "wp_1",
+    "wp_2",
+    "conv_1pt",
+    "conv_2pt",
+    "wp_go1",
+    "wp_go2"
+  )]
 
-  original_df |>
-    left_join(df, by = c("index")) |>
-    select(-index)
+  out <- df_left_join(original_df, probs, by = "index")
+  df_select(out, setdiff(names(out), "index"))
 }

@@ -156,3 +156,65 @@ plays |>
 ```
 
 Note that the probabilities are slightly different here because ESPN has the wrong value for time remaining (125 seconds instead of 129). This doesn't affect a lot of plays but is something to be aware of.
+
+## How sure is the recommendation? The bootstrap
+
+The models behind these numbers are fit on a finite history of games, and a different history would give slightly different models. `add_4th_probs(bootstrap = TRUE)` shows how much that matters. It also values each play under 100 versions of nfl4th's win probability and go for it models, each refit on games resampled from the real history; with the shipped models that makes 101 draws. [How nfl4th makes 4th down recommendations](how-nfl4th-works.html) explains the method. The first use downloads the draws (about 38 MB) to the package cache.
+
+Here is the Packers play from above:
+
+```{r boot}
+boot <- one_play |>
+  nfl4th::add_4th_probs(bootstrap = TRUE)
+
+boot |>
+  select(go_boost, go_boost_lo, go_boost_hi, boot_go_pct, boot_pct) |>
+  knitr::kable(digits = 1)
+```
+
+* `go_boost` is the shipped models' number, the same as without the bootstrap.
+* `go_boost_lo` and `go_boost_hi` are the 10th and 90th percentiles of `go_boost` across the 101 draws: an 80% interval.
+* `boot_go_pct` is the percent of draws in which going for it beats the better kick.
+* `boot_pct` is the percent of draws whose best option (go for it, field goal or punt) is the same as the shipped models'.
+
+A rough guide, from [Brill, Yurko and Wyner](https://arxiv.org/abs/2311.03490): when 83% or more of the draws agree, the call is confident; 67 to 83% is a lean; below 67% it's close to a toss-up. Calls more than a point of win probability from a toss-up are almost always confident.
+
+Each draw's numbers are in the list columns ending in `_boot`: one vector of 101 values per play, the shipped models first.
+
+```{r boot-draws, fig.width = 8, fig.height = 4}
+draws <- tibble(
+  go_boost = boot$go_boost_boot[[1]],
+  go_wp = boot$go_wp_boot[[1]],
+  fg_wp = boot$fg_wp_boot[[1]]
+)
+
+draws |>
+  ggplot(aes(go_boost)) +
+  geom_histogram(binwidth = 0.25) +
+  geom_vline(xintercept = 0) +
+  labs(
+    x = "Gain in win probability from going for it (percentage points)",
+    y = "Draws",
+    title = paste0(round(boot$boot_go_pct), "% of the 101 draws say go for it")
+  ) +
+  theme_minimal()
+```
+
+Within a draw the numbers fit together: `go_wp` is `first_down_prob` times `wp_succeed` plus the rest times `wp_fail`, and likewise for field goals. Medians taken one column at a time don't. To show one coherent set of numbers from the middle of the draws, use `boot_median_draw`, the draw with the median `go_boost`:
+
+```{r boot-median}
+draws[boot$boot_median_draw, ] |>
+  knitr::kable(digits = 3)
+```
+
+`load_4th_pbp()` doesn't include the bootstrap, so to bootstrap many plays, run `add_4th_probs()` on nflfastR play-by-play. `nfl4th_start_workers()` keeps the draws in worker processes, which roughly halves the time per play:
+
+```{r boot-season, eval = FALSE}
+nfl4th_start_workers(4)
+
+fourth_downs <- nflreadr::load_pbp(2025) |>
+  filter(down == 4) |>
+  nfl4th::add_4th_probs(bootstrap = TRUE)
+
+nfl4th_stop_workers()
+```

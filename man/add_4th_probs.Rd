@@ -4,13 +4,17 @@
 \alias{add_4th_probs}
 \title{Get 4th down decision probabilities}
 \usage{
-add_4th_probs(df)
+add_4th_probs(df, bootstrap = FALSE)
 }
 \arguments{
 \item{df}{A data frame of decisions to be computed for.}
+
+\item{bootstrap}{If \code{TRUE}, also value every play under 100 bootstrap
+versions of nfl4th's win probability and go for it models (see Details).
+The first use downloads them (about 38 MB) to the package cache.}
 }
 \value{
-Original data frame Data frame plus the following columns added:
+The original data frame plus the following columns:
 \describe{
 \item{go_boost}{Gain (or loss) in win prob associated with choosing to go for it (percentage points).}
 \item{first_down_prob}{Probability of earning a first down if going for it on 4th down.}
@@ -23,10 +27,43 @@ Original data frame Data frame plus the following columns added:
 \item{fg_wp}{Average win probability when attempting field goal.}
 \item{punt_wp}{Average win probability when punting.}
 }
+With \code{bootstrap = TRUE}, also:
+\describe{
+\item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+\item{boot_go_pct}{Percent of the draws in which going beats the better kick (go_boost > 0). The recommendation itself is the sign of go_boost; this says how often the draws agree that going is better.}
+\item{go_boost_lo, go_boost_hi}{10th and 90th percentile of go_boost across the draws, an 80\% interval.}
+\item{boot_median_draw}{The draw whose go_boost is the median of the play's draws (1 to 101; 1 is the shipped fit). Taking every number from that draw gives one coherent fit at the median, e.g. \code{go_wp_boot[[i]][boot_median_draw[i]]}.}
+\item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
+\item{go_wp_boot, fg_wp_boot, punt_wp_boot, first_down_prob_boot, wp_fail_boot, wp_succeed_boot, fg_make_prob_boot, miss_fg_wp_boot, make_fg_wp_boot}{Each of those columns in each draw, likewise. Within a draw they fit together: go_wp is first_down_prob x wp_succeed + (1 - first_down_prob) x wp_fail, and fg_wp likewise. fg_make_prob is the same in every draw (the field goal table isn't resampled).}
+}
 }
 \description{
 Get various probabilities associated with each option on 4th downs (go
 for it, kick field goal, punt).
+}
+\details{
+Overtime plays (\code{qtr > 4}) are valued with the overtime rules of
+the game (sudden death, modified sudden death, or both teams getting the
+ball) using nflfastR's overtime win probability model. \code{quarter_seconds_remaining}
+is then the time left in the overtime period. Add \code{ot_possession} (1 for the
+first possession of overtime, 2 for the second, 3 for any later possession)
+to tell which possession it is. Without it, a tied game is assumed to be in
+the first possession and a team that trails in the second. \code{nflfastR} data
+doesn't need it, the possessions are counted from the plays.
+
+A conversion that doesn't score is valued at the offense's next snap, at the
+typical gap after a conversion for the quarter, the time left and the score
+(about 37 seconds away from the end of a half, as little as 6 to 10 in the
+last seconds). Add \code{runoff} to set the seconds that run off after the 6 of
+the play instead.
+
+With \code{bootstrap = TRUE} each play is also valued under 100 bootstrap
+versions of the two models nfl4th fits itself, the 1st down win probability
+model and the go for it model, each refit on a history resampled by game.
+With the shipped fit that makes 101 draws, the shipped fit first. They show
+how much a recommendation depends on the particular games the models were
+fit on (sampling uncertainty, not every source of model error). The punt and
+field goal models are the same in every draw.
 }
 \examples{
 \dontshow{if (identical(data.table::getDTthreads(FALSE), 2L) || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
@@ -54,7 +91,7 @@ play <-
 try({# to avoid cran issues
 probs <- nfl4th::add_4th_probs(play)
 
-dplyr::glimpse(probs)
+tibble::glimpse(probs)
 })
 }
 \dontshow{\}) # examplesIf}
