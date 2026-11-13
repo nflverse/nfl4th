@@ -135,6 +135,7 @@ calib$situation <- factor(calib$situation, levels = c("Ordinary", "Late and desp
 calib$se <- 100 * sqrt(calib$actual / 100 * (1 - calib$actual / 100) / calib$plays)
 
 ggplot(calib, aes(x = distance)) +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.8) +
   geom_linerange(
     aes(ymin = actual - 2 * se, ymax = actual + 2 * se, color = "Actual (± 2 SE)"),
     linewidth = 0.8
