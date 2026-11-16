@@ -16,6 +16,10 @@ load_4th_pbp(seasons, fast = FALSE)
 \describe{
 \item{go}{100 if a team went for it on 4th down, 0 otherwise. It's 100 and 0 as a convenience for obtaining percent of times going for it.}
 }
+With \code{fast = TRUE} the pre-computed numbers are \code{go_boost}, \code{go_wp},
+\code{fg_wp} and \code{punt_wp}, and the bootstrap summaries \code{boot_pct},
+\code{boot_go_pct}, \code{go_boost_lo} and \code{go_boost_hi} (see \code{add_4th_probs()}).
+For each draw's numbers, use \code{add_4th_probs(bootstrap = TRUE)}.
 }
 \description{
 Load calculated 4th down probabilities from \code{nflfastR} data.
@@ -25,7 +29,7 @@ Load calculated 4th down probabilities from \code{nflfastR} data.
 \donttest{
 try({# Wrap in try to avoid CRAN test problems
 probs <- load_4th_pbp(2019:2020)
-dplyr::glimpse(probs)
+tibble::glimpse(probs)
 })
 \dontshow{
 # Close open connections for R CMD Check

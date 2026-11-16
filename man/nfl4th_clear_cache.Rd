@@ -4,15 +4,19 @@
 \alias{nfl4th_clear_cache}
 \title{Reset nfl4th Package Cache}
 \usage{
-nfl4th_clear_cache(type = c("games", "fd_model", "wp_model", "all"))
+nfl4th_clear_cache(
+  type = c("games", "fd_model", "wp_model", "bootstrap", "all")
+)
 }
 \arguments{
-\item{type}{One of \code{"games"} (the default), \code{"fd_model"}, or \code{"all"}.
+\item{type}{One of \code{"games"} (the default), \code{"fd_model"}, \code{"wp_model"},
+\code{"bootstrap"}, or \code{"all"}.
 \code{"games"} will remove an internally used games file.
-\code{"fd_model"} will remove the nfl4th 4th down model (only necessary in the
-unlikely case of a model update).
-\code{"wp_model"} will remove the nfl4th win probability model (only necessary in the
-unlikely case of a model update).
+\code{"bootstrap"} will remove the bootstrap models downloaded by
+\code{add_4th_probs(bootstrap = TRUE)}.
+\code{"fd_model"} and \code{"wp_model"} will remove the go for it and win
+probability models cached by earlier nfl4th versions (both models now ship
+with the package).
 \code{"all"} will remove all of the above.}
 }
 \value{

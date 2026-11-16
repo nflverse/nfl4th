@@ -15,6 +15,7 @@ Original data frame Data frame plus the following columns added:
 \item{desc}{Play description from ESPN.}
 \item{type_text}{Play type text from ESPN.}
 \item{index}{Index number of play from a given game. Useful for tracking plays (e.g. for 4th down bot).}
+\item{ot_possession}{Overtime possession number (1, 2, or 3 for any later possession), \code{NA} in regulation.}
 \item{The rest}{All the columns needed for \verb{add_4th_probs().}}
 }
 }
@@ -33,7 +34,7 @@ must be present:
 try({# to avoid cran issues
 plays <- nfl4th::get_4th_plays('2020_20_TB_GB')
 
-dplyr::glimpse(plays)
+tibble::glimpse(plays)
 })
 }
 }

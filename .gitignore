@@ -50,3 +50,5 @@ po/*~
 # model debris
 *.ubj
 
+data-raw/bootstrap/
+data-raw/bootstrap_models.rds

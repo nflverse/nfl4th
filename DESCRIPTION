@@ -1,7 +1,7 @@
 Package: nfl4th
 Title: Functions to Calculate Optimal Fourth Down Decisions in the
     National Football League
-Version: 1.0.7.9001
+Version: 1.0.7.9002
 Authors@R: c(
     person("Ben", "Baldwin", , "bbaldwin206@gmail.com", role = c("aut", "cre", "cph")),
     person("Sebastian", "Carl", , "mrcaseb@gmail.com", role = "ctb")
@@ -19,19 +19,14 @@ Imports:
     cli,
     curl,
     data.table,
-    dplyr,
-    janitor,
     jsonlite,
-    mgcv,
-    nflfastR (>= 5.2.0),
     nflreadr,
-    purrr,
-    rlang,
-    stringr,
+    parallel,
     tibble,
-    tidyr,
+    vctrs (>= 0.7.0),
     xgboost
 Suggests: 
+    dplyr (>= 1.2.0),
     future,
     gt,
     knitr,
