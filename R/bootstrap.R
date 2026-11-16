@@ -45,7 +45,7 @@ with_active <- function(set, code) {
 
 # The draws for this version of the models, on the nfl4th_infrastructure
 # release. Rebuilding the models means rebuilding the draws under a new name.
-bootstrap_file <- "bootstrap_models_20261113.rds"
+bootstrap_file <- "bootstrap_models_20261116.rds"
 
 nfl4th_bootstrap_path <- function() {
   file.path(R_user_dir("nfl4th", "cache"), bootstrap_file)
@@ -60,14 +60,14 @@ bootstrap_url <- paste0(
 bootstrap_memo <- new.env(parent = emptyenv())
 
 # The draws: from the file in option nfl4th.bootstrap_models if it is set,
-# otherwise downloaded once (about 35 MB) to the package cache. Kept in memory.
+# otherwise downloaded once (about 80 MB) to the package cache. Kept in memory.
 bootstrap_models <- function() {
   f <- getOption("nfl4th.bootstrap_models")
   if (is.null(f)) {
     f <- nfl4th_bootstrap_path()
     if (!file.exists(f)) {
       cli::cli_alert_info(
-        "Downloading the bootstrap models (about 35 MB, once) . . ."
+        "Downloading the bootstrap models (about 80 MB, once) . . ."
       )
       dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
       tmp <- paste0(f, ".part")
@@ -151,7 +151,7 @@ wpfd_inputs <- c(
 # taken `chunk` at a time: step 3 holds every play once per draw, so a whole
 # season at once would need many GB. Each play's values don't depend on the
 # other plays in the chunk.
-add_boot_probs <- function(x, chunk = 50L) {
+add_boot_probs <- function(x, chunk = 25L) {
   n <- nrow(x)
   if (n > chunk) {
     groups <- split(seq_len(n), ceiling(seq_len(n) / chunk))
@@ -231,8 +231,8 @@ boot_columns <- c(
   "make_fg_wp"
 )
 
-# the draw whose go_boost is the median of the play's draws (with 101 draws,
-# the 51st smallest; NA draws aside, the lower one of the middle two when
+# the draw whose go_boost is the median of the play's draws (with 201 draws,
+# the 101st smallest; NA draws aside, the lower one of the middle two when
 # there is an even number)
 boot_median_draw <- function(boost) {
   apply(boost, 1, function(v) {
@@ -292,8 +292,9 @@ nfl4th_workers <- new.env(parent = emptyenv())
 #' bootstrap draws of nfl4th's models. `nfl4th_start_workers()` starts R
 #' processes that each load a share of the draws once and keep them in memory;
 #' while they run, each play's draws are evaluated in them in parallel, which
-#' cuts the time per play (about a third of a second for one play in the last
-#' minute of a game with 11 workers, against about 0.85 seconds without).
+#' cuts the time per play (with 11 workers, about 0.3 seconds for one play
+#' early in a game and 1 second in the last 2 minutes, against about 0.6 and
+#' 2 seconds without).
 #' `nfl4th_stop_workers()` stops them. They also stop when the R session ends.
 #'
 #' The workers are separate processes (`parallel::makePSOCKcluster()`), so they

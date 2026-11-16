@@ -330,7 +330,7 @@ Here's what each piece pays attention to:
 
 A model built from history inherits that history's luck. If a handful of 4th & 3s had bounced the other way, the model would come out a little different, and every once in a while, so would its recommendation. A single win probability number can't tell you how much that matters, so we check.
 
-**How.** We rebuild the two models that drive most decisions, win probability and going for it, 100 times. Each time, we build them from a reshuffled version of history: we draw 7,409 games at random from the real ones, so some games appear twice and some not at all. Then we ask each version, and the real one, what it recommends. If 98 of the 101 versions say go, it's a clear call. If 55 say go and 46 say kick, it's close to a coin flip. This technique is called the bootstrap.
+**How.** We rebuild the two models that drive most decisions, win probability and going for it, 200 times. Each time, we build them from a reshuffled version of history: we draw 7,409 games at random from the real ones, so some games appear twice and some not at all. Then we ask each version, and the real one, what it recommends. If 195 of the 201 versions say go, it's a clear call. If 110 say go and 91 say kick, it's close to a coin flip. This technique is called the bootstrap.
 
 The punt, field goal and pick six models stay the same in every version. Reshuffling moves them very little compared with the two models that drive the calls.
 
@@ -364,18 +364,18 @@ This isn't circular. The measured noise doesn't use the bootstrap at all: it's t
 - **All the games, not half**, as above. Because games are drawn with replacement, each of our rebuilds ends up with about 4,700 different games in it. Each of theirs had about 1,600.
 - **Fewer moving parts.** The paper also reshuffles drives within each game and rebuilds its punt and field goal models every time, which adds a bit more noise. We keep those models fixed, because reshuffling barely moves them.
 
-**How sure are the calls?** Here's every regulation 4th down from weeks 1–9 of 2026, grouped by go boost. Going was recommended on 995 of them and kicking on 1,073. The "80% range" is where the middle 80% of the 101 versions land.
+**How sure are the calls?** Here's every regulation 4th down from weeks 1–9 of 2026, grouped by go boost. Going was recommended on 995 of them and kicking on 1,073. The "80% range" is where the middle 80% of the 201 versions land.
 
 | Go Boost | Plays | Median Go Boost | Median Width of the 80% Range | Range Entirely on the Recommended Side | Teams Went |
 |---|---|---|---|---|---|
-| −5 or Less | 99 | −6.18 | 1.6 | 100% | 0% |
-| −5 to −3 | 199 | −3.80 | 1.3 | 100% | 0% |
+| −5 or Less | 99 | −6.18 | 1.7 | 100% | 0% |
+| −5 to −3 | 199 | −3.80 | 1.4 | 100% | 0% |
 | −3 to −2 | 176 | −2.48 | 1.4 | 99% | 1% |
-| −2 to −1 | 224 | −1.43 | 1.2 | 95% | 3% |
-| −1 to 1 | 798 | 0.01 | 1.0 | | 15% |
+| −2 to −1 | 224 | −1.43 | 1.3 | 93% | 3% |
+| −1 to 1 | 798 | 0.01 | 1.1 | | 15% |
 | 1 to 2 | 202 | 1.52 | 1.5 | 97% | 31% |
 | 2 to 3 | 157 | 2.39 | 1.7 | 99% | 42% |
-| 3 to 5 | 145 | 3.76 | 1.9 | 99% | 67% |
+| 3 to 5 | 145 | 3.76 | 2.0 | 100% | 67% |
 | 5 or More | 68 | 6.22 | 3.1 | 100% | 72% |
 
 Once a call is more than a point from a toss-up, the versions almost never disagree, for go calls and kick calls alike. The typical go recommendation (a go boost of +1.4) has an 80% range about 1.5 points wide. The thinnest calls are at 4th & 7–10, where the typical go boost is +0.4 and a third of the go calls are genuine toss-ups.

@@ -4,7 +4,13 @@ type <- Sys.getenv("NFLVERSE_UPDATE_TYPE", unset = NA_character_)
 type <- rlang::arg_match0(type, c("season", "combine"))
 
 if (type == "season") {
-  pbp <- nfl4th::load_4th_pbp(season)
+  # with the bootstrap summaries (see ?add_4th_probs): the draws are kept in
+  # worker processes, one per core but one. The per-draw list columns are not
+  # saved: load_4th_pbp(fast = TRUE) downloads every season's numbers
+  nfl4th::nfl4th_start_workers()
+  pbp <- nflreadr::load_pbp(season) |>
+    nfl4th::add_4th_probs(bootstrap = TRUE)
+  nfl4th::nfl4th_stop_workers()
 
   condensed <- pbp |>
     dplyr::filter(!is.na(go_boost)) |>
@@ -14,7 +20,11 @@ if (type == "season") {
       go_boost,
       go_wp,
       punt_wp,
-      fg_wp
+      fg_wp,
+      boot_pct,
+      boot_go_pct,
+      go_boost_lo,
+      go_boost_hi
     )
 
   nflversedata::nflverse_save(

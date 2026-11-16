@@ -69,7 +69,7 @@ pak::pak("nflverse/nfl4th")
   death, modified sudden death, or both teams getting the ball) using
   nflfastR’s overtime win probability model
 - **How sure is a recommendation?** `add_4th_probs(bootstrap = TRUE)`
-  also values every play under 100 versions of the win probability and
+  also values every play under 200 versions of the win probability and
   go for it models, each refit on a resampled history of games, and
   reports how often the call holds and an 80% interval for the gain from
   going for it

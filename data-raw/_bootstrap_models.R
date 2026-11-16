@@ -1,7 +1,7 @@
-# Builds the bootstrap draws behind add_4th_probs(bootstrap = TRUE): 101
+# Builds the bootstrap draws behind add_4th_probs(bootstrap = TRUE): 201
 # versions of the two models nfl4th fits itself, the 1st down win probability
 # model (data-raw/_wp_model.R) and the go for it model
-# (data-raw/_go_for_it_model.R). Draw 1 is the shipped fit; draws 2 to 101 refit
+# (data-raw/_go_for_it_model.R). Draw 1 is the shipped fit; draws 2 to 201 refit
 # both on a history resampled by game: the games are drawn with replacement, as
 # many as there are, and a game drawn k times contributes its rows k times to
 # both models. The punt and field goal tables and nflfastR's models stay fixed.
@@ -14,8 +14,14 @@
 # within 3%, with 90% intervals holding 91% of the time. Drawing half the games
 # (phi = 0.5, as Brill, Yurko and Wyner do) overstated it about 1.8 times.
 #
+# The draws resample the games in data-raw/bootstrap_games.rds (7,410 games,
+# 1999 to 2026 week 10), the history the first 100 draws were built on, so
+# draws added later resample the same games even after new games are played.
+# When the models are retrained on newer data, rewrite that file (or delete it
+# to use every game) and rebuild all the draws.
+#
 # Writes data-raw/bootstrap/draw_<b>.rds as it goes (rerunning skips the draws
-# already there), then data-raw/bootstrap_models.rds (38 MB). That file is
+# already there), then data-raw/bootstrap_models.rds (about 76 MB). That file is
 # uploaded to the nfl4th_infrastructure release under the name in
 # `bootstrap_file` (R/bootstrap.R), which bootstrap_models() downloads; it
 # checks that draw 1 is the shipped fit, so rebuilding the models means
@@ -31,7 +37,7 @@ source("data-raw/_wp_model.R")
 FD_FUNCTIONS_ONLY <- TRUE
 source("data-raw/_go_for_it_model.R")
 
-n_draws <- 101
+n_draws <- 201
 out_dir <- "data-raw/bootstrap"
 dir.create(out_dir, showWarnings = FALSE)
 
@@ -50,6 +56,13 @@ pbp <- repair_broken_games(pbp)
 wp_rows <- wp_model_data(pbp)
 go_rows <- fd_model_data(pbp)
 rm(pbp)
+if (file.exists("data-raw/bootstrap_games.rds")) {
+  keep <- readRDS("data-raw/bootstrap_games.rds")
+  have <- union(wp_rows$game_id, go_rows$game_id)
+  stopifnot(all(keep %in% have))
+  wp_rows <- wp_rows[wp_rows$game_id %in% keep, , drop = FALSE]
+  go_rows <- go_rows[go_rows$game_id %in% keep, , drop = FALSE]
+}
 games <- sort(union(unique(wp_rows$game_id), unique(go_rows$game_id)))
 cat(
   "WP rows:",

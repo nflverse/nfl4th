@@ -20,8 +20,9 @@ The number of workers, invisibly.
 bootstrap draws of nfl4th's models. \code{nfl4th_start_workers()} starts R
 processes that each load a share of the draws once and keep them in memory;
 while they run, each play's draws are evaluated in them in parallel, which
-cuts the time per play (about a third of a second for one play in the last
-minute of a game with 11 workers, against about 0.85 seconds without).
+cuts the time per play (with 11 workers, about 0.3 seconds for one play
+early in a game and 1 second in the last 2 minutes, against about 0.6 and
+2 seconds without).
 \code{nfl4th_stop_workers()} stops them. They also stop when the R session ends.
 
 The workers are separate processes (\code{parallel::makePSOCKcluster()}), so they

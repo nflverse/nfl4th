@@ -55,7 +55,7 @@ pak::pak("nflverse/nfl4th")
 * The **field goal** model gives field goal % by distance, roof type and era, corrected for the fact that only teams that trust their kicker try very long field goals
 * The **win probability** of the 1st down that follows each choice comes from nfl4th's own model, trained on 1st downs with the recipe of nflfastR's `vegas_wp`
 * **Overtime** decisions follow the overtime rules of the game (sudden death, modified sudden death, or both teams getting the ball) using nflfastR's overtime win probability model
-* **How sure is a recommendation?** `add_4th_probs(bootstrap = TRUE)` also values every play under 100 versions of the win probability and go for it models, each refit on a resampled history of games, and reports how often the call holds and an 80% interval for the gain from going for it
+* **How sure is a recommendation?** `add_4th_probs(bootstrap = TRUE)` also values every play under 200 versions of the win probability and go for it models, each refit on a resampled history of games, and reports how often the call holds and an 80% interval for the gain from going for it
 
 [How nfl4th makes 4th down recommendations](https://www.nfl4th.com/articles/articles/how-nfl4th-works.html) explains each of these in detail.
 

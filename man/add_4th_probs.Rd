@@ -9,9 +9,9 @@ add_4th_probs(df, bootstrap = FALSE)
 \arguments{
 \item{df}{A data frame of decisions to be computed for.}
 
-\item{bootstrap}{If \code{TRUE}, also value every play under 100 bootstrap
+\item{bootstrap}{If \code{TRUE}, also value every play under 200 bootstrap
 versions of nfl4th's win probability and go for it models (see Details).
-The first use downloads them (about 38 MB) to the package cache.}
+The first use downloads them (about 80 MB) to the package cache.}
 }
 \value{
 The original data frame plus the following columns:
@@ -29,11 +29,11 @@ The original data frame plus the following columns:
 }
 With \code{bootstrap = TRUE}, also:
 \describe{
-\item{boot_pct}{Percent of the 101 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
+\item{boot_pct}{Percent of the 201 draws whose best option (go, field goal or punt) is the one with the shipped fit.}
 \item{boot_go_pct}{Percent of the draws in which going beats the better kick (go_boost > 0). The recommendation itself is the sign of go_boost; this says how often the draws agree that going is better.}
 \item{go_boost_lo, go_boost_hi}{10th and 90th percentile of go_boost across the draws, an 80\% interval.}
-\item{boot_median_draw}{The draw whose go_boost is the median of the play's draws (1 to 101; 1 is the shipped fit). Taking every number from that draw gives one coherent fit at the median, e.g. \code{go_wp_boot[[i]][boot_median_draw[i]]}.}
-\item{go_boost_boot}{go_boost in each draw (a list column of length 101 vectors, the shipped fit first).}
+\item{boot_median_draw}{The draw whose go_boost is the median of the play's draws (1 to 201; 1 is the shipped fit). Taking every number from that draw gives one coherent fit at the median, e.g. \code{go_wp_boot[[i]][boot_median_draw[i]]}.}
+\item{go_boost_boot}{go_boost in each draw (a list column of length 201 vectors, the shipped fit first).}
 \item{go_wp_boot, fg_wp_boot, punt_wp_boot, first_down_prob_boot, wp_fail_boot, wp_succeed_boot, fg_make_prob_boot, miss_fg_wp_boot, make_fg_wp_boot}{Each of those columns in each draw, likewise. Within a draw they fit together: go_wp is first_down_prob x wp_succeed + (1 - first_down_prob) x wp_fail, and fg_wp likewise. fg_make_prob is the same in every draw (the field goal table isn't resampled).}
 }
 }
@@ -57,10 +57,10 @@ typical gap after a conversion for the quarter, the time left and the score
 last seconds). Add \code{runoff} to set the seconds that run off after the 6 of
 the play instead.
 
-With \code{bootstrap = TRUE} each play is also valued under 100 bootstrap
+With \code{bootstrap = TRUE} each play is also valued under 200 bootstrap
 versions of the two models nfl4th fits itself, the 1st down win probability
 model and the go for it model, each refit on a history resampled by game.
-With the shipped fit that makes 101 draws, the shipped fit first. They show
+With the shipped fit that makes 201 draws, the shipped fit first. They show
 how much a recommendation depends on the particular games the models were
 fit on (sampling uncertainty, not every source of model error). The punt and
 field goal models are the same in every draw.
