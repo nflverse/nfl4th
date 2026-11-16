@@ -1,0 +1,90 @@
+# **nfl4th**
+
+This is the package that powers the [fourth down
+calculator](https://rbsdm.com/stats/fourth_calculator/) introduced in
+[this piece on The
+Athletic](https://www.nytimes.com/athletic/2144214/2020/10/28/nfl-fourth-down-decisions-the-math-behind-the-leagues-new-aggressiveness/).
+
+The code that powers the Twitter fourth down bot [is in this folder
+here](https://github.com/guga31bb/fourth_calculator/tree/main/bot) and
+the [code that runs the Shiny app is
+here](https://github.com/guga31bb/fourth_calculator/blob/main/app.R).
+
+## Installation
+
+The easiest way to get the released version of nfl4th is to install it
+from [CRAN](https://cran.r-project.org/package=nfl4th) with:
+
+``` r
+
+install.packages("nfl4th")
+```
+
+To get a bug fix or to use a feature from the development version, you
+can install the development version of nfl4th from
+[GitHub](https://github.com/nflverse/nfl4th/) with:
+
+``` r
+
+install.packages("nfl4th", repos = c("https://nflverse.r-universe.dev", getOption("repos")))
+```
+
+or by using remotes:
+
+``` r
+
+if (!require("pak")) install.packages("pak")
+pak::pak("nflverse/nfl4th")
+```
+
+## Features
+
+- The **go for it** model gives probabilities for possibilities of yards
+  gained, including a touchdown, a first down via defensive penalty, and
+  a failed attempt returned for a touchdown. It is built from smooth
+  models of conversion, touchdowns, and where the play ends, fit on 3rd
+  and 4th downs since 2001
+- The **punt** model gives the probability of every spot where the
+  receiving team can start, including touchbacks, blocked punts,
+  penalties on the return, return touchdowns, and muffs the punting team
+  recovers, fit on the last 8 seasons of punts
+- The **field goal** model gives field goal % by distance, roof type and
+  era, corrected for the fact that only teams that trust their kicker
+  try very long field goals
+- The **win probability** of the 1st down that follows each choice comes
+  from nfl4th’s own model, trained on 1st downs with the recipe of
+  nflfastR’s `vegas_wp`
+- **Overtime** decisions follow the overtime rules of the game (sudden
+  death, modified sudden death, or both teams getting the ball) using
+  nflfastR’s overtime win probability model
+- **How sure is a recommendation?** `add_4th_probs(bootstrap = TRUE)`
+  also values every play under 200 versions of the win probability and
+  go for it models, each refit on a resampled history of games, and
+  reports how often the call holds and an 80% interval for the gain from
+  going for it
+
+[How nfl4th makes 4th down
+recommendations](https://www.nfl4th.com/articles/articles/how-nfl4th-works.html)
+explains each of these in detail.
+
+## Current limitations
+
+- None of the models know anything about the two teams beyond the point
+  spread and the over/under: not the kicker, the punter or the returner,
+  the offense’s short-yardage strength, injuries, or the weather
+- Since 2020, the go for it model predicts late 4th & 8-10 attempts to
+  convert about 3.5 percentage points more often than they did out of
+  sample, so go recommendations there deserve extra caution
+- A field goal that is blocked and returned for a touchdown isn’t
+  modeled: a miss gives the other team the ball at the spot of the kick
+- The bootstrap measures sampling uncertainty, how much the models would
+  change with a different history of games. Errors that every refit of
+  the same models shares aren’t in its intervals
+
+## Get Started
+
+To get started with nfl4th please see [this
+article](https://www.nfl4th.com/articles/articles/nfl4th.html), which
+also shows how to use the bootstrap output. Some examples of 4th down
+research using the package [can be found
+here](https://www.nfl4th.com/articles/articles/4th-down-research.html).
